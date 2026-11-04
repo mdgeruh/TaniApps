@@ -317,3 +317,25 @@ html[data-glass="1"] .pd-kartu{background:var(--ink-raised);-webkit-backdrop-fil
 /* v0.1.036: tiga tombol CSV tetap satu baris; turun baris utuh bila layar sangat sempit */
 .seg.tiga{flex-wrap:wrap}
 .seg.tiga .btn{flex:1 1 auto;white-space:nowrap;padding-left:8px;padding-right:8px;font-size:12px}
+
+/* Foto nota (v0.1.037) */
+.nota-box{margin-top:6px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.nota-box .note{flex:1 1 100%;margin:0}
+.nota-btn{flex:0 0 auto;min-height:40px}
+.nota-thumb{padding:0;border:1px solid var(--line);background:var(--ink-raised);width:96px;height:96px;overflow:hidden;cursor:pointer;display:block;border-radius:8px;flex:0 0 auto}
+.nota-thumb:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.nota-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.nota-thumb.samar img{filter:blur(14px)}
+.nota-aksi{display:flex;flex-direction:column;gap:8px}
+.nota-ikon{display:inline-flex;vertical-align:-2px;margin-left:6px;color:var(--gold-dim)}
+.nota-lihat{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+.nota-lihat img{max-width:100%;max-height:calc(100% - 64px);object-fit:contain;background:#fff}
+.nota-lihat .btn{flex:0 0 auto;min-height:44px;min-width:120px;background:var(--ink);color:var(--paper)}
+@media print{.nota-box,.nota-lihat{display:none}}
+
+/* Fase 7 — aksesibilitas (v0.1.038) */
+.sr-only{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.lewati{position:absolute;min-height:44px;box-sizing:border-box;display:flex;align-items:center;left:8px;top:-60px;z-index:100;background:var(--fill);color:var(--on-fill);padding:10px 16px;font-size:13px;font-weight:600;text-decoration:none;border-radius:8px}
+.lewati:focus{top:calc(8px + env(safe-area-inset-top,0px))}
+#app:focus{outline:none}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}

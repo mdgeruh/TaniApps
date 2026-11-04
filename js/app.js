@@ -1,5 +1,5 @@
-/* Tani Keuangan — Fase 1: pencatatan transaksi + efek kaca (v0.1.036) */
-const VERSI = '0.1.036';
+/* Tani Keuangan — Fase 1: pencatatan transaksi + efek kaca (v0.1.038) */
+const VERSI = '0.1.038';
 const KUNCI = 'tani.v1';
 const IKON = {
   beranda: '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
@@ -131,7 +131,7 @@ const Samar = {
 const App = {
   data: null, tab: 'beranda', buka: false, balik: 'beranda', hapusMinta: null,
   filter: { periode: 'bulan', jenis: 'semua', kat: 'semua', siklus: 'semua', dari: '', sampai: '', cari: '', lain: false },
-  draft: null, lastKat: {},
+  draft: null, lastKat: {}, batasTx: 100,
 
   /* ---------- data ---------- */
   aktif() { return this._ak || (this._ak = this.data.transaksi.filter((t) => !t.terhapus)); },
@@ -195,6 +195,11 @@ const App = {
     document.addEventListener('click', (e) => this.klik(e));
     document.addEventListener('keydown', (e) => {
       const t = e.target;
+      if (t && t.matches && t.matches('[role="tab"]') && ['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) {
+        const ls = [...t.parentElement.querySelectorAll('[role="tab"]')], i = ls.indexOf(t);
+        const n = e.key === 'Home' ? 0 : e.key === 'End' ? ls.length - 1 : (i + (e.key === 'ArrowRight' ? 1 : -1) + ls.length) % ls.length;
+        e.preventDefault(); const lt = ls[n].dataset.lt; ls[n].click(); const b = document.querySelector('[data-lt="' + lt + '"]'); if (b) b.focus(); return;
+      }
       if ((e.key === 'Enter' || e.key === ' ') && t && t.matches && t.matches('[role="button"][tabindex]')) { e.preventDefault(); t.click(); }
     });
     $('app').addEventListener('change', (e) => this.ubahField(e));
@@ -214,7 +219,7 @@ const App = {
         e.target.value = fmtInput(angkaKetik(e.target.value));
       }
       if (e.target.id === 'f_cari') {
-        this.filter.cari = e.target.value.trim(); clearTimeout(this._tc);
+        this.filter.cari = e.target.value.trim(); this.batasTx = 100; clearTimeout(this._tc);
         this._tc = setTimeout(() => { const el = $('txHasil'); if (el) el.innerHTML = this.hasilTx(); }, 150);
       }
     });
@@ -225,6 +230,7 @@ const App = {
     $('eye').addEventListener('click', () => { this.buka = !this.buka; this.ringkas(); });
     this.go('beranda');
     if (pertama) Panduan.otomatis();
+    setTimeout(() => Nota.rapikan(), 4000);
   },
 
   klik(e) {
@@ -244,9 +250,10 @@ const App = {
   ubahField(e) {
     const f = e.target.dataset.f;
     if (f) {
-      this.filter[f] = e.target.value;
+      this.filter[f] = e.target.value; this.batasTx = 100;
       if (f === 'periode' && e.target.value !== 'rentang') { this.filter.dari = ''; this.filter.sampai = ''; }
       this.go('transaksi', true);
+    } else if (e.target.id === 'f_nota') { Nota.pilih(e.target);
     } else if (e.target.id === 'csvFile' && e.target.files[0]) {
       const r = new FileReader();
       r.onload = () => { $('csvBox').value = r.result; this.imporCsv(); };
@@ -316,9 +323,11 @@ const App = {
     else h = '<section><h2>' + NANTI[t][0] + '</h2><p class="note">' + NANTI[t][1] + '</p></section>';
     $('app').innerHTML = h;
     Form.upgrade($('app'));
+    if (t === 'catat') Nota.isiBox(); else if (t === 'setelan') Nota.isiInfo();
     const induk = { 'siklus-form': 'siklus', 'siklus-detail': 'siklus', panen: 'siklus', master: 'lainnya', rencana: 'lainnya' }[t] || t;
-    document.querySelectorAll('.main-tab-btn,.bnav-btn').forEach((b) => b.classList.toggle('active', b.dataset.go === induk));
+    document.querySelectorAll('.main-tab-btn,.bnav-btn').forEach((b) => { const on = b.dataset.go === induk; b.classList.toggle('active', on); if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
     $('gear').classList.toggle('active', t === 'setelan');
+    if (t === 'setelan') $('gear').setAttribute('aria-current', 'page'); else $('gear').removeAttribute('aria-current');
     const hc = $('heroCard'); if (hc) hc.hidden = t !== 'beranda';
     this.judulHal(t);
     Fab.atur();
@@ -327,6 +336,11 @@ const App = {
   },
 
   /* ---------- judul halaman aktif (v0.1.033) ---------- */
+  /* Pengumuman halaman untuk pembaca layar (wilayah aria-live), hanya saat halaman berganti. */
+  umumkan(teks) {
+    const el = $('srHal'); if (!el || this._umum === teks) return; this._umum = teks;
+    el.textContent = ''; setTimeout(() => { el.textContent = teks; }, 60);
+  },
   judulHal(t) {
     const sid = typeof Siklus !== 'undefined' ? Siklus.cari(Siklus.sid) : null;
     const J = {
@@ -339,17 +353,18 @@ const App = {
       catat: [this.draft && this.draft.id ? 'Ubah transaksi' : this.draft && this.draft.jenis === 'masuk' ? 'Catat hasil' : 'Catat modal']
     }[t];
     const box = $('judulHal'), ind = $('judulInduk');
-    if (!J) { box.hidden = true; document.title = 'Tani Keuangan'; return; }
+    if (!J) { box.hidden = true; document.title = 'Tani Keuangan'; this.umumkan('Beranda'); return; }
     box.hidden = false; $('judulTeks').textContent = J[0];
     ind.hidden = !J[1]; if (J[1]) { ind.dataset.go = J[1]; ind.textContent = '‹ ' + J[2]; }
     document.title = J[0] + ' · Tani Keuangan';
+    this.umumkan(J[0]);
   },
 
   /* ---------- tampilan: transaksi ---------- */
   barisTx(t) {
     const m = t.jenis === 'masuk';
     return '<div class="tx" data-edit="' + t.id + '" role="button" tabindex="0">' +
-      '<div class="tx-l"><div class="tx-n">' + esc(this.namaKat(t.kategoriId)) + '</div>' +
+      '<div class="tx-l"><div class="tx-n">' + esc(this.namaKat(t.kategoriId)) + (t.notaId ? Nota.ikon : '') + '</div>' +
       '<div class="note">' + Setelan.tgl(t.tanggal) + (t.siklusId && this.tab !== 'siklus-detail' && Siklus.cari(t.siklusId) ? ' · ' + esc(Siklus.nama(t.siklusId).split(' · ')[0]) : '') + (t.catatan ? ' · ' + esc(t.catatan) : '') + '</div></div>' +
       '<div class="tx-a ' + (m ? 'up' : 'down') + '">' + (m ? '+' : '−') + rp(t.jumlah).replace('Rp ', 'Rp\u00a0') + '</div></div>';
   },
@@ -401,20 +416,22 @@ const App = {
       '<div><span class="note">Hasil</span><strong class="up">' + rp(hasil) + '</strong></div>' +
       '<div><span class="note">' + (hasil - modal < 0 ? 'Rugi' : 'Untung') + '</span><strong class="' + (hasil - modal < 0 ? 'down' : 'up') + '">' + rp(hasil - modal) + '</strong></div></div>' +
       (terbalik ? '<p class="note down" role="alert" style="margin-top:14px">Tanggal "Dari" setelah "Sampai", jadi tidak ada hasil.</p><button type="button" class="btn" data-do="tukar-tgl" style="width:100%;margin-top:8px">Tukar tanggal</button>' :
-       list.length ? list.map((t) => this.barisTx(t)).join('') : '<p class="note" style="margin-top:14px">Tidak ada transaksi pada filter ini.</p>');
+       list.length ? list.slice(0, this.batasTx).map((t) => this.barisTx(t)).join('') +
+         (list.length > this.batasTx ? '<button type="button" class="btn" data-do="tx-lagi" style="width:100%;margin-top:12px;min-height:44px">Tampilkan lebih banyak (sisa ' + (list.length - this.batasTx).toLocaleString('id-ID') + ')</button>' : '') :
+         '<p class="note" style="margin-top:14px">Tidak ada transaksi pada filter ini.</p>');
   },
 
   /* ---------- tampilan: catat / ubah ---------- */
   baru(sid) {
     const jenis = (this.draft && !this.draft.id && this.draft.jenis) || 'keluar';
-    this.draft = { id: null, jenis, jumlah: 0, kat: this.lastKat[jenis] || this.kategori(jenis)[0].id, tanggal: isoHari(), catatan: '', siklus: sid || '' };
+    this.draft = { id: null, jenis, jumlah: 0, kat: this.lastKat[jenis] || this.kategori(jenis)[0].id, tanggal: isoHari(), catatan: '', siklus: sid || '', nota: null, notaLama: null };
     this.hapusMinta = null;
     this.go('catat');
   },
   ubahTx(id) {
     const t = this.data.transaksi.find((x) => x.id === id);
     if (!t) return;
-    this.draft = { id: t.id, jenis: t.jenis, jumlah: t.jumlah, kat: t.kategoriId, tanggal: t.tanggal, catatan: t.catatan || '', siklus: t.siklusId || '' };
+    this.draft = { id: t.id, jenis: t.jenis, jumlah: t.jumlah, kat: t.kategoriId, tanggal: t.tanggal, catatan: t.catatan || '', siklus: t.siklusId || '', nota: t.notaId || null, notaLama: t.notaId || null };
     this.hapusMinta = null;
     this.go('catat');
   },
@@ -438,6 +455,7 @@ const App = {
       Siklus.opsi(Siklus.daftar().filter((s) => s.status === 'berjalan' || s.id === d.siklus), d.siklus, (x) => Siklus.nama(x.id)) + '</select>' +
       '<label for="f_tanggal">Tanggal</label><input type="date" id="f_tanggal" value="' + d.tanggal + '">' +
       '<label for="f_catatan">Catatan (opsional)</label><input id="f_catatan" maxlength="120" value="' + esc(d.catatan) + '" placeholder="mis. NPK 5 kg">' +
+      Nota.kotak() +
       '<button class="btn gold" data-do="simpan">Simpan</button>' +
       (edit ? '' : '<button class="btn" data-do="simpan-baru" style="width:100%;margin-top:10px">Simpan &amp; catat lagi</button>') +
       (edit ? '<button class="btn" data-do="dup-tx" style="width:100%;margin-top:10px">Duplikat sebagai transaksi baru</button>' : '') +
@@ -475,14 +493,16 @@ const App = {
   },
   aksi(a, el) {
     if (a === 'tukar-tgl') { const f = this.filter, x = f.dari; f.dari = f.sampai; f.sampai = x; this.go('transaksi', true); return; }
+    if (Nota.aksi(a)) return;
+    if (a === 'tx-lagi') { this.batasTx += 100; const el = $('txHasil'); if (el) el.innerHTML = this.hasilTx(); return; }
     if (Siklus.aksi(a, el)) return;
     if (a === 'jenis-keluar' || a === 'jenis-masuk') {
       const d = this.bacaForm(); d.jenis = a.slice(6); d.kat = this.lastKat[d.jenis] || this.kategori(d.jenis)[0].id;
       this.go('catat', true);
-    } else if (a === 'batal') { this.draft = null; this.go(this.balik || 'beranda'); }
+    } else if (a === 'batal') { Nota.buang(this.draft); this.draft = null; this.go(this.balik || 'beranda'); }
     else if (a === 'simpan' || a === 'simpan-baru') this.simpanTx(a === 'simpan-baru');
     else if (a === 'dup-tx') {
-      const d = this.bacaForm(); this.draft = Object.assign({}, d, { id: null, tanggal: isoHari() }); this.hapusMinta = null;
+      const d = this.bacaForm(); Nota.buang(d); this.draft = Object.assign({}, d, { id: null, tanggal: isoHari(), nota: null, notaLama: null }); this.hapusMinta = null;
       this.toast('Disalin sebagai transaksi baru — ubah bila perlu, lalu Simpan'); this.go('catat', true);
     } else if (a === 'hapus-tx') {
       const d = this.draft;
@@ -511,15 +531,16 @@ const App = {
     const sifat = d.jenis === 'keluar' ? (kat && kat.sifatBiaya) || 'variabel' : null;
     if (d.id) {
       const t = this.data.transaksi.find((x) => x.id === d.id);
-      Object.assign(t, { tanggal: d.tanggal, jenis: d.jenis, kategoriId: d.kat, jumlah: d.jumlah, sifatBiaya: sifat, catatan: d.catatan, siklusId: d.siklus || null, diubah: nowIso() });
+      Object.assign(t, { tanggal: d.tanggal, jenis: d.jenis, kategoriId: d.kat, jumlah: d.jumlah, sifatBiaya: sifat, catatan: d.catatan, siklusId: d.siklus || null, notaId: d.nota || null, diubah: nowIso() });
     } else {
       this.data.transaksi.push({ id: uid('t'), tanggal: d.tanggal, jenis: d.jenis, kategoriId: d.kat, jumlah: d.jumlah, siklusId: d.siklus || null,
-        sifatBiaya: sifat, catatan: d.catatan, dibuat: nowIso(), diubah: nowIso(), terhapus: false });
+        sifatBiaya: sifat, catatan: d.catatan, notaId: d.nota || null, dibuat: nowIso(), diubah: nowIso(), terhapus: false });
     }
     this.lastKat[d.jenis] = d.kat;
+    if (d.notaLama && d.notaLama !== d.nota) Nota.hapus(d.notaLama);
     this.simpan();
     if (lagi) {
-      this.draft = { id: null, jenis: d.jenis, jumlah: 0, kat: d.kat, tanggal: d.tanggal, catatan: '', siklus: d.siklus };
+      this.draft = { id: null, jenis: d.jenis, jumlah: 0, kat: d.kat, tanggal: d.tanggal, catatan: '', siklus: d.siklus, nota: null, notaLama: null };
       this.toast('Tersimpan'); this.go('catat', true);
       const j = $('f_jumlah'); if (j) j.focus();
     } else { this.draft = null; this.toast('Tersimpan'); this.go(['transaksi', 'siklus-detail'].includes(this.balik) ? this.balik : 'beranda'); }

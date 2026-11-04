@@ -24,7 +24,7 @@ var Setelan = (function () {
   var BAWAAN = { mode: 'light', skema: 'hijau', ukuran: 100, kaca: false, tanggal: 'dmy', sembunyi: false, margin: 30 };
   var s = Object.assign({}, BAWAAN);
   var h = { versi: '', ambil: function () { return {}; }, pasang: function () {}, hapus: function () {}, ubah: function () {} };
-  var konfirmasi = null;
+  var konfirmasi = null, konfirmasi2 = null;
 
   function muat() {
     var o = {};
@@ -80,6 +80,7 @@ var Setelan = (function () {
       '<textarea id="dataBox" class="settings-text" rows="5" aria-label="Data JSON" placeholder="Hasil ekspor muncul di sini"></textarea>' +
       '<div class="note" id="dataMsg" role="status" aria-live="polite" style="margin-top:8px"></div>' +
       row('Data contoh', 'Isi data tiruan (±7 bulan: tiga unit, empat komoditas, enam siklus) untuk mencoba aplikasi. Bisa dihapus tanpa mengganggu catatan Anda.', '<button type="button" class="btn" data-do="' + (typeof Contoh !== 'undefined' && Contoh.ada() ? 'hapus-contoh' : 'contoh') + '">' + (typeof Contoh !== 'undefined' && Contoh.ada() ? 'Hapus data contoh' : 'Isi data contoh') + '</button>') +
+      (typeof Nota !== 'undefined' && Nota.tersedia() ? row('Foto nota', 'Foto bukti transaksi hanya disimpan di browser ini; tidak ikut ekspor, cadangan otomatis, maupun sinkron cloud. Foto yang tidak lagi dipakai dibersihkan otomatis setelah 30 hari. <span id="notaInfo"></span>', '<button type="button" class="btn danger" data-act="nota-hapus">Hapus semua foto</button>') : '') +
       row('Hapus semua data', 'Menghapus transaksi dan siklus di browser ini. Salinan cadangan otomatis dan data cloud tidak ikut terhapus. Bila sinkron cloud aktif, data akan kembali dari cloud: hapus juga data cloud di bagian Sinkron cloud.', '<button type="button" class="btn danger" data-act="hapus">Hapus semua data</button>');
     var tentang = head('Tentang', '') +
       row('Versi', 'Tani Keuangan, keuangan pertanian rumahan.', '<strong>v' + h.versi + '</strong>') +
@@ -130,6 +131,13 @@ var Setelan = (function () {
       else if (x === 'ekspor') ekspor();
       else if (x === 'impor') impor();
       else if (x === 'berkas') document.getElementById('fileImp').click();
+      else if (x === 'nota-hapus') {
+        if (konfirmasi2) { clearTimeout(konfirmasi2); konfirmasi2 = null; Nota.kosongkan().then(function () { pesan('Semua foto nota dihapus.'); Nota.isiInfo(); a.textContent = 'Hapus semua foto'; }).catch(function () { pesan('Foto tidak bisa dihapus.'); }); }
+        else {
+          a.textContent = 'Ketuk lagi untuk menghapus';
+          konfirmasi2 = setTimeout(function () { konfirmasi2 = null; a.textContent = 'Hapus semua foto'; }, 4000);
+        }
+      }
       else if (x === 'hapus') {
         if (konfirmasi) { clearTimeout(konfirmasi); konfirmasi = null; h.hapus(); pesan('Semua data dihapus.'); }
         else {

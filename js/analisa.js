@@ -97,7 +97,7 @@ const Analisa = {
     const tabs = [['ringkasan', 'Ringkasan'], ['grafik', 'Grafik'], ['rincian', 'Rincian']];
     return '<div class="lap-aksi no-print"><button type="button" class="ikon-btn" data-an="cetak" aria-label="Cetak atau simpan PDF">' + this.IKON.cetak + '<span>Cetak</span></button>' +
       '<button type="button" class="ikon-btn" data-an="xls" aria-label="Ekspor ke Excel">' + this.IKON.xls + '<span>Excel</span></button></div>' +
-      '<div class="lap-tabs no-print" role="tablist" aria-label="Bagian laporan">' + tabs.map((t) => '<button type="button" role="tab" class="lap-tab' + (this.sub === t[0] ? ' on' : '') + '" aria-selected="' + (this.sub === t[0]) + '" data-lt="' + t[0] + '">' + t[1] + '</button>').join('') + '</div>' +
+      '<div class="lap-tabs no-print" role="tablist" aria-label="Bagian laporan">' + tabs.map((t) => '<button type="button" role="tab" class="lap-tab' + (this.sub === t[0] ? ' on' : '') + '" aria-selected="' + (this.sub === t[0]) + '" tabindex="' + (this.sub === t[0] ? 0 : -1) + '" data-lt="' + t[0] + '">' + t[1] + '</button>').join('') + '</div>' +
       '<div class="lap-panel" role="tabpanel">' + this.vLaporanIsi() + '</div>';
   },
   vLaporanIsi() {
