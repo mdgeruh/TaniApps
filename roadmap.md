@@ -1,6 +1,6 @@
 # Roadmap — Web App Keuangan Pertanian Rumahan
 
-> Status dokumen: draf v0.1 · Terakhir diperbarui: 4 November 2026 · Fase 5 selesai; Fase 6 berjalan: cadangan otomatis + dasar PWA; FAB kontekstual; chart di Beranda; data contoh otomatis; sinkron Supabase (v0.1.023); penyempurnaan UX (v0.1.024); kartu hero Beranda (v0.1.025); judul halaman (v0.1.026)
+> Status dokumen: draf v0.1 · Terakhir diperbarui: 4 November 2026 · Fase 5 selesai; Fase 6 berjalan: cadangan otomatis + dasar PWA; FAB kontekstual; chart di Beranda; data contoh otomatis; sinkron Supabase (v0.1.023); penyempurnaan UX (v0.1.024); kartu hero Beranda (v0.1.025); judul halaman (v0.1.026); foto nota lokal (v0.1.037); optimasi performa/aksesibilitas bagian 1 (v0.1.038)
 
 ## 1. Visi & Tujuan
 
@@ -116,14 +116,14 @@ Aplikasi web sederhana untuk mencatat dan menganalisa keuangan pertanian skala r
 ### Fase 6C — Analisa Lanjutan & Template (v0.1.025+)
 - [x] Analisa sensitivitas: "bagaimana jika harga jual turun 10%?" (memakai HPP dan BEP yang ada) (v0.1.029)
 - [x] Template komoditas dengan estimasi biaya standar (sayur daun, cabai, tomat, lele, ayam petelur) — proporsi biaya (bukan harga rupiah) (v0.1.030)
-- [ ] Foto nota/bukti transaksi (lokal dulu)
+- [x] Foto nota/bukti transaksi (lokal dulu) — satu foto per transaksi, dikecilkan, disimpan di IndexedDB; tidak ikut ekspor/sinkron (v0.1.037, docs/NOTA.md); belum diuji di kamera HP sungguhan
 - **Hasil:** pengguna baru membuat siklus dalam satu ketukan dan bisa menguji skenario harga
 
 ### Fase 7 — Rilis v1.0 (Minggu 17–18)
 - [ ] Pengujian dengan data nyata (minimal 1–2 siklus)
 - [ ] Perbaikan UX berdasarkan umpan balik
 - [x] Dokumentasi pengguna & panduan cepat (termasuk panduan cepat 3–4 layar di dalam aplikasi saat pertama dibuka) — panduan 4 layar (js/panduan.js) dan docs/PANDUAN.md (v0.1.034); belum diuji di HP sungguhan
-- [ ] Optimasi performa dan aksesibilitas
+- [ ] Optimasi performa dan aksesibilitas — sebagian: daftar Transaksi bertahap, aria-current, tautan lewati, pengumuman halaman, panah di tab Laporan, kurangi gerakan (v0.1.038, docs/AUDIT.md); centang setelah diuji dengan pembaca layar dan HP sungguhan
 - **Hasil:** rilis stabil
 
 ## 7. Ide Lanjutan (Backlog)
@@ -135,7 +135,7 @@ Aplikasi web sederhana untuk mencatat dan menganalisa keuangan pertanian skala r
 - Katalog harga pasar (input manual) dan pembanding harga
 - Kalkulator kelayakan usaha (NPV, IRR sederhana)
 - Integrasi Google Sheets / ekspor ke template Excel
-- Foto nota/bukti transaksi
+- Foto nota/bukti transaksi (selesai di v0.1.037)
 - Mode multi-bahasa
 
 ## 8. Metrik Keberhasilan
@@ -203,3 +203,5 @@ Aplikasi web sederhana untuk mencatat dan menganalisa keuangan pertanian skala r
 | 0.1.033 | 2026-11-04 | Tab Laporan bergaya map (menyatu dengan panel); tombol Cetak dan Excel berikon di atas tab |
 | 0.1.035 | 2026-11-04 | Audit seluruh halaman; perbaikan impor yang merusak data, keyboard, format R/C, tabel, target ketuk (docs/AUDIT.md) |
 | 0.1.036 | 2026-11-04 | Tindak lanjut catatan audit: Tersembunyi di semua halaman, saldo awal kas, HPP/harga rata-rata, input rupiah, anggaran berformat, rentang tanggal terbalik (docs/AUDIT.md) |
+| 0.1.037 | 2026-11-04 | Fase 6C: foto nota/bukti transaksi (lokal, IndexedDB), ikon di baris transaksi, pembersihan otomatis (docs/NOTA.md) |
+| 0.1.038 | 2026-11-04 | Fase 7: daftar Transaksi bertahap (6.000 baris: 132 → 14 ms), aria-current, tautan lewati, pengumuman halaman, panah di tab Laporan, kurangi gerakan |

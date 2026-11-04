@@ -1,7 +1,7 @@
 # Tani Keuangan — Keuangan Pertanian Rumahan
 
 Web app untuk mencatat dan menganalisa keuangan pertanian rumahan.
-Versi saat ini: **v0.1.036** (tindak lanjut catatan audit: Tersembunyi di semua halaman, saldo awal kas, HPP dan harga rata-rata lebih tepat, input rupiah aman; di atas audit dan perbaikan anomali; di atas panduan cepat 4 layar saat pertama dibuka, panduan pengguna, dan pemulihan sw.js; di atas tab Laporan bergaya map + tombol ikon; di atas geser untuk hapus transaksi; di atas Laporan dengan sub-tab; di atas template komoditas; di atas simulasi harga/biaya di Laporan; di atas pengingat perkiraan panen; di atas duplikat transaksi dan perbandingan 3 bulan di Laporan; di atas judul halaman aktif; di atas kartu hero di Beranda; di atas penyempurnaan UX: FAB sembunyi saat gulir, filter Transaksi ringkas + pencarian, bagian terlipat; di atas sinkron cloud Supabase opsional; di atas data contoh otomatis; di atas chart di Beranda; di atas FAB kontekstual per halaman; di atas Fase 6 bagian 1: cadangan otomatis dan dasar PWA; di atas Fase 5: rencana keuangan — anggaran, arus kas, aset, utang/piutang; di atas grafik tren garis halus di dashboard; di atas Fase 4: dashboard, cetak/PDF, Excel; di atas Fase 3: tab Laporan — laba-rugi, R/C, HPP, BEP, harga minimum; di atas perbaikan tampil di HP — versi satu berkas `tani-keuangan.html` dan penyimpanan cadangan; di atas form kustom, Fase 2, Fase 1, dan efek kaca).
+Versi saat ini: **v0.1.038** (Fase 7 bagian 1: daftar Transaksi bertahap dan perbaikan aksesibilitas; di atas foto nota/bukti transaksi, disimpan lokal di IndexedDB; di atas tindak lanjut catatan audit: Tersembunyi di semua halaman, saldo awal kas, HPP dan harga rata-rata lebih tepat, input rupiah aman; di atas audit dan perbaikan anomali; di atas panduan cepat 4 layar saat pertama dibuka, panduan pengguna, dan pemulihan sw.js; di atas tab Laporan bergaya map + tombol ikon; di atas geser untuk hapus transaksi; di atas Laporan dengan sub-tab; di atas template komoditas; di atas simulasi harga/biaya di Laporan; di atas pengingat perkiraan panen; di atas duplikat transaksi dan perbandingan 3 bulan di Laporan; di atas judul halaman aktif; di atas kartu hero di Beranda; di atas penyempurnaan UX: FAB sembunyi saat gulir, filter Transaksi ringkas + pencarian, bagian terlipat; di atas sinkron cloud Supabase opsional; di atas data contoh otomatis; di atas chart di Beranda; di atas FAB kontekstual per halaman; di atas Fase 6 bagian 1: cadangan otomatis dan dasar PWA; di atas Fase 5: rencana keuangan — anggaran, arus kas, aset, utang/piutang; di atas grafik tren garis halus di dashboard; di atas Fase 4: dashboard, cetak/PDF, Excel; di atas Fase 3: tab Laporan — laba-rugi, R/C, HPP, BEP, harga minimum; di atas perbaikan tampil di HP — versi satu berkas `tani-keuangan.html` dan penyimpanan cadangan; di atas form kustom, Fase 2, Fase 1, dan efek kaca).
 
 ## Struktur Folder
 
@@ -22,6 +22,7 @@ tani-keuangan/
 ├── js/app.js            Aplikasi: transaksi, kategori, filter, ringkasan, CSV
 ├── js/beranda.js        Beranda: perlu perhatian, grafik, banding bulan lalu, kas
 ├── js/geser.js          Geser untuk hapus transaksi + Urungkan
+├── js/nota.js           Foto nota/bukti transaksi (IndexedDB, lokal)
 ├── js/panduan.js        Panduan cepat 4 layar (tampil sekali saat pertama dibuka)
 ├── js/analisa.js        Laporan, dashboard, cetak, Excel
 ├── js/contoh.js         Data contoh realistis (isi otomatis saat pertama dibuka)
@@ -43,6 +44,7 @@ tani-keuangan/
     ├── LAPORAN.md       Rumus dan cara baca laporan
     ├── RENCANA.md       Rencana keuangan (Fase 5)
     ├── CONTOH.md        Isi dan aturan data contoh
+    ├── NOTA.md          Foto nota/bukti transaksi (lokal)
     ├── FAB.md           Perilaku FAB per halaman
     ├── SINKRON.md       Sinkron cloud Supabase (SQL, cara kerja, batasan)
     ├── CADANGAN.md      Cadangan otomatis dan PWA (Fase 6)
