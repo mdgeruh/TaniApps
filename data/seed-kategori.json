@@ -1,1 +1,21 @@
-
+{
+  "keluar": [
+    { "id": "benih",       "nama": "Benih / Bibit",         "sifatBiaya": "variabel" },
+    { "id": "pupuk",       "nama": "Pupuk / Nutrisi",       "sifatBiaya": "variabel" },
+    { "id": "pestisida",   "nama": "Pestisida / Obat",      "sifatBiaya": "variabel" },
+    { "id": "pakan",       "nama": "Pakan",                 "sifatBiaya": "variabel" },
+    { "id": "media",       "nama": "Media Tanam / Polybag", "sifatBiaya": "variabel" },
+    { "id": "upah",        "nama": "Tenaga Kerja",          "sifatBiaya": "variabel" },
+    { "id": "air-listrik", "nama": "Air / Listrik",         "sifatBiaya": "tetap" },
+    { "id": "alat",        "nama": "Alat & Perlengkapan",   "sifatBiaya": "tetap" },
+    { "id": "sewa",        "nama": "Sewa Lahan",            "sifatBiaya": "tetap" },
+    { "id": "kemasan",     "nama": "Kemasan & Pengiriman",  "sifatBiaya": "variabel" },
+    { "id": "lain-keluar", "nama": "Lainnya",               "sifatBiaya": "variabel" }
+  ],
+  "masuk": [
+    { "id": "jual-panen", "nama": "Penjualan Hasil Panen" },
+    { "id": "jual-bibit", "nama": "Penjualan Bibit / Olahan" },
+    { "id": "subsidi",    "nama": "Bantuan / Subsidi" },
+    { "id": "lain-masuk", "nama": "Lainnya" }
+  ]
+}
