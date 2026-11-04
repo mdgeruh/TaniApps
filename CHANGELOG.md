@@ -1,5 +1,44 @@
 # Changelog
 
+## v0.1.038 — 2026-11-04
+Fase 7 — optimasi performa dan aksesibilitas (bagian pertama). Hasil ukur dan audit: `docs/AUDIT.md` (bagian "Fase 7").
+
+### Performa
+- **Daftar Transaksi bertahap**: 100 baris pertama, tombol "Tampilkan lebih banyak (sisa N)" untuk 100 berikutnya. Dengan 6.000 transaksi dan periode "Semua", render turun dari 132 ms (6.075 baris) menjadi 14 ms (100 baris). Ringkasan Modal/Hasil/Untung, CSV, dan Laporan tetap dihitung dari semua baris. Batas kembali ke 100 saat filter atau pencarian berubah.
+
+### Aksesibilitas
+- Menu aktif diberi `aria-current="page"` (menu atas, menu bawah, tombol Setelan); kedua `nav` diberi label.
+- Tautan **Lewati ke konten** (Tab pertama, tampil saat fokus); `#app` bisa menerima fokus.
+- Pembaca layar diberi tahu nama halaman saat berpindah (wilayah `aria-live`).
+- Tab Laporan: navigasi keyboard sesuai pola ARIA (panah kiri/kanan, Home, End; tabindex bergulir).
+- Preferensi **kurangi gerakan** sistem meredam semua animasi dan transisi.
+
+### Catatan
+- Audit otomatis (nama tombol, label kolom, urutan judul, target ketuk 40 px, kontras 4,5:1; 8 halaman × terang/gelap): tidak ada temuan baru. Peringatan kontras "●" (legenda) tetap negatif palsu yang sudah dicatat.
+- Uji di Chromium (Playwright): 15 pemeriksaan Fase 7 + 26 pemeriksaan foto nota lolos, tanpa galat JavaScript. **Belum diuji** dengan pembaca layar sungguhan (TalkBack/VoiceOver) dan di HP berspesifikasi rendah; butir Fase 7 "Optimasi performa dan aksesibilitas" karena itu belum dicentang.
+- `js/app.js`, `js/analisa.js`, `css/style.css`, `index.dev.html`, `sw.js` (cache `tani-keuangan-v0_1_038`), `index.html` dan `tani-keuangan.html` (hasil build), `docs/AUDIT.md`, `docs/TRANSAKSI.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+## v0.1.037 — 2026-11-04
+Fase 6C — foto nota/bukti transaksi (lokal dulu). Dokumen: `docs/NOTA.md`.
+
+### Ditambahkan
+- **Foto nota** di form Catat/Ubah (opsional): ambil dari kamera atau pilih dari galeri, lihat layar penuh, ganti, atau hapus. Satu foto per transaksi.
+- Foto dikecilkan sebelum disimpan (sisi terpanjang maks. 1280 px, JPEG 0,72) dan disimpan di **IndexedDB** `tani-nota`, bukan localStorage, sehingga kuota data utama aman. Transaksi hanya menyimpan rujukan `notaId`.
+- Ikon kamera kecil di baris transaksi yang punya foto.
+- Mode **Tersembunyi** juga berlaku: gambar kecil diburamkan dan tampilan penuh ditahan sampai tombol mata dibuka.
+- Setelan → Data → **Foto nota**: jumlah dan ukuran foto, tombol **Hapus semua foto** (dua ketukan).
+- Pembersihan otomatis foto yatim (tidak dirujuk transaksi, lebih dari 30 hari).
+- Bila rujukan ada tetapi foto tidak ada di browser ini (perangkat lain, data browser dibersihkan): pesan jelas, **Pilih foto** atau **Lepas rujukan**.
+
+### Perilaku yang perlu diketahui
+- Foto **tidak** ikut ekspor JSON, cadangan otomatis, maupun sinkron cloud; hanya rujukannya.
+- Batal, Duplikat, ganti, dan hapus foto tidak meninggalkan berkas yatim. Duplikat transaksi tidak menyalin foto.
+- Hapus transaksi (lunak) tidak langsung menghapus foto, agar Urungkan tetap bisa memulihkan.
+
+### Catatan
+- Diuji di Chromium (Playwright): 26 pemeriksaan lolos (kecilkan 3000×2000 ke 1280 px, simpan/ganti/hapus/batal/duplikat, berkas bukan gambar, Tersembunyi, ekspor tanpa isi foto, Setelan, pembersihan, tanpa luapan di 320 px), tanpa galat JavaScript. **Belum diuji** di kamera HP sungguhan, HEIC di Safari/iOS, dan batas kuota IndexedDB perangkat.
+- `js/nota.js` (baru), `js/app.js`, `js/setelan.js`, `css/style.css`, `index.dev.html`, `sw.js` (cache `tani-keuangan-v0_1_037`), `index.html` dan `tani-keuangan.html` (hasil build), `docs/NOTA.md` (baru), `docs/DATA-SCHEMA.md`, `docs/TRANSAKSI.md`, `docs/SETELAN.md`, `docs/CADANGAN.md`, `docs/PANDUAN.md`, `README.md`, `roadmap.md`, `VERSION`.
+
 ## v0.1.036 — 2026-11-04
 Tindak lanjut catatan "untuk keputusan Anda" di `docs/AUDIT.md` (tabel keputusan di bagian akhir berkas itu).
 
