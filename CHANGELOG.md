@@ -1,5 +1,397 @@
 # Changelog
 
+## v0.1.065 — 2026-11-04
+Aturan surface edit (butir audit terakhir): modal untuk isian sedikit, halaman untuk isian banyak. Aturan tertulis di `docs/MODAL.md`.
+
+### Aturan
+- **Modal** bila isiannya sedikit (sekitar empat kolom atau kurang) dan berdiri sendiri: Anggaran, Aset, Utang/piutang, Harga pasar, Saldo awal, Bayar utang, Unit/Komoditas, jadwal kegiatan, **Selesaikan siklus**.
+- **Halaman** bila isiannya banyak, berhubungan dengan bagian lain, atau perlu ruang: Transaksi (jumlah, kategori, siklus, nota, piutang), Panen (kotor, susut, harga, pembeli, piutang), Siklus (unit, komoditas, tanggal, catatan), Setelan.
+- Dari modal detail, tombol Ubah membuka surface yang sama dengan jenis datanya (Panen tetap ke halaman, sesuai aturan).
+
+### Diubah
+- **Selesaikan siklus** kini berupa modal (tanggal selesai, catatan konsekuensi, galat tampil di dalam modal) menggantikan isian yang membuka di halaman. Validasi tetap: tidak sebelum tanggal mulai, tidak di masa depan, tidak sebelum panen terakhir. Esc menutup tanpa mengubah; Urungkan setelah selesai tetap ada.
+- Kode mode inline (`fin`, `vSelesai`, `konfirm-selesai`, `batal-selesai`) dihapus; `js/siklus.js` (`selesaiBuka`, `selesaiSimpan`), `js/app.js` (versi), `sw.js` (`tani-keuangan-v0_1_065`), `index.html`, `tani-keuangan.html`, `docs/MODAL.md`, `docs/SIKLUS.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Diuji di Chromium lebar HP: tombol membuka modal, tanggal tidak valid ditolak di dalam modal tanpa mengubah status, Esc menutup, menyimpan menyelesaikan siklus, Urungkan mengembalikan, tanpa galat. Belum diuji di HP sungguhan.
+- Dengan ini semua butir audit di roadmap sudah dikerjakan; uji di HP sungguhan dan data nyata tetap belum.
+
+## v0.1.064 — 2026-11-04
+Penamaan diseragamkan (butir audit). Aturan tertulis di `docs/STYLE.md` (bagian Penamaan).
+
+### Aturan
+- **Awalan tombol +:** *Catat* untuk data kejadian (transaksi, panen, harga pasar, utang/piutang); *Tambah* untuk membuat benda atau master (unit, komoditas, aset, jadwal kegiatan); *Atur* untuk menetapkan nilai (anggaran, saldo awal kas).
+- **Tombol simpan:** *Simpan* + objek untuk data baru (mis. Simpan harga), *Simpan perubahan* saat mengubah.
+- **Toast:** Catat → "… tersimpan"; Tambah → "… ditambahkan"; ubah → "… diperbarui"; hapus → "… dihapus" (dengan Urungkan). Nama objek selalu disebut.
+- **Keadaan kosong:** menyebut tombol + dan tindakannya (mis. "Ketuk tombol + lalu pilih Catat panen").
+
+### Diubah
+- Toast transaksi: "Tersimpan" menjadi **Transaksi tersimpan**, dan saat mengubah **Transaksi diperbarui** (sebelumnya sama-sama "Tersimpan").
+- Toast: "Kategori ditambah" → **Kategori ditambahkan**; "Aset tersimpan" → **Aset ditambahkan** (selaras dengan tombol Tambah aset); "Harga diperbarui" dan "Harga dihapus" → **Harga pasar diperbarui / dihapus**; Panen yang diubah → **Panen diperbarui** (sebelumnya "Panen tersimpan").
+- Keadaan kosong kini menyebut tombol +: Panen dan Transaksi siklus (hanya untuk siklus berjalan, karena siklus selesai tidak bisa ditambah), daftar Unit dan Komoditas, serta Harga pasar.
+- Nama tombol + di FAB dan label tombol simpan sudah mengikuti aturan, jadi tidak diubah.
+- `js/app.js`, `js/siklus.js`, `js/rencana.js`, `js/harga.js`, `sw.js` (`tani-keuangan-v0_1_064`), `index.html`, `tani-keuangan.html`, `docs/STYLE.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Diuji di Chromium lebar HP: toast transaksi baru dan diubah, serta dua teks keadaan kosong siklus. Teks lain diperiksa dari kode, belum dijalankan satu per satu. Belum diuji di HP sungguhan.
+- Toast Utang/piutang ("Catatan tersimpan / diperbarui") dan "Pembayaran tersimpan" tidak diubah.
+- Belum dikerjakan dari audit: aturan modal vs halaman untuk edit.
+
+## v0.1.063 — 2026-11-04
+Gaya baris daftar disatukan (butir audit). Dokumen: `docs/STYLE.md` (bagian Baris daftar).
+
+### Diubah
+- Tiga jenis baris (`.tx` transaksi/siklus/panen, `.ang-baris` anggaran/aset/utang/harga/jadwal, `.m-row` unit/komoditas) kini memakai aturan tampilan yang sama: tinggi minimal 48 px, jarak dan garis pemisah sama, latar saat disentuh/diarahkan, cincin fokus keyboard yang sama (di dalam baris), dan satu tanda **›** di kanan yang menandakan baris bisa dibuka. Sebelumnya Transaksi hanya mengubah warna nama, Anggaran memakai latar, dan Master punya tanda sendiri.
+- Tanda › di baris Transaksi/Siklus/Panen dan Anggaran/Aset/Utang/Harga/Jadwal baru ditambahkan; baris Master tetap memakai tanda › miliknya (tidak digandakan). Tanda disembunyikan saat cetak.
+- Geser untuk hapus tidak terpengaruh (diuji ulang).
+- `css/style.css`, `js/app.js` (versi), `sw.js` (`tani-keuangan-v0_1_063`), `index.html`, `tani-keuangan.html`, `docs/STYLE.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Yang disatukan adalah **tampilan dan perilaku**, bukan markup: ketiganya masih elemen berbeda (`div role=button`, `button`, `div` berisi `span role=button`) karena strukturnya berbeda (geser hapus, bilah progres, tombol di dalam baris). Menyatukan markup memerlukan penulisan ulang banyak tampilan dan belum dikerjakan.
+- Diuji di Chromium lebar HP: tampilan Transaksi, Aset, dan Master, serta geser untuk hapus, tanpa galat. Belum diuji di HP sungguhan.
+- Belum dikerjakan dari audit: aturan modal vs halaman untuk edit, penamaan.
+
+## v0.1.062 — 2026-11-04
+Harga pasar: riwayat jadi daftar ringkas + modal detail (butir audit berikutnya). Dokumen: `docs/HARGA.md`, `docs/MODAL.md`.
+
+### Diubah
+- **Riwayat harga** (tab Rencana → Harga) kini satu baris ringkas per catatan (harga per satuan, tanggal, sumber), sama dengan Anggaran/Aset/Utang. Tombol Hapus inline dihapus.
+- Ketuk baris membuka **modal detail** (harga, tanggal, sumber, perubahan dari catatan sebelumnya bila ini yang terbaru) dengan tombol **Ubah harga**, **Hapus harga**, dan Tutup.
+- **Ubah harga** (baru): tanggal, harga, dan sumber bisa diperbaiki; komoditas tetap. Validasi sama dengan saat mencatat (harga lebih dari 0, tanggal wajib dan tidak di masa depan); galat tampil di dalam modal.
+- Hapus harga langsung terhapus dengan **Urungkan**, mengikuti aturan hapus di `docs/MODAL.md`.
+- `js/harga.js` (`cek`, `cari`, `edit`, `hapus`; baris ringkas), `js/rencana.js` (formulir `hargaDetail` dan `hargaUbah`), `js/app.js` (versi), `sw.js` (`tani-keuangan-v0_1_062`), `index.html`, `tani-keuangan.html`, `docs/HARGA.md`, `docs/MODAL.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Diuji di Chromium lebar HP: baris tampil, detail terbuka, Ubah mengisi nilai lama dan menyimpan (33.000 → 35.000), Hapus lalu Urungkan mengembalikan, harga 0 ditolak dengan pesan di modal, tanpa galat. Belum diuji di HP sungguhan.
+- Belum dikerjakan dari audit: aturan modal vs halaman untuk edit, satu komponen baris, penamaan.
+
+## v0.1.061 — 2026-11-04
+Penyeragaman pola dan perilaku antar halaman (butir 1–3 dari audit di roadmap). Dokumen baru: `docs/MODAL.md`.
+
+### Ditambahkan
+- **Mesin modal bersama** (`js/modal.js`) menggantikan tiga salinan di Rencana, Siklus (Unit/Komoditas), dan Bayar utang.
+- **Tombol kembali terhubung ke riwayat browser:** pindah halaman dan membuka modal masing-masing satu entri. Kembali menutup modal dulu, lalu kembali ke halaman sebelumnya. Batal dan Simpan di halaman isian memakai `history.back()` sehingga riwayat tidak menumpuk.
+
+### Diubah
+- Klik di luar menutup **semua modal detail**; modal formulir tidak menutup (agar isian tidak hilang). Sebelumnya hanya detail Unit/Komoditas.
+- Fokus kembali ke pemicu setelah menyimpan, juga bila halaman digambar ulang (sebelumnya jatuh ke `BODY`). Referensi ke tombol `utang-bayar` yang sudah hilang diganti.
+- Pesan galat validasi tampil **di dalam modal** (Rencana, Bayar utang, formulir Unit/Komoditas); sebelumnya campur antara inline dan toast.
+- Peringatan "Hanya angka" / "Rupiah bulat" kini juga muncul di modal.
+- **Hapus seragam:** transaksi (tombol), siklus, dan unit/komoditas langsung terhapus dengan Urungkan, tanpa "ketuk lagi". Tombol Hapus panen di formulir panen dihapus; panen dihapus lewat modal detail. "Ketuk lagi" tetap dipakai untuk tindakan yang tidak bisa dipulihkan (hapus semua data, cloud, pulihkan cadangan, data contoh).
+
+### Catatan
+- Koreksi audit: hapus siklus dan panen sebenarnya sudah punya Urungkan; yang tidak punya hanya hapus transaksi lewat tombol.
+- Belum dikerjakan dari audit: Harga pasar jadi daftar + detail, aturan modal vs halaman untuk edit, satu komponen baris, penamaan.
+- Diubah: `js/modal.js` (baru), `js/rencana.js`, `js/utang.js`, `js/siklus.js`, `js/app.js`, `js/dlgsiklus.js`, `index.dev.html`, `sw.js` (`tani-keuangan-v0_1_061`), `index.html`, `tani-keuangan.html`, `docs/MODAL.md`, `README.md`, `roadmap.md`, `VERSION`. Diuji di Chromium headless (riwayat, modal, hapus); belum diuji di HP sungguhan.
+
+## v0.1.060 — 2026-11-04
+Pola daftar ringkas + modal detail dipakai juga di detail siklus. Dokumen: `docs/JADWAL.md`, `docs/SIKLUS.md`. Unit dan Komoditas (tab Master) sudah memakai pola ini sejak sebelumnya.
+
+### Diubah
+- **Jadwal kegiatan:** satu baris per kegiatan; yang selesai dilipat. Ketuk untuk modal detail: Sudah dikerjakan, **Ubah** (baru), Hapus (Urungkan). Formulir "Tambah kegiatan" di halaman dihapus; tambah lewat tombol + → **Tambah jadwal kegiatan**.
+- **Panen:** ketuk baris membuka modal detail (kotor, susut, bersih, harga, pembeli) dengan **Ubah panen** dan **Hapus panen** (Urungkan). Siklus selesai kini bisa melihat detail panen (sebelumnya baris tidak bisa diketuk).
+
+### Catatan
+- Logika data tidak berubah: hapus panen tetap ikut menghapus transaksi hasilnya dan ditolak bila piutangnya sudah ada pembayaran; jadwal berulang tetap dijadwalkan ulang saat dikerjakan.
+- Berkas baru `js/dlgsiklus.js` memakai mesin modal Rencana. Diubah: `js/jadwal.js`, `js/siklus.js`, `js/rencana.js`, `js/fab.js`, `js/app.js`, `sw.js` (`tani-keuangan-v0_1_060`), `index.dev.html`, `index.html`, `tani-keuangan.html`, dokumen, `roadmap.md`, `VERSION`. Belum diuji di HP sungguhan.
+
+## v0.1.059 — 2026-11-04
+Sisa usulan optimalisasi halaman Rencana keuangan (roadmap). Dokumen: `docs/RENCANA.md`.
+
+### Ditambahkan
+- **Arus kas:** grafik batang arus bersih 6 bulan terakhir ditambah 3 bulan proyeksi (batang pudar), dan baris **Kas cukup ± N bulan** saat rata-rata arus bersih negatif.
+- **Utang/piutang:** saringan Semua / Utang / Piutang; catatan lunas dilipat ("Sudah lunas"); lencana **Lewat tempo**.
+- **Anggaran:** siklus selesai dilipat di bawah siklus berjalan.
+- **Simpan & tambah lagi** di modal Tambah aset dan Catat harga pasar (modal dibuka lagi; komoditas harga tetap terpilih).
+- **Harga pasar:** garis tren (hingga 12 catatan) dan **Lihat semua** menggantikan batas 5 catatan.
+
+### Diubah
+- Perhitungan kas dilakukan sekali per penggambaran halaman Rencana (sebelumnya diulang belasan kali per bulan dan per angka). Hasil sama.
+
+### Catatan
+- Gambar ulang tetap seluruh halaman Rencana, tetapi memakai `App.go('rencana', true)` yang menjaga posisi tampilan; gambar ulang sebagian belum dikerjakan.
+- Diubah: `js/rencana.js`, `js/harga.js`, `css/style.css`, `js/app.js`, `sw.js` (`tani-keuangan-v0_1_059`), `index.html`, `tani-keuangan.html`, `docs/RENCANA.md`, `README.md`, `roadmap.md`, `VERSION`. Belum diuji di HP sungguhan.
+
+## v0.1.058 — 2026-11-04
+Aset dan Utang/piutang memakai pola daftar ringkas + modal detail, seperti Anggaran. Dokumen: `docs/RENCANA.md`.
+
+### Diubah
+- **Aset:** satu baris per aset (nama, nilai buku, bar umur terpakai). Ketuk untuk detail: harga beli, tanggal, umur, penyusutan, nilai buku, dengan tombol Ubah aset dan Hapus aset (Urungkan). Total investasi dan balik modal tetap di bawah daftar.
+- **Utang/piutang:** satu baris per catatan (pihak, jenis, sisa, jatuh tempo, tanda lewat). Ketuk untuk detail. Dari transaksi: Bayar / Terima bayar, Lihat transaksi, dan riwayat pembayaran dengan Hapus per pembayaran (Urungkan). Manual: Tandai lunas / Buka lagi, Ubah, Hapus (Urungkan).
+- Total utang dan piutang tidak lagi diulang di tab ini karena sudah ada di kartu ringkasan.
+
+### Catatan
+- Perilaku data tidak berubah; hanya tampilan dan jalur tombol. Kode tombol lama di halaman dihapus.
+- Diubah: `js/rencana.js`, `js/app.js`, `sw.js` (`tani-keuangan-v0_1_058`), `index.html`, `tani-keuangan.html`, `docs/RENCANA.md`, `README.md`, `roadmap.md`, `VERSION`. Belum diuji di HP sungguhan.
+
+## v0.1.057 — 2026-11-04
+Tab Anggaran di Rencana keuangan jadi daftar ringkas dengan detail dalam modal. Dokumen: `docs/RENCANA.md`.
+
+### Diubah
+- Tiap siklus tampil satu baris: nama, persen terpakai, bar, dan realisasi / anggaran. Urutan dari yang paling terpakai; siklus tanpa anggaran di bawah.
+- Ketuk baris membuka modal **detail**: anggaran, realisasi, sisa atau melebihi, serta saran alokasi. Tombol **Ubah anggaran** (membuka form ubah) dan **Hapus anggaran** (dengan Urungkan). Siklus tanpa anggaran mendapat tombol Atur anggaran.
+- Tombol + di tab Anggaran tetap membuka form Atur anggaran untuk siklus mana pun.
+
+### Catatan
+- Hapus anggaran hanya mengosongkan anggaran (jadi 0), siklus dan transaksinya tidak tersentuh.
+- Diubah: `js/rencana.js`, `css/style.css`, `js/app.js`, `sw.js` (`tani-keuangan-v0_1_057`), `index.html`, `tani-keuangan.html`, `docs/RENCANA.md`, `README.md`, `roadmap.md`, `VERSION`. Belum diuji di HP sungguhan.
+
+## v0.1.056 — 2026-11-04
+Tiga prioritas dari usulan optimalisasi halaman Rencana keuangan (roadmap). Dokumen: `docs/RENCANA.md`.
+
+### Ditambahkan
+- **Kartu ringkasan** di atas sub-tab: saldo kas, utang dan piutang belum lunas, dan anggaran terpakai (jumlah modal siklus ber-anggaran dibanding total anggaran).
+- Sub-tab jadi **satu baris yang bisa digeser** dan otomatis menggulir ke yang aktif.
+- Aset dan utang/piutang manual punya tombol **Ubah** (modal yang sama dengan tambah). Hapus kini punya **Urungkan**.
+
+### Catatan
+- Utang dari transaksi tetap tidak bisa diubah di sini (ubah lewat transaksinya). Mengubah utang manual membuka kembali status lunas.
+- Diubah: `js/rencana.js`, `css/style.css`, `js/app.js`, `sw.js` (`tani-keuangan-v0_1_056`), `index.html`, `tani-keuangan.html`, `docs/RENCANA.md`, `README.md`, `roadmap.md`, `VERSION`. Belum diuji di HP sungguhan.
+
+## v0.1.055 — 2026-11-04
+Isian Rencana keuangan dipindah dari halaman ke modal yang dibuka lewat tombol +. Dokumen: `docs/FAB.md`, `docs/RENCANA.md`.
+
+### Diubah
+- Rencana → **Aset**, **Utang/piutang**, **Harga pasar**: formulir di halaman dihapus. Tombol + membuka modal (Tambah aset, Catat utang atau piutang, Catat harga pasar). Sebelumnya tombol + hanya menggulir ke isian.
+- Rencana → **Anggaran**: kolom isian per siklus diganti tampilan baca. Tombol + membuka modal Atur anggaran (pilih siklus; isian terisi anggaran saat ini). Tiap siklus juga punya tombol **Atur anggaran** ke modal yang sama.
+- Rencana → **Arus kas**: saldo awal kas tampil sebagai angka. Tombol + kini berisi Catat modal, Catat hasil, dan **Atur saldo awal kas**; ada pula tombol Atur saldo awal di bagian itu.
+- Bila halaman Aset atau Utang/piutang masih kosong, tampil petunjuk singkat untuk mengetuk +.
+
+### Catatan
+- Modal memakai pola yang sama dengan jendela Bayar: gulir halaman terkunci, Esc menutup, Enter menyimpan, fokus terjebak di modal dan kembali ke pemicu, galat tampil di dalam modal tanpa menutupnya.
+- Tombol + menampilkan pesan, bukan modal, bila belum ada komoditas (Harga pasar) atau belum ada siklus (Anggaran).
+- **Kelayakan** tidak diubah: itu kalkulator dengan hasil langsung saat mengetik, bukan pencatatan data.
+- Struktur data tidak berubah. `Harga.simpan()` dipisah dari `Harga.aksi()` (kini hanya hapus); `Fab.fokus()` dihapus; `Rencana.pesan()` dihapus.
+- Diubah: `js/rencana.js`, `js/harga.js`, `js/fab.js`, `js/app.js` (versi), `sw.js` (cache `tani-keuangan-v0_1_055`), `index.html`, `tani-keuangan.html`, `docs/FAB.md`, `docs/RENCANA.md`, `docs/HARGA.md`, `docs/PANDUAN.md`, `README.md`, `roadmap.md`, `VERSION`.
+- Diuji di Chromium headless (layar 390 px): tiap sub-tab tanpa isian di halaman, simpan aset, utang (termasuk galat kosong), harga pasar, anggaran, dan saldo awal lewat Enter berhasil tanpa galat skrip. Belum diuji di HP sungguhan.
+
+## v0.1.054 — 2026-11-04
+Ekspor Excel (.xlsx) multi-lembar (backlog roadmap: ekspor ke Excel). Dokumen: `docs/EKSPOR.md`.
+
+### Ditambahkan
+- Lainnya → **Ekspor Excel (.xlsx)**: satu berkas dengan lembar Siklus (Untung dan R/C berupa rumus Excel), Transaksi, Panen, Utang dan piutang, Aset, Harga pasar, dan Jadwal. Baris judul dibekukan dan berfilter, tanggal bertipe tanggal, uang berformat ribuan.
+- Pembuat .xlsx sendiri (`js/xlsx.js`, ZIP + XML, tanpa pustaka luar), jadi tetap jalan luring.
+
+### Catatan
+- Ekspor satu arah untuk analisis; cadangan yang bisa dipulihkan tetap JSON. Ekspor/impor CSV tidak berubah. Foto nota tidak ikut.
+- Berkas baru `js/xlsx.js`; diubah `js/app.js` (tombol dan versi), `index.dev.html`, `sw.js` (cache `tani-keuangan-v0_1_054`), `index.html`, `tani-keuangan.html`, `docs/EKSPOR.md`, `docs/SETELAN.md`, `docs/PANDUAN.md`, `README.md`, `roadmap.md`, `VERSION`.
+- Berkas hasil diuji dibuka dengan openpyxl (7 lembar, rumus, tanggal, karakter khusus XML, nama lembar, pembekuan baris, filter) dan lolos uji integritas ZIP. Belum diuji di Excel/HP sungguhan; unduhan tidak berjalan di pratinjau web artefak.
+
+## v0.1.053 — 2026-11-04
+Kalkulator kelayakan usaha (backlog roadmap: NPV, IRR sederhana). Dokumen: `docs/KELAYAKAN.md`.
+
+### Ditambahkan
+- Sub-tab **Kelayakan** di Rencana keuangan: investasi awal, arus kas bersih per periode (bulanan atau tahunan), jumlah periode, nilai sisa, dan diskonto per tahun.
+- Hasil langsung saat mengetik: **NPV** (layak / belum layak), **IRR per tahun**, **balik modal**, **PI**, dan total arus kas masuk.
+- Tombol isi cepat arus kas dari rata-rata 3 bulan; isian terakhir diingat di `pengaturan.kelayakan`.
+
+### Catatan
+- Model sederhana (arus kas tetap per periode); tidak mengubah transaksi, kas, atau laporan. Skema bertambah satu objek opsional di pengaturan.
+- Berkas baru `js/kelayakan.js`; diubah `js/rencana.js`, `js/app.js` (versi), `index.dev.html`, `sw.js` (cache `tani-keuangan-v0_1_053`), `index.html`, `tani-keuangan.html`, `docs/KELAYAKAN.md`, `docs/DATA-SCHEMA.md`, `docs/RENCANA.md`, `docs/PANDUAN.md`, `README.md`, `roadmap.md`, `VERSION`.
+- Diuji dengan skrip logika terhadap hitungan manual (NPV −5,26 dan IRR 9,7% untuk investasi 1.000 dengan 3×400 pada diskonto 10%, kasus layak, konversi bulanan, balik modal, validasi). Belum diuji di browser dan HP sungguhan.
+
+## v0.1.052 — 2026-11-04
+Katalog harga pasar (input manual) dan pembanding harga (backlog roadmap). Dokumen: `docs/HARGA.md`.
+
+### Ditambahkan
+- Sub-tab **Harga pasar** di Rencana keuangan: catat harga pasar per komoditas (tanggal, harga, sumber), harga terakhir dengan tren ▲/▼, riwayat 5 catatan, hapus dengan Urungkan.
+- **Pembanding**: harga jualmu 90 hari terakhir (tertimbang panen bersih) dibanding harga pasar terakhir.
+- Form Catat panen menampilkan harga pasar terakhir sebagai acuan; tombol + di sub-tab mengarah ke isian harga.
+- Data contoh: dua harga pasar cabai.
+
+### Catatan
+- Skema komoditas bertambah `hargaPasar` (opsional, data lama tetap valid). Tidak memengaruhi rumus keuangan.
+- Berkas baru `js/harga.js`; diubah `js/rencana.js`, `js/siklus.js`, `js/fab.js`, `js/contoh.js`, `js/app.js` (versi), `index.dev.html`, `sw.js` (cache `tani-keuangan-v0_1_052`), `index.html`, `tani-keuangan.html`, `docs/HARGA.md`, `docs/DATA-SCHEMA.md`, `docs/RENCANA.md`, `docs/PANDUAN.md`, `README.md`, `roadmap.md`, `VERSION`.
+- Roadmap: butir backlog analisa sensitivitas dan template komoditas ditandai selesai (sudah ada sejak v0.1.029 dan v0.1.030).
+- Diuji dengan skrip logika (validasi, rata-rata tertimbang, tren, hapus/Urungkan, batas riwayat). Belum diuji di browser dan HP sungguhan.
+
+## v0.1.051 — 2026-11-04
+Jadwal kegiatan per siklus (dari backlog roadmap: kalender tanam + pengingat jadwal pupuk/panen). Dokumen: `docs/JADWAL.md`.
+
+### Ditambahkan
+- Bagian **Jadwal kegiatan** di detail siklus: tambah kegiatan (nama, tanggal, ulangi tiap N hari atau sekali), **Sudah dikerjakan** (berulang dijadwalkan lagi N hari sejak hari ini), Hapus, keduanya dengan Urungkan.
+- Beranda → Perlu perhatian: pengingat kegiatan yang jatuh tempo dalam 3 hari atau sudah lewat.
+- Data contoh: dua kegiatan di siklus cabai.
+
+### Catatan
+- Skema siklus bertambah `jadwal` (opsional, data lama tetap valid). Tidak memengaruhi rumus keuangan.
+- Berkas baru `js/jadwal.js`; diubah `js/siklus.js`, `js/beranda.js`, `js/contoh.js`, `js/app.js` (versi), `index.dev.html`, `sw.js` (cache `tani-keuangan-v0_1_051`), `index.html`, `tani-keuangan.html`, `docs/JADWAL.md`, `docs/DATA-SCHEMA.md`, `docs/PANDUAN.md`, `README.md`, `roadmap.md`, `VERSION`.
+- Diuji dengan skrip logika (validasi, ulang, selesai, Urungkan, pengingat, siklus selesai). Belum diuji di browser dan HP sungguhan; pengingat hanya tampil saat aplikasi dibuka.
+
+## v0.1.050 — 2026-11-04
+Penyempurnaan Catat panen vs Catat hasil (dari backlog roadmap). Dokumen: `docs/SIKLUS.md`.
+
+### Ditambahkan
+- Catat hasil: **peringatan hasil ganda** bila siklus yang dipilih sudah punya panen berharga (yang otomatis tercatat sebagai Hasil).
+- Catat hasil berkategori Penjualan Hasil Panen: catatan bahwa hasil tanpa jumlah barang tidak masuk HPP/BEP/harga minimum, dengan tombol **Catat sebagai panen**.
+- Beranda → Perlu perhatian: pengingat **panen belum dijual**; ketuk membuka form panen untuk mengisi harga.
+
+### Catatan
+- Tidak mengubah skema data maupun rumus. Catatan di form diperbarui langsung saat siklus atau kategori diganti.
+- Diuji dengan skrip logika (kondisi tampil catatan, pengingat, panen masa depan tidak diingatkan). Belum diuji di browser dan HP sungguhan.
+- Diubah: `js/app.js`, `js/siklus.js`, `js/beranda.js`, `sw.js` (cache `tani-keuangan-v0_1_050`), `index.html`, `tani-keuangan.html`, `docs/SIKLUS.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+## v0.1.049 — 2026-11-04
+Tahap 2 pembayaran utang/piutang: tombol Bayar dan cicilan. Dokumen: `docs/UTANG.md`.
+
+### Ditambahkan
+- Tombol **Bayar** (utang) / **Terima bayar** (piutang) di Rencana → Utang/piutang untuk utang dari transaksi. Jendela pembayaran: jumlah bebas (bawaan seluruh sisa, tombol *Semua sisa*) dan tanggal bayar, dengan pemilih tanggal yang sama seperti form lain.
+- **Cicilan**: pembayaran sebagian diperbolehkan; sisa tetap tercatat. Utang menjadi **lunas otomatis** saat sisa nol.
+- Kartu utang menampilkan bilah kemajuan, jumlah dibayar, sisa, dan **riwayat pembayaran**; tiap pembayaran bisa dihapus dengan **Urungkan**.
+
+### Diubah
+- **Tandai lunas / Buka lagi** tidak lagi dipakai untuk utang dari transaksi (digantikan Bayar dan Hapus pembayaran); tetap ada untuk utang manual.
+- Validasi pembayaran: jumlah > 0 dan tidak melebihi sisa; tanggal tidak sebelum tanggal transaksi dan tidak di masa depan.
+
+### Catatan
+- Tidak mengubah skema data: pembayaran memakai `utang.bayar` yang sudah ada sejak v0.1.048; `lunas` pada utang tertaut kini dihitung otomatis. Rumus kas tidak berubah.
+- Diuji dengan skrip logika (cicilan, lunas otomatis, hapus/urungkan pembayaran, kas piutang dan utang, validasi, tampilan daftar). Jendela Bayar belum diuji di browser dan HP sungguhan.
+- Diubah: `js/utang.js`, `js/rencana.js`, `css/style.css`, `sw.js` (cache `tani-keuangan-v0_1_049`), `index.html`, `tani-keuangan.html`, `docs/UTANG.md`, `docs/DATA-SCHEMA.md`, `docs/RENCANA.md`, `docs/PANDUAN.md`, `README.md`, `roadmap.md`, `VERSION`, `js/app.js` (versi).
+
+## v0.1.048 — 2026-11-04
+Tahap 1 pembayaran utang/piutang dari transaksi. Dokumen: `docs/UTANG.md`.
+
+### Ditambahkan
+- Isian **Pembayaran** di Catat modal, Catat hasil, dan Catat panen: Tunai, Belum dibayar, Sebagian dibayar (uang muka). Bila ada sisa, pihak wajib diisi dan jatuh tempo opsional.
+- Sisa otomatis menjadi **utang** (modal) atau **piutang** (hasil) tertaut ke transaksi, tampil di Rencana → Utang/piutang dan di baris transaksi.
+- **Tandai lunas** pada utang tertaut mencatat pembayaran (menggerakkan kas, bukan transaksi baru); Buka lagi membatalkannya. Tombol Hapus diganti Lihat transaksi untuk utang tertaut.
+
+### Diubah
+- **Saldo kas** (Beranda), **Arus kas** dan proyeksi (Rencana) kini dihitung dari uang yang benar-benar bergerak. Untung, R/C, HPP, BEP, dan laporan tetap memakai nilai penuh transaksi.
+- Total utang/piutang dan pengingat jatuh tempo memakai sisa yang belum dibayar.
+- Hapus transaksi, panen, atau geser hapus ikut menghapus utang tertaut dan Urungkan memulihkannya; ditolak bila sudah ada pembayaran.
+
+### Catatan
+- Tidak mengubah data lama: transaksi tanpa utang dianggap tunai. Skema utang bertambah `transaksiId` dan `bayar` (opsional). CSV tidak memuat status pembayaran.
+- Berkas baru `js/utang.js`; diubah `js/app.js`, `js/siklus.js`, `js/rencana.js`, `js/beranda.js`, `js/geser.js`, `index.dev.html`, `sw.js` (cache `tani-keuangan-v0_1_048`), `index.html`, `tani-keuangan.html`, `docs/DATA-SCHEMA.md`, `docs/UTANG.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+## v0.1.047 — 2026-11-04
+### Diubah
+- Setiap baris di **Perlu perhatian** (Beranda) kini bisa diketuk dan memakai tanda ›: perkiraan panen dan anggaran membuka detail siklusnya; utang/piutang jatuh tempo membuka Rencana → Utang/piutang. Bisa lewat keyboard (Enter/Spasi).
+
+### Catatan
+- Tidak mengubah skema data. `js/beranda.js`, `js/app.js`, `css/style.css`, `sw.js` (cache `tani-keuangan-v0_1_047`), `README.md`, `roadmap.md`, `VERSION`.
+
+## v0.1.046 — 2026-11-04
+### Diubah
+- Tombol **Siklus baru** dihapus dari halaman Siklus; siklus baru dibuat lewat tombol + (FAB). Teks daftar kosong menunjuk ke tombol +.
+
+### Catatan
+- Tidak mengubah skema data. `js/siklus.js`, `js/app.js`, `sw.js` (cache `tani-keuangan-v0_1_046`), `docs/SIKLUS.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+## v0.1.045 — 2026-11-04
+### Diubah
+- Tombol **Siklus baru** dihapus dari modal detail unit dan komoditas. Siklus baru dibuat dari menu Siklus.
+
+### Catatan
+- Tidak mengubah skema data. `js/siklus.js`, `js/app.js`, `sw.js` (cache `tani-keuangan-v0_1_045`), `docs/SIKLUS.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+## v0.1.044 — 2026-11-04
+Tombol + di halaman Unit kini berupa pilihan melayang, sama seperti di Beranda.
+
+### Diubah
+- Ketuk + membuka dua pilihan: **Tambah unit** dan **Tambah komoditas**; ikon berubah jadi ✕ untuk menutup. Pilihan tidak lagi bergantung tab yang aktif.
+- Catatan teks halaman Unit disesuaikan.
+
+### Catatan
+- Tidak mengubah skema data. `js/fab.js`, `js/siklus.js`, `sw.js` (cache `tani-keuangan-v0_1_044`), `index.html`, `tani-keuangan.html`, `docs/FAB.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+## v0.1.043 — 2026-11-04
+Form unit dan komoditas pindah ke modal, dibuka dengan tombol + (FAB).
+
+### Diubah
+- Halaman Unit kini hanya berisi daftar. **Tombol +** membuka modal form Tambah unit atau Tambah komoditas sesuai tab aktif (template komoditas ada di dalam modal).
+- **Ubah** (dari modal detail) membuka modal form yang sama dengan data terisi; dari detail siklus tidak lagi pindah ke halaman Unit.
+- Modal form: fokus ke isian nama, Enter menyimpan, Esc/✕/Batal menutup, ketuk latar tidak menutup (mencegah isian hilang), pesan galat (toast) tampil di atas modal.
+- Daftar kosong menampilkan tombol Tambah di halaman.
+
+### Catatan
+- Tidak mengubah skema data. `js/siklus.js`, `js/fab.js`, `js/app.js`, `css/style.css`, `sw.js` (cache `tani-keuangan-v0_1_043`), `index.html`, `tani-keuangan.html`, `docs/SIKLUS.md`, `docs/FAB.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+## v0.1.042 — 2026-11-04
+Optimasi halaman Siklus dan Lainnya setelah unit dan komoditas punya menu sendiri.
+
+### Siklus
+- **Saringan Unit dan Komoditas** di daftar (muncul bila ada lebih dari 3 siklus); angka pada tab Berjalan/Selesai mengikuti saringan.
+- **Ringkasan** total modal, hasil, dan untung/rugi untuk siklus yang tampil (bila lebih dari 1).
+- Tombol "Kelola unit & komoditas" dihapus dari daftar; kini hanya muncul sebagai "Siapkan unit & komoditas" bila unit atau komoditas belum ada.
+- **Detail siklus**: baris Unit dan Komoditas bisa diketuk untuk membuka modal detail. Arsipkan dari sana tetap di halaman siklus; Ubah membawa ke menu Unit dengan form terisi.
+- Membuka siklus dari modal kini menutup modal.
+
+### Lainnya
+- Kartu Unit & komoditas dihapus (sudah ada di menu); Rencana keuangan dipindah ke atas.
+- Tombol + dihilangkan di halaman ini karena isinya pengaturan (kategori, CSV), bukan pencatatan.
+
+### Catatan
+- Tidak mengubah skema data. `js/app.js`, `js/siklus.js`, `js/fab.js`, `sw.js` (cache `tani-keuangan-v0_1_042`), `index.html`, `tani-keuangan.html`, `docs/SIKLUS.md`, `docs/FAB.md`, `docs/PANDUAN.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+## v0.1.041 — 2026-11-04
+Menu dan halaman khusus unit dan komoditas. Dokumen: `docs/SIKLUS.md`.
+
+### Ditambahkan
+- **Menu Unit** di navigasi atas dan bawah (antara Siklus dan Laporan), tidak lagi tersembunyi di Lainnya. Halaman bernama Unit & komoditas dan menyala sebagai menu aktif.
+- **Dua tab** Unit / lahan (n) dan Komoditas (n): satu daftar per layar, bukan dua daftar bertumpuk. Isian form tiap tab tidak hilang saat berpindah tab.
+- **Tombol +** (FAB) di halaman ini: Tambah unit atau Tambah komoditas, sesuai tab aktif; menyorot isian nama.
+- Modal detail (v0.1.040) tetap dipakai dari kedua daftar.
+
+### Diubah
+- Enam menu bawah kini muat di layar 320 px (huruf menu sedikit lebih kecil di bawah 360 px).
+- Lainnya masih punya pintasan, tombolnya kini "Buka halaman Unit". Halaman Unit tidak lagi punya tautan kembali ke Lainnya.
+
+### Catatan
+- Tidak mengubah skema data.
+- `js/app.js`, `js/siklus.js`, `js/fab.js`, `css/style.css`, `sw.js` (cache `tani-keuangan-v0_1_041`), `index.html` dan `tani-keuangan.html` (hasil build), `docs/SIKLUS.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+## v0.1.040 — 2026-11-04
+Detail unit dan komoditas ditampilkan dalam modal dengan tombol aksi. Dokumen: `docs/SIKLUS.md`.
+
+### Ditambahkan
+- **Modal detail** untuk unit dan komoditas: ketuk namanya di Lainnya → Kelola unit & komoditas. Isi: jenis, luas/kapasitas (unit) atau satuan hasil, umur panen, panen bersih, dan panen terdekat (komoditas), jumlah siklus (berjalan/selesai), total modal, hasil, untung/rugi dari semua siklusnya, serta 5 siklus terbaru (ketuk untuk membuka detail siklus).
+- **Tombol aksi di modal**: Siklus baru (isian unit/komoditas terpilih), Ubah, Arsipkan/Pulihkan, Hapus (dua ketukan, ada Urungkan). Keterangan di modal menjelaskan mengapa Hapus tidak tersedia bila sudah dipakai siklus.
+- Aksesibilitas modal: `role="dialog"` + `aria-modal`, fokus masuk ke modal dan kembali ke baris saat ditutup, Tab terkunci di dalam modal, Esc/✕/ketuk latar menutup, gulir latar dikunci, animasi dihormati preferensi kurangi gerakan. Tampil sebagai lembar bawah di HP dan di tengah di layar lebar.
+
+### Diubah
+- Baris unit dan komoditas kini bersih: nama, ringkasan, jumlah siklus, penanda arsip, dan panah. Tombol Hapus/Arsipkan per baris pindah ke modal.
+- Hapus unit/komoditas yang sudah tidak dipakai siklus manapun kini juga tersedia untuk yang berstatus arsip.
+- Mode Tersembunyi ikut menyamarkan nominal di modal.
+
+### Catatan
+- Tidak mengubah skema data; data v0.1.039 terbaca apa adanya.
+- `js/siklus.js`, `js/app.js` (Samar menyapu modal), `css/style.css`, `sw.js` (cache `tani-keuangan-v0_1_040`), `index.html` dan `tani-keuangan.html` (hasil build), `docs/SIKLUS.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+## v0.1.039 — 2026-11-04
+Optimalisasi CRUD siklus, unit, dan komoditas (sebelum melanjutkan Fase 7). Dokumen: `docs/SIKLUS.md`.
+
+### Ditambahkan
+- **Ubah unit dan komoditas.** Sebelumnya hanya bisa tambah dan hapus. Ketuk nama di daftar (Lainnya → Kelola unit & komoditas): form terisi, baris ditandai, tombol jadi **Simpan perubahan** dengan **Batal**. Isian form yang sedang diketik tidak hilang saat halaman digambar ulang (hapus/arsip baris lain).
+- **Arsipkan.** Unit atau komoditas yang sudah dipakai siklus (termasuk siklus lama yang selesai) tidak bisa dihapus; kini ada **Arsipkan** (dan **Pulihkan**). Yang diarsipkan tidak muncul di pilihan siklus baru, tetapi tetap tampil di siklus lama. Field baru `arsip` pada unit dan komoditas.
+- **Ubah siklus**: unit, komoditas, tanggal mulai, tanggal selesai (siklus selesai), catatan. Panen dan transaksi tetap terhubung.
+- **Tanggal selesai dipilih sendiri** saat Selesaikan siklus (bawaan hari ini), tidak lagi otomatis hari ini. Ada **Urungkan** setelah menyelesaikan.
+- **Ulangi siklus ini** (siklus selesai): form siklus baru terisi unit, komoditas, dan catatan yang sama, tanggal mulai hari ini.
+- Siklus baru memakai unit dan komoditas siklus terakhir sebagai isian awal (bila masih aktif).
+- **Urungkan** setelah menghapus siklus, unit, komoditas, dan panen (hapus panen ikut memulihkan transaksi hasilnya).
+- Tab daftar siklus menampilkan jumlah: Berjalan (n) / Selesai (n). Baris unit dan komoditas menampilkan "N siklus" bila dipakai.
+
+### Diubah
+- Hapus unit/komoditas butuh dua ketukan ("Yakin hapus?"), sama seperti hapus lain; sebelumnya satu ketukan langsung hapus.
+- Pesan hapus siklus yang masih punya data menyebut jumlahnya ("2 transaksi dan 1 panen masih terhubung").
+- Siklus selesai: panen hanya bisa diubah setelah dibuka kembali (aturan lama, kini dijelaskan di halaman).
+
+### Validasi baru
+- Nama unit dan komoditas tidak boleh kembar (huruf besar/kecil dan spasi ganda diabaikan).
+- Luas/kapasitas harus angka lebih dari 0 dan wajib bersatuan; umur panen bilangan bulat 1–730 hari; satuan hasil wajib.
+- Tanggal panen tidak boleh sebelum tanggal mulai siklus. Tanggal mulai tidak boleh setelah panen pertama; tanggal selesai tidak boleh sebelum mulai, setelah hari ini, atau sebelum panen terakhir.
+- Impor, pemulihan, dan sinkron membuang unit atau komoditas tanpa nama (lewat `Store.sah`).
+
+### Diperbaiki
+- Menghapus siklus, unit, komoditas, dan menyelesaikan siklus kini memperbarui `diubah`, sehingga sinkron cloud (gabung per entri) tidak salah memilih versi lama.
+- Mengganti satuan komoditas yang sudah punya panen memunculkan peringatan bahwa satuan baru berlaku di semua panennya.
+
+### Catatan
+- Diuji di Chromium (Playwright): 67 pemeriksaan lolos (tambah/ubah/batal/hapus/arsip/Urungkan unit dan komoditas, semua validasi, ubah siklus, selesai dengan tanggal, ulangi siklus, hapus siklus dan panen dengan Urungkan, Enter di baris, tanpa luapan di 320 px, target ketuk 40 px, tema terang/gelap), tanpa galat JavaScript. **Belum diuji** di HP sungguhan dan dengan pembaca layar.
+- Tidak mengubah skema lama: data v0.1.038 terbaca apa adanya (field `arsip` opsional).
+- `js/siklus.js`, `js/app.js` (hook `Siklus.pindah`, judul Ubah siklus, `Store.sah`), `css/style.css`, `sw.js` (cache `tani-keuangan-v0_1_039`), `index.html` dan `tani-keuangan.html` (hasil build), `docs/SIKLUS.md`, `docs/DATA-SCHEMA.md`, `README.md`, `roadmap.md`, `VERSION`.
+
 ## v0.1.038 — 2026-11-04
 Fase 7 — optimasi performa dan aksesibilitas (bagian pertama). Hasil ukur dan audit: `docs/AUDIT.md` (bagian "Fase 7").
 

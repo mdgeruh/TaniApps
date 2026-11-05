@@ -1,6 +1,6 @@
 # Roadmap — Web App Keuangan Pertanian Rumahan
 
-> Status dokumen: draf v0.1 · Terakhir diperbarui: 4 November 2026 · Fase 5 selesai; Fase 6 berjalan: cadangan otomatis + dasar PWA; FAB kontekstual; chart di Beranda; data contoh otomatis; sinkron Supabase (v0.1.023); penyempurnaan UX (v0.1.024); kartu hero Beranda (v0.1.025); judul halaman (v0.1.026); foto nota lokal (v0.1.037); optimasi performa/aksesibilitas bagian 1 (v0.1.038)
+> Status dokumen: draf v0.1 · Terakhir diperbarui: 4 November 2026 · Fase 5 selesai; Fase 6 berjalan: cadangan otomatis + dasar PWA; FAB kontekstual; chart di Beranda; data contoh otomatis; sinkron Supabase (v0.1.023); penyempurnaan UX (v0.1.024); kartu hero Beranda (v0.1.025); judul halaman (v0.1.026); foto nota lokal (v0.1.037); optimasi performa/aksesibilitas bagian 1 (v0.1.038); pembayaran utang/piutang tahap 1 (v0.1.048) dan tahap 2: tombol Bayar + cicilan (v0.1.049); Catat panen vs Catat hasil (v0.1.050); jadwal kegiatan per siklus (v0.1.051); katalog harga pasar (v0.1.052); kalkulator kelayakan usaha (v0.1.053); ekspor Excel (v0.1.054); isian Rencana keuangan lewat modal FAB (v0.1.055); ringkasan, sub-tab geser, ubah aset/utang (v0.1.056); daftar anggaran dengan detail (v0.1.057); daftar aset dan utang dengan detail (v0.1.058); grafik arus kas, saringan utang, simpan & tambah lagi, tren harga (v0.1.059); Jadwal dan Panen lewat modal detail (v0.1.060); modal bersama, tombol kembali, hapus seragam (v0.1.061)
 
 ## 1. Visi & Tujuan
 
@@ -128,15 +128,50 @@ Aplikasi web sederhana untuk mencatat dan menganalisa keuangan pertanian skala r
 
 ## 7. Ide Lanjutan (Backlog)
 
-- Template komoditas (sayur daun, cabai, tomat, lele, ayam petelur) dengan estimasi biaya standar
-- Analisa sensitivitas: "bagaimana jika harga jual turun 10%?"
-- Kalender tanam + pengingat jadwal pupuk/panen
+- Template komoditas (sayur daun, cabai, tomat, lele, ayam petelur) dengan estimasi biaya standar (selesai di v0.1.030)
+- Analisa sensitivitas: "bagaimana jika harga jual turun 10%?" (selesai di v0.1.029)
+- Kalender tanam + pengingat jadwal pupuk/panen — **jadwal kegiatan per siklus selesai di v0.1.051** (docs/JADWAL.md); pengingat panen sudah ada sejak v0.1.028; belum ada tampilan kalender gabungan lintas siklus maupun notifikasi di luar aplikasi
 - Pencatatan cuaca/hasil per kondisi untuk korelasi
-- Katalog harga pasar (input manual) dan pembanding harga
-- Kalkulator kelayakan usaha (NPV, IRR sederhana)
-- Integrasi Google Sheets / ekspor ke template Excel
+- Katalog harga pasar (input manual) dan pembanding harga (selesai di v0.1.052, docs/HARGA.md; belum diuji di browser/HP sungguhan)
+- Kalkulator kelayakan usaha (NPV, IRR sederhana) (selesai di v0.1.053, docs/KELAYAKAN.md; belum diuji di browser/HP sungguhan)
+- Integrasi Google Sheets / ekspor ke template Excel — **ekspor Excel (.xlsx) multi-lembar selesai di v0.1.054** (docs/EKSPOR.md); integrasi Google Sheets langsung dan template Excel yang bisa diimpor balik belum
 - Foto nota/bukti transaksi (selesai di v0.1.037)
+- Penyeragaman pola dan perilaku antar halaman (hasil audit 2026-11-04, **butir 1–3 selesai di v0.1.061** (docs/MODAL.md), Harga pasar selesai di v0.1.062, sisanya belum; poin 3–5 diuji di browser, sisanya dari membaca kode, belum diuji di HP sungguhan). Urutan pengerjaan yang disarankan: 1, 2, 3.
+  - [x] **1. Satukan mesin modal (selesai di v0.1.061).** Kini ada tiga salinan (`Rencana.dlg`, `Siklus.dm`, `Utang.dlg`) dengan perilaku berbeda. Jadikan satu modul bersama. Sekaligus menyelesaikan: klik di luar modal menutup (kini hanya di Master); fokus kembali ke pemicu setelah simpan (kini jatuh ke `BODY` di Rencana; Bayar utang masih mencari tombol `utang-bayar` yang sudah hilang sejak v0.1.058); satu gaya pesan galat (kini inline di Rencana, toast di tempat lain); pemformat angka dan peringatan "Hanya angka" / "Rupiah bulat" ikut berlaku di modal (kini hanya di `#app`).
+  - [x] **2. Integrasi tombol kembali (selesai di v0.1.061).** Belum ada `pushState` / `popstate`: pindah tab dan modal tidak masuk riwayat, sehingga gestur kembali di Android kemungkinan keluar dari aplikasi. Modal terbuka = satu entri riwayat; kembali menutup modal, lalu kembali ke tab sebelumnya.
+  - [x] **3. Seragamkan hapus (selesai di v0.1.061; koreksi: hapus siklus dan panen sudah punya Urungkan, hanya hapus transaksi lewat tombol yang belum).** Kini dua gaya: "ketuk lagi" tanpa Urungkan (tombol Transaksi, Siklus, form Panen, Setelan, Cadangan) dan langsung hapus + Urungkan (Aset, Utang, Jadwal, Anggaran, Harga, pembayaran, geser Transaksi, Panen lewat modal). Usulan: Urungkan untuk data transaksional; konfirmasi hanya untuk tindakan yang tak bisa dipulihkan (hapus semua data, timpa cloud). Panen punya dua jalur hapus (form dan modal): sisakan satu.
+  - [x] Harga pasar: riwayat jadi daftar + modal detail (Ubah, Hapus) seperti tab Rencana lain (selesai di v0.1.062; diuji di browser, belum di HP).
+  - [x] Surface edit (selesai di v0.1.065, aturan di docs/MODAL.md): putuskan aturan (modal untuk isian sedikit, halaman untuk isian banyak) dan terapkan konsisten. Kini Panen: modal detail lalu Ubah membuka halaman; "Selesaikan siklus" masih isian inline di halaman.
+  - [x] Gaya baris (tampilan dan perilaku disatukan di v0.1.063; markup masih tiga jenis): satukan `.tx` (div role=button), `.ang-baris` (button) dan `.m-row` (dengan tanda ›) ke satu komponen daftar.
+  - [x] Penamaan (selesai di v0.1.064, aturan di docs/STYLE.md): seragamkan awalan FAB (Catat / Tambah / Atur), label tombol simpan, kata toast (tersimpan / ditambahkan / diperbarui), dan petunjuk keadaan kosong (Panen dan Transaksi siklus belum menyebut tombol +).
+  - Sudah konsisten (pertahankan): semua modal punya role dialog, Esc, jebakan Tab, kunci gulir, dan penyamaran angka (Samar); aksi hapus yang memakai toast menyediakan Urungkan; tombol + hilang di halaman form.
+- Optimalisasi halaman Rencana keuangan (usulan 2026-11-04, **seluruh butir selesai di v0.1.056–v0.1.059**; urutan prioritas, belum diuji di HP sungguhan):
+  - [x] **Prioritas 1 (selesai di v0.1.056).** Kartu ringkasan di atas sub-tab: saldo kas, utang dan piutang belum lunas, anggaran terpakai, supaya tidak perlu pindah-pindah sub-tab.
+  - [x] **Prioritas 2 (selesai di v0.1.056; Kelayakan belum dipisah).** Enam chip sub-tab dijadikan satu baris yang bisa digeser menyamping dan otomatis menggulir ke chip aktif; Kelayakan bisa dipisah karena sifatnya kalkulator, bukan pencatatan.
+  - [x] **Prioritas 3 (selesai di v0.1.056).** Aset dan utang manual bisa diubah lewat tombol Ubah (modal yang sama); Hapus diberi konfirmasi atau Urungkan, seperti pada pembayaran utang.
+  - [x] Arus kas: grafik batang 6 bulan terakhir plus proyeksi, dan baris "kas cukup berapa bulan" bila arus bersih negatif (selesai di v0.1.059).
+  - [x] Anggaran: daftar ringkas diurutkan dari yang paling terpakai, ketuk untuk detail dengan Ubah dan Hapus (v0.1.057); siklus selesai dilipat (v0.1.059).
+  - [x] Utang/piutang: daftar ringkas dengan detail dan aksi (v0.1.058, juga Aset); lipat yang lunas, saringan Utang / Piutang, lencana "Lewat tempo" (v0.1.059).
+  - [x] Modal isian: tombol "Simpan & tambah lagi" untuk aset dan harga pasar (selesai di v0.1.059).
+  - [x] Teknis (v0.1.059; gambar ulang sebagian belum, posisi gulir sudah terjaga lewat `App.go('rencana', true)`): jaga posisi gulir dan gambar ulang hanya bagian yang berubah (kini `App.go('rencana', true)` menggambar ulang seluruh halaman); hitung `saldoSd()` sekali lalu simpan sementara agar tidak menghitung ulang seluruh peristiwa kas per bulan; harga pasar mendapat grafik tren kecil dan tombol "lihat semua" (kini hanya 5 catatan terakhir).
+- Isian Rencana keuangan lewat modal FAB, bukan isian di halaman (**selesai di v0.1.055**, docs/FAB.md dan docs/RENCANA.md; belum diuji di HP sungguhan; Kelayakan tetap kalkulator di halaman karena hasilnya tampil langsung saat mengetik):
+  - Tombol + di Rencana membuka modal: Anggaran → Atur anggaran (pilih siklus), Arus kas → pilihan Catat modal / Catat hasil / Atur saldo awal kas, Aset → Tambah aset, Utang/piutang → Catat utang atau piutang, Harga pasar → Catat harga pasar (pilih komoditas).
+  - Isian di halaman dihapus; halaman hanya menampilkan data, dengan tombol Atur anggaran di tiap siklus dan Atur saldo awal di Arus kas sebagai jalan pintas ke modal yang sama.
+  - Modal memakai pola jendela Bayar: kunci gulir, Esc menutup, Enter menyimpan, fokus terjebak di dalam modal, galat tampil di dalam modal (modal tetap terbuka), fokus kembali ke pemicu.
+  - Tombol + menampilkan pesan (bukan modal) bila belum ada komoditas (Harga pasar) atau siklus (Anggaran).
 - Mode multi-bahasa
+- Pembayaran utang/piutang dari Catat modal, Catat hasil, dan Catat panen (rancangan 2026-11-04). **Tahap 1 selesai di v0.1.048, tahap 2 (tombol Bayar dan cicilan) selesai di v0.1.049** (docs/UTANG.md); jendela Bayar belum diuji di browser/HP sungguhan:
+  - Form catat mendapat isian **Pembayaran**: Tunai (bawaan), Belum dibayar, atau Sebagian (uang muka). Bila ada sisa, **Pihak** wajib diisi dan **Jatuh tempo** opsional.
+  - Modal belum dibayar = beli kredit: biaya diakui penuh di siklus (HPP, anggaran, laba-rugi benar), kas belum berkurang, terbentuk **utang** sebesar sisa. Hasil belum dibayar = jual kredit: pendapatan diakui penuh, kas belum bertambah, terbentuk **piutang**. Form panen berharga juga mendapat pilihan ini.
+  - Pelunasan lewat tombol **Bayar** (jumlah bebas, bisa dicicil, ada tanggal bayar), menggantikan "Tandai lunas". Pembayaran bukan transaksi Modal/Hasil baru, hanya menggerakkan kas, sehingga biaya dan hasil tidak terhitung dua kali. Lunas otomatis saat sisa nol.
+  - Dasar hitung: untung, R/C, HPP, BEP, laporan memakai nilai penuh transaksi; Saldo kas dan Arus kas memakai uang yang benar-benar bergerak (transaksi tunai, uang muka, pembayaran); utang/piutang di Rencana dan Beranda memakai sisa, jatuh tempo masuk "Perlu perhatian".
+  - Data: catatan utang menyimpan `transaksiId` dan daftar pembayaran (pola sama dengan panen → transaksi). Ubah transaksi memperbarui jumlah utang; hapus transaksi yang sudah ada pembayaran ditolak sampai pembayarannya dihapus; hapus punya Urungkan. Transaksi lama tanpa catatan utang dianggap tunai, tanpa migrasi. Utang manual di Rencana tetap ada untuk pinjaman di luar transaksi.
+  - Risiko: saldo kas tidak lagi sama dengan jumlah semua transaksi, jadi rumus kas di Beranda, Rencana → Arus kas, dan proyeksi harus diganti dan diuji; bagian terbesar dan paling rawan salah. Dasar nilai penuh dipilih daripada kas sederhana agar biaya siklus tidak meleset.
+  - Tahap 1: pilihan pembayaran di Catat modal/hasil/panen, pembentukan utang/piutang, perhitungan kas (v0.1.048). Tahap 2: tombol Bayar, cicilan, tanggal bayar, lunas otomatis, hapus pembayaran dengan Urungkan (v0.1.049).
+- Penyempurnaan Catat panen vs Catat hasil (**selesai di v0.1.050**, docs/SIKLUS.md; belum diuji di browser/HP sungguhan):
+  - Peringatan hasil ganda di Catat hasil bila siklus sudah punya panen berharga.
+  - Petunjuk bahwa hasil tanpa jumlah barang tidak masuk HPP/BEP/harga minimum, dengan tombol "Catat sebagai panen".
+  - Pengingat "panen belum dijual" di Perlu perhatian; mengarah ke form panen (bukan Catat hasil) agar jumlah barang tetap ikut dihitung.
 
 ## 8. Metrik Keberhasilan
 
@@ -183,6 +218,15 @@ Aplikasi web sederhana untuk mencatat dan menganalisa keuangan pertanian skala r
 | 0.1.013 | 2026-11-03 | Grafik tren garis halus hasil/modal dengan tooltip sentuh, rentang 6/12 bulan, tabel angka |
 | 0.1.014 | 2026-11-03 | Batang Modal di grafik batang diberi warna merah agar berbeda dari Hasil |
 | 0.1.015 | 2026-11-03 | Fase 5: anggaran vs realisasi, arus kas + proyeksi, aset + penyusutan + balik modal, utang/piutang (docs/RENCANA.md) |
+| 0.1.057 | 2026-11-04 | Tab Anggaran jadi daftar ringkas; ketuk untuk detail dengan Ubah dan Hapus anggaran (docs/RENCANA.md) |
+| 0.1.058 | 2026-11-04 | Aset dan Utang/piutang jadi daftar ringkas; ketuk untuk detail dengan Bayar, Ubah, Hapus, riwayat pembayaran (docs/RENCANA.md) |
+| 0.1.059 | 2026-11-04 | Grafik arus kas + perkiraan kas cukup berapa bulan, saringan dan lipat lunas di Utang, lipat siklus selesai, Simpan & tambah lagi, tren harga pasar (docs/RENCANA.md) |
+| 0.1.060 | 2026-11-04 | Detail siklus: Jadwal kegiatan dan Panen jadi daftar ringkas dengan modal detail (Ubah/Hapus/Sudah dikerjakan), tambah jadwal lewat tombol + (docs/JADWAL.md, docs/SIKLUS.md) |
+| 0.1.061 | 2026-11-04 | Satu mesin modal bersama, tombol kembali HP terhubung ke riwayat, hapus seragam dengan Urungkan (docs/MODAL.md) |
+| 0.1.062 | 2026-11-04 | Harga pasar: riwayat jadi daftar ringkas + modal detail (Ubah, Hapus dengan Urungkan) |
+| 0.1.063 | 2026-11-04 | Gaya baris daftar disatukan (.tx, .ang-baris, .m-row): tinggi, hover/fokus, tanda › |
+| 0.1.064 | 2026-11-04 | Penamaan diseragamkan: kata toast, keadaan kosong menyebut tombol +, aturan awalan tombol |
+| 0.1.065 | 2026-11-04 | Aturan surface edit; Selesaikan siklus menjadi modal |
 | 0.1.016 | 2026-11-03 | index.html menjadi versi satu berkas (aman dibuka dari HP); templat pindah ke index.dev.html |
 | 0.1.017 | 2026-11-03 | Hero ringkasan (untung, modal, hasil, R/C) hanya tampil di Beranda |
 | 0.1.018 | 2026-11-03 | Beranda: aksi cepat, perlu perhatian, banding bulan lalu, posisi kas; cache transaksi; font tidak memblokir |
@@ -205,3 +249,21 @@ Aplikasi web sederhana untuk mencatat dan menganalisa keuangan pertanian skala r
 | 0.1.036 | 2026-11-04 | Tindak lanjut catatan audit: Tersembunyi di semua halaman, saldo awal kas, HPP/harga rata-rata, input rupiah, anggaran berformat, rentang tanggal terbalik (docs/AUDIT.md) |
 | 0.1.037 | 2026-11-04 | Fase 6C: foto nota/bukti transaksi (lokal, IndexedDB), ikon di baris transaksi, pembersihan otomatis (docs/NOTA.md) |
 | 0.1.038 | 2026-11-04 | Fase 7: daftar Transaksi bertahap (6.000 baris: 132 → 14 ms), aria-current, tautan lewati, pengumuman halaman, panah di tab Laporan, kurangi gerakan |
+| 0.1.039 | 2026-11-04 | Optimalisasi CRUD siklus, unit, komoditas: ubah, arsip, Urungkan, ulangi siklus, tanggal selesai, validasi (docs/SIKLUS.md) |
+| 0.1.040 | 2026-11-04 | Detail unit dan komoditas dalam modal dengan tombol aksi (docs/SIKLUS.md) |
+| 0.1.041 | 2026-11-04 | Menu baru Unit: halaman khusus unit dan komoditas dengan tab dan FAB |
+| 0.1.042 | 2026-11-04 | Optimasi Siklus (saringan unit/komoditas, ringkasan, tautan modal) dan Lainnya |
+| 0.1.043 | 2026-11-04 | Form tambah/ubah unit dan komoditas dalam modal, dibuka lewat FAB |
+| 0.1.044 | 2026-11-04 | FAB halaman Unit menjadi pilihan melayang: Tambah unit / Tambah komoditas |
+| 0.1.045 | 2026-11-04 | Tombol Siklus baru dihapus dari modal detail unit dan komoditas |
+| 0.1.046 | 2026-11-04 | Tombol Siklus baru dihapus dari halaman Siklus (cukup lewat FAB) |
+| 0.1.047 | 2026-11-04 | Kartu "Perlu perhatian" di Beranda bisa diketuk: ke detail siklus (panen, anggaran) atau Rencana → Utang/piutang |
+| 0.1.048 | 2026-11-04 | Tahap 1 pembayaran utang/piutang: pilihan Tunai/Belum dibayar/Sebagian di Catat modal, hasil, panen; kas dari uang yang bergerak (docs/UTANG.md) |
+| 0.1.049 | 2026-11-04 | Tahap 2 pembayaran utang/piutang: tombol Bayar/Terima bayar, cicilan, tanggal bayar, lunas otomatis, riwayat pembayaran + Urungkan (docs/UTANG.md) |
+| 0.1.050 | 2026-11-04 | Catat panen vs Catat hasil: peringatan hasil ganda, tombol Catat sebagai panen, pengingat panen belum dijual (docs/SIKLUS.md) |
+| 0.1.051 | 2026-11-04 | Jadwal kegiatan per siklus (pupuk, semprot, dsb.) dengan pengingat di Beranda (docs/JADWAL.md) |
+| 0.1.052 | 2026-11-04 | Katalog harga pasar manual per komoditas dan pembanding dengan harga jual (docs/HARGA.md) |
+| 0.1.053 | 2026-11-04 | Kalkulator kelayakan usaha: NPV, IRR, balik modal, PI (docs/KELAYAKAN.md) |
+| 0.1.054 | 2026-11-04 | Ekspor Excel (.xlsx) multi-lembar tanpa pustaka luar: Siklus (rumus), Transaksi, Panen, Utang, Aset, Harga pasar, Jadwal (docs/EKSPOR.md) |
+| 0.1.055 | 2026-11-04 | Semua isian Rencana keuangan (anggaran, saldo awal, aset, utang/piutang, harga pasar) lewat modal dari tombol +; isian di halaman dihapus (docs/FAB.md, docs/RENCANA.md) |
+| 0.1.056 | 2026-11-04 | Rencana keuangan: kartu ringkasan, sub-tab satu baris bisa digeser, Ubah dan Urungkan untuk aset dan utang manual (docs/RENCANA.md) |
