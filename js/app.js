@@ -1,5 +1,5 @@
 /* Tani Keuangan — Fase 1: pencatatan transaksi + efek kaca (v0.1.039) */
-const VERSI = '0.1.077';
+const VERSI = '0.1.079';
 const KUNCI = 'tani.v1';
 const IKON = {
   master: '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><path d="M16.5 13v7M13 16.5h7"/>',
@@ -197,11 +197,6 @@ const App = {
     document.addEventListener('click', (e) => this.klik(e));
     document.addEventListener('keydown', (e) => {
       const t = e.target;
-      if (t && t.matches && t.matches('[role="tab"]') && ['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) {
-        const ls = [...t.parentElement.querySelectorAll('[role="tab"]')], i = ls.indexOf(t);
-        const n = e.key === 'Home' ? 0 : e.key === 'End' ? ls.length - 1 : (i + (e.key === 'ArrowRight' ? 1 : -1) + ls.length) % ls.length;
-        e.preventDefault(); const lt = ls[n].dataset.lt; ls[n].click(); const b = document.querySelector('[data-lt="' + lt + '"]'); if (b) b.focus(); return;
-      }
       if ((e.key === 'Enter' || e.key === ' ') && t && t.matches && t.matches('[role="button"][tabindex]')) { e.preventDefault(); t.click(); }
     });
     $('app').addEventListener('change', (e) => this.ubahField(e));

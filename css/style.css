@@ -78,6 +78,12 @@ table.ledger tbody tr:hover{background:var(--ink)}
 @media (min-width:721px){.fab{bottom:28px}.fab-dial{bottom:96px}}
 /* ---------- Setelan ---------- */
 body{zoom:var(--zoom,1)}
+/* v0.1.078: elemen lebar (bulatan latar Efek kaca, angka panjang) tidak boleh melebarkan layout viewport; di Chrome Android itu membuat navbar fixed lebih lebar dari layar. clip tidak mematikan sticky */
+html,body{overflow-x:clip}
+.bottom-nav{box-sizing:border-box;overflow:hidden}
+.bottom-nav .bnav-btn{overflow:hidden}
+.bnav-btn span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row>span,.tx-n,.note{overflow-wrap:anywhere}
 html[data-scheme="emas"]{--ink:#F3EDE0;--ink-raised:#E8E0CC;--paper:#2B2415;--paper-dim:#6B6046;--paper-faint:#6F654F;--gold:#9C7526;--gold-dim:#B08F4E;--fill:#C9A24B;--fill-hi:#E8D9A8;--on-fill:#2B2415;--act-bg:#E8E0CC;--act-tx:#2B2415;--gain:#4F7548;--loss:#9C4530;--line:#D9CFB4;--line-soft:#E3DAC3}
 html[data-scheme="emas"][data-theme="dark"]{--ink:#1B1712;--ink-raised:#231E17;--paper:#EDE6D6;--paper-dim:#9C907B;--paper-faint:#8D836F;--gold:#C9A24B;--gold-dim:#8C744E;--fill:#C9A24B;--fill-hi:#C9A24B;--on-fill:#1B1712;--act-bg:#231E17;--act-tx:#C9A24B;--gain:#84AB7C;--loss:#C06B54;--line:#3A3226;--line-soft:#2A251C;color-scheme:dark}
 .masthead-right{display:flex;align-items:center;gap:10px}
@@ -149,7 +155,7 @@ html[data-glass="1"] :is(section,.pd-kartu,.dm-kartu,.cx-pop,.bottom-nav,.toast)
   box-shadow:var(--glass-shadow),var(--lg-hi)}
 /* v0.1.072 — blur hanya untuk permukaan yang melayang di atas isi; kartu isi, tombol, dan kolom isian tanpa blur (hemat GPU HP) */
 html[data-glass="1"] :is(.pd-kartu,.dm-kartu,.cx-pop,.bottom-nav,.toast){-webkit-backdrop-filter:var(--lg-blur);backdrop-filter:var(--lg-blur)}
-.bottom-nav,.fab{will-change:transform}
+.fab{will-change:transform}
 html[data-glass="1"] section{border-radius:28px}
 html[data-glass="1"] .hero-card{border-left:1px solid var(--glass-edge)}
 @supports (background:color-mix(in srgb,red 50%,transparent)){
@@ -358,16 +364,6 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 .ikon-btn{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 14px;font:inherit;font-size:12.5px;border:1px solid var(--line);border-radius:8px;background:none;color:var(--paper-dim);cursor:pointer}
 .ikon-btn svg{width:18px;height:18px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .ikon-btn:hover,.ikon-btn:focus-visible{color:var(--gold);border-color:var(--gold)}
-.lap-tabs{display:flex;position:relative;z-index:1;margin-bottom:-1px}
-.lap-tab{flex:1;min-height:46px;font:inherit;font-size:13px;color:var(--paper-dim);background:color-mix(in srgb,var(--ink-raised) 55%,var(--ink));border:1px solid var(--line);border-left-width:0;border-radius:0;cursor:pointer}
-.lap-tab:first-child{border-left-width:1px;border-top-left-radius:10px}
-.lap-tab:last-child{border-top-right-radius:10px}
-.lap-tab.on{background:var(--ink-raised);color:var(--paper);font-weight:700;border-top:2px solid var(--gold);border-bottom-color:var(--ink-raised)}
-.lap-tab:focus-visible{outline:2px solid var(--gold);outline-offset:-3px}
-.lap-panel{border:1px solid var(--line);background:var(--ink-raised);border-radius:0 0 12px 12px;margin-bottom:16px}
-.lap-panel>section,html[data-glass="1"] .lap-panel>section{background:transparent;border:0;border-top:1px solid var(--line-soft);border-radius:0;box-shadow:none;margin:0;-webkit-backdrop-filter:none;backdrop-filter:none}
-.lap-panel>section:first-child{border-top:0}
-@media print{.lap-panel{border:0}}
 /* ---------- Panduan cepat (v0.1.034) ---------- */
 .pd-kartu{width:100%;max-width:440px;max-height:92vh;overflow-y:auto;background:var(--ink-raised);color:var(--paper);border:1px solid var(--line);border-bottom:0;border-radius:18px 18px 0 0;padding:24px 20px calc(18px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 40px rgba(0,0,0,.3)}
 @media (min-width:721px){.pd-kartu{border-bottom:1px solid var(--line);border-radius:18px;padding-bottom:20px}}
@@ -554,3 +550,22 @@ html[data-glass="1"] .row-tuju>.mu{color:var(--paper-dim)}
 }
 
 .dm-kartu.pd-kartu{display:block;overflow-y:auto}
+
+/* v0.1.079 — Laporan satu halaman */
+.lap-filter .lap-fl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--paper-faint);margin-top:2px}
+.lap-untung{display:flex;flex-direction:column;gap:2px}.lap-untung strong{font-family:'Fraunces',Georgia,serif;font-size:30px;font-weight:500;line-height:1.15}
+.lap-kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-soft)}
+.lap-kpi>div{display:flex;flex-direction:column;gap:2px;min-width:0}.lap-kpi .mu{font-size:11px;letter-spacing:.06em;text-transform:uppercase}.lap-kpi b{font-weight:600;font-size:14px;overflow-wrap:anywhere}
+.lap-kartu{border-top:1px solid var(--line-soft)}.lap-kartu>summary{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:52px;padding:10px 22px 10px 0;cursor:pointer;list-style:none;position:relative}
+.lap-kartu>summary::-webkit-details-marker{display:none}
+.lap-kartu>summary::after{content:'›';position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:20px;line-height:1;color:var(--paper-faint);transition:transform .15s}
+.lap-kartu[open]>summary::after{transform:translateY(-50%) rotate(90deg)}
+.lap-kartu>summary:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.lk-n{font-weight:600;min-width:0;overflow-wrap:anywhere}.lk-v{display:flex;flex-direction:column;align-items:flex-end;gap:1px;flex:0 0 auto;font-size:13px}
+.lk-isi{padding:0 0 10px}
+.lap-det>summary{cursor:pointer;font-family:'Fraunces',Georgia,serif;font-size:20px;min-height:44px;display:flex;align-items:center;list-style:none}
+.lap-det>summary::-webkit-details-marker{display:none}
+.lap-det>summary::after{content:'›';margin-left:auto;font-size:20px;color:var(--paper-faint);transition:transform .15s}
+.lap-det[open]>summary::after{transform:rotate(90deg)}
+.lap-untung>.mu{font-size:12px;letter-spacing:.04em;color:var(--paper-dim)}
+.lap-kpi{gap:6px}.lap-kpi b{font-size:12.5px;white-space:nowrap;overflow-wrap:normal}

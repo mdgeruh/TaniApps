@@ -9,7 +9,7 @@ const Rute = {
   /* keadaan aplikasi saat ini → nama rute (tanpa tanda #) */
   hash() {
     const t = App.tab;
-    if (t === 'laporan') return Analisa.sub && Analisa.sub !== 'ringkasan' ? 'laporan-' + Analisa.sub : 'laporan';
+    if (t === 'laporan') return 'laporan';
     if (t === 'rencana') return 'rencana-' + Rencana.sub;
     if (t === 'master') return Siklus.msub === 'kom' ? 'komoditas' : 'unit';
     if (t === 'siklus') return Siklus.sub && Siklus.sub !== 'berjalan' ? 'siklus-' + Siklus.sub : 'siklus';
@@ -33,7 +33,7 @@ const Rute = {
     const D = App.data, tetap = ['beranda', 'transaksi', 'lainnya', 'setelan', 'laporan'];
     if (tetap.includes(h)) { App.go(h); return true; }
     let m;
-    if ((m = /^laporan-(grafik|rincian)$/.exec(h))) { Analisa.sub = m[1]; App.go('laporan'); return true; }
+    if ((m = /^laporan-(grafik|rincian)$/.exec(h))) { App.go('laporan'); return true; } // alamat lama (sub-tab) → satu halaman
     if ((m = /^rencana-(\w+)$/.exec(h)) && Rencana.SUB.some((x) => x[0] === m[1])) { Rencana.sub = m[1]; App.go('rencana'); return true; }
     if (h === 'unit' || h === 'komoditas') { Siklus.msub = h === 'unit' ? 'unit' : 'kom'; App.go('master'); return true; }
     if (h === 'siklus') { Siklus.sub = 'berjalan'; App.go('siklus'); return true; }
