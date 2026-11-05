@@ -1,7 +1,8 @@
-/* Tani Keuangan — Fase 1: pencatatan transaksi + efek kaca (v0.1.038) */
-const VERSI = '0.1.038';
+/* Tani Keuangan — Fase 1: pencatatan transaksi + efek kaca (v0.1.039) */
+const VERSI = '0.1.065';
 const KUNCI = 'tani.v1';
 const IKON = {
+  master: '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><path d="M16.5 13v7M13 16.5h7"/>',
   beranda: '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
   transaksi: '<path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/>',
   siklus: '<path d="M12 21v-9"/><path d="M12 12c0-4 3-6 7-6 0 4-3 6-7 6z"/><path d="M12 14c0-3-2-5-6-5 0 3 2 5 6 5z"/>',
@@ -9,7 +10,7 @@ const IKON = {
   lainnya: '<circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/>'
 };
 const ikon = (k, c) => '<svg class="' + c + '" viewBox="0 0 24 24" aria-hidden="true">' + IKON[k] + '</svg>';
-const TAB = [['beranda','Beranda'],['transaksi','Transaksi'],['siklus','Siklus'],['laporan','Laporan'],['lainnya','Lainnya']];
+const TAB = [['beranda','Beranda'],['transaksi','Transaksi'],['siklus','Siklus'],['master','Unit'],['laporan','Laporan'],['lainnya','Lainnya']];
 const NANTI = {
   laporan: ['Laporan', 'Laporan hadir di Fase 3.']
 };
@@ -76,6 +77,7 @@ const Store = {
     if (!x || typeof x !== 'object' || Array.isArray(x) || !s(x.id)) return false;
     if (k === 'transaksi') return /^\d{4}-\d{2}-\d{2}/.test(x.tanggal || '') && n(x.jumlah) && (x.jenis === 'masuk' || x.jenis === 'keluar');
     if (k === 'siklus') return s(x.mulai);
+    if (k === 'unit' || k === 'komoditas') return s(x.nama);
     if (k === 'panen') return s(x.tanggal) && n(x.kuantitasKotor) && n(x.susut);
     if (k === 'aset') return n(x.hargaBeli) && n(x.umurBulan) && x.umurBulan > 0;
     if (k === 'utang') return n(x.jumlah);
@@ -114,7 +116,7 @@ const Samar = {
     L.forEach((x) => this.samarkan(x));
   },
   pulihkan() { this.ada.forEach((n) => { if (n.isConnected && this.asli.has(n)) n.nodeValue = this.asli.get(n); }); this.ada.clear(); },
-  terapkan() { if (this.aktif()) this.sapu($('app')); else this.pulihkan(); },
+  terapkan() { if (this.aktif()) { this.sapu($('app')); const m = document.querySelector('.dm-lapis'); if (m) this.sapu(m); } else this.pulihkan(); },
   cetak(ya) { this.cetakan = ya; this.terapkan(); },
   pasang(root) {
     this.mo = new MutationObserver((ms) => {
@@ -239,6 +241,7 @@ const App = {
     if (g) { this.go(g.dataset.go); return; }
     const ed = e.target.closest('[data-edit]');
     if (ed) { this.ubahTx(ed.dataset.edit); return; }
+    if (e.target.closest('[data-bu]')) { Rencana.sub = 'utang'; this.go('rencana'); return; }
     if (e.target.closest('[data-bp]')) { Beranda.semua = !Beranda.semua; this.go('beranda', true); return; }
     const fl = e.target.closest('[data-fl]');
     if (fl) { this.filter.lain = !this.filter.lain; this.go('transaksi', true); return; }
@@ -248,6 +251,10 @@ const App = {
     if (d) this.aksi(d.dataset.do, d);
   },
   ubahField(e) {
+    if (e.target.dataset.sfl) { Siklus.saring(e.target.dataset.sfl, e.target.value); return; }
+    if (e.target.id === 'f_siklus' || e.target.id === 'f_kat') { this.bacaForm(); const i = $('f_info'); if (i) i.innerHTML = this.infoHasil(); return; }
+    if (e.target.id === 'f_bayar') { this.bacaForm(); this.go('catat', true); return; }
+    if (e.target.id === 'p_bayar') { Siklus.bacaPanen(); this.go('panen', true); return; }
     const f = e.target.dataset.f;
     if (f) {
       this.filter[f] = e.target.value; this.batasTx = 100;
@@ -302,8 +309,35 @@ const App = {
   },
 
   /* ---------- navigasi ---------- */
+  /* ---- riwayat browser (v0.1.065): tiap pindah halaman = satu entri; tombol kembali HP menutup modal lalu kembali ke halaman sebelumnya ---- */
+  LEAF: ['catat', 'panen', 'siklus-form', 'setelan'],
+  riwayatAwal(t) {
+    this.rw = [{ t: t, sid: Siklus.sid }]; this.ri = 0;
+    try { history.replaceState({ r: 0 }, ''); } catch (e) { /* riwayat tidak tersedia */ }
+    window.addEventListener('popstate', (e) => this.pop(e));
+  },
+  /* true bila perpindahan diserahkan ke history.back() (kembali dari halaman isian ke halaman sebelumnya) */
+  nav(t) {
+    if (t === this.tab && t !== 'siklus-detail') return false;
+    const prev = this.rw[this.ri - 1];
+    if (this.LEAF.includes(this.tab) && prev && prev.t === t && (prev.sid || null) === (Siklus.sid || null)) { try { history.back(); return true; } catch (e) { /* lanjut dorong */ } }
+    this.rw = this.rw.slice(0, this.ri + 1); this.rw.push({ t: t, sid: Siklus.sid }); this.ri++;
+    try { history.pushState({ r: this.ri }, ''); } catch (e) { /* abaikan */ }
+    return false;
+  },
+  siapForm(t) { return t === 'setelan' || (t === 'catat' && !!this.draft) || (t === 'panen' && !!Siklus.pd); },
+  pop(e) {
+    if (Modal.popstate()) return;
+    const s = e.state; if (!s || s.r == null || s.modal || !this.rw[s.r]) return;
+    this.ri = s.r; const ent = this.rw[s.r];
+    if (this.LEAF.includes(ent.t) && !this.siapForm(ent.t) && s.r > 0) { try { history.back(); } catch (er) { /* abaikan */ } return; }
+    this._pop = true;
+    try { if (ent.sid) Siklus.sid = ent.sid; this.go(ent.t); } finally { this._pop = false; }
+  },
   go(t, tetap) {
+    if (!tetap && !this._pop && this.rw && this.nav(t)) return;
     this._ak = null;
+    if (typeof Siklus !== 'undefined') Siklus.pindah(t, this.tab);
     if (t !== 'catat' && t !== 'setelan' && this.tab !== t) this.hapusMinta = null;
     if ((t === 'catat' || t === 'setelan') && this.tab !== 'catat' && this.tab !== 'setelan') this.balik = this.tab;
     this.tab = t;
@@ -324,7 +358,7 @@ const App = {
     $('app').innerHTML = h;
     Form.upgrade($('app'));
     if (t === 'catat') Nota.isiBox(); else if (t === 'setelan') Nota.isiInfo();
-    const induk = { 'siklus-form': 'siklus', 'siklus-detail': 'siklus', panen: 'siklus', master: 'lainnya', rencana: 'lainnya' }[t] || t;
+    const induk = { 'siklus-form': 'siklus', 'siklus-detail': 'siklus', panen: 'siklus', rencana: 'lainnya' }[t] || t;
     document.querySelectorAll('.main-tab-btn,.bnav-btn').forEach((b) => { const on = b.dataset.go === induk; b.classList.toggle('active', on); if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
     $('gear').classList.toggle('active', t === 'setelan');
     if (t === 'setelan') $('gear').setAttribute('aria-current', 'page'); else $('gear').removeAttribute('aria-current');
@@ -333,6 +367,7 @@ const App = {
     Fab.atur();
     this.ringkas();
     if (!tetap) window.scrollTo(0, 0);
+    if (!this.rw) this.riwayatAwal(t);
   },
 
   /* ---------- judul halaman aktif (v0.1.033) ---------- */
@@ -345,10 +380,10 @@ const App = {
     const sid = typeof Siklus !== 'undefined' ? Siklus.cari(Siklus.sid) : null;
     const J = {
       transaksi: ['Transaksi'], siklus: ['Siklus'], laporan: ['Laporan'], lainnya: ['Lainnya'], setelan: ['Setelan'],
-      'siklus-form': ['Siklus baru', 'siklus', 'Siklus'],
+      'siklus-form': Siklus.sf && Siklus.sf.id ? ['Ubah siklus', 'siklus-detail', 'Detail siklus'] : ['Siklus baru', 'siklus', 'Siklus'],
       'siklus-detail': [sid ? Siklus.nama(sid.id) : 'Detail siklus', 'siklus', 'Siklus'],
       panen: [Siklus.pd && Siklus.pd.id ? 'Ubah panen' : 'Catat panen', 'siklus-detail', 'Detail siklus'],
-      master: ['Unit & komoditas', 'lainnya', 'Lainnya'],
+      master: ['Unit & komoditas'],
       rencana: ['Rencana keuangan', 'lainnya', 'Lainnya'],
       catat: [this.draft && this.draft.id ? 'Ubah transaksi' : this.draft && this.draft.jenis === 'masuk' ? 'Catat hasil' : 'Catat modal']
     }[t];
@@ -365,7 +400,7 @@ const App = {
     const m = t.jenis === 'masuk';
     return '<div class="tx" data-edit="' + t.id + '" role="button" tabindex="0">' +
       '<div class="tx-l"><div class="tx-n">' + esc(this.namaKat(t.kategoriId)) + (t.notaId ? Nota.ikon : '') + '</div>' +
-      '<div class="note">' + Setelan.tgl(t.tanggal) + (t.siklusId && this.tab !== 'siklus-detail' && Siklus.cari(t.siklusId) ? ' · ' + esc(Siklus.nama(t.siklusId).split(' · ')[0]) : '') + (t.catatan ? ' · ' + esc(t.catatan) : '') + '</div></div>' +
+      '<div class="note">' + Setelan.tgl(t.tanggal) + (t.siklusId && this.tab !== 'siklus-detail' && Siklus.cari(t.siklusId) ? ' · ' + esc(Siklus.nama(t.siklusId).split(' · ')[0]) : '') + (t.catatan ? ' · ' + esc(t.catatan) : '') + (() => { const u = Utang.tertaut(t), s = u && Utang.sisa(u); return s ? ' · <span class="' + (u.jenis === 'utang' ? 'down' : 'up') + '">' + u.jenis + ' ' + rp(s) + '</span>' : ''; })() + '</div></div>' +
       '<div class="tx-a ' + (m ? 'up' : 'down') + '">' + (m ? '+' : '−') + rp(t.jumlah).replace('Rp ', 'Rp\u00a0') + '</div></div>';
   },
   grafikLipat(bln) {
@@ -424,14 +459,14 @@ const App = {
   /* ---------- tampilan: catat / ubah ---------- */
   baru(sid) {
     const jenis = (this.draft && !this.draft.id && this.draft.jenis) || 'keluar';
-    this.draft = { id: null, jenis, jumlah: 0, kat: this.lastKat[jenis] || this.kategori(jenis)[0].id, tanggal: isoHari(), catatan: '', siklus: sid || '', nota: null, notaLama: null };
+    this.draft = { id: null, jenis, jumlah: 0, kat: this.lastKat[jenis] || this.kategori(jenis)[0].id, tanggal: isoHari(), catatan: '', siklus: sid || '', nota: null, notaLama: null, ...Utang.d0() };
     this.hapusMinta = null;
     this.go('catat');
   },
   ubahTx(id) {
     const t = this.data.transaksi.find((x) => x.id === id);
     if (!t) return;
-    this.draft = { id: t.id, jenis: t.jenis, jumlah: t.jumlah, kat: t.kategoriId, tanggal: t.tanggal, catatan: t.catatan || '', siklus: t.siklusId || '', nota: t.notaId || null, notaLama: t.notaId || null };
+    this.draft = { id: t.id, jenis: t.jenis, jumlah: t.jumlah, kat: t.kategoriId, tanggal: t.tanggal, catatan: t.catatan || '', siklus: t.siklusId || '', nota: t.notaId || null, notaLama: t.notaId || null, ...Utang.dari(t) };
     this.hapusMinta = null;
     this.go('catat');
   },
@@ -440,7 +475,20 @@ const App = {
     if (!$('f_jumlah')) return d;
     d.jumlah = angka($('f_jumlah').value); d.kat = $('f_kat').value;
     d.tanggal = $('f_tanggal').value; d.catatan = $('f_catatan').value; d.siklus = $('f_siklus').value;
+    Utang.baca(d, 'f');
     return d;
+  },
+  /* v0.1.050: catatan di form Catat hasil agar penjualan panen tidak terhitung dua kali dan tetap masuk HPP/BEP */
+  infoHasil() {
+    const d = this.draft; if (!d || d.jenis !== 'masuk' || !d.siklus || !Siklus.cari(d.siklus)) return '';
+    const tx = (p) => p.transaksiId && this.data.transaksi.find((t) => t.id === p.transaksiId && !t.terhapus);
+    const jual = Siklus.panenOf(d.siklus).filter(tx), nilai = jual.reduce((a, p) => a + tx(p).jumlah, 0);
+    const catatan = (h) => '<p class="note" style="margin-top:10px">' + h + '</p>';
+    let h = '';
+    if (!d.id && jual.length) h += catatan('Siklus ini sudah punya ' + jual.length + ' panen berharga (total ' + rp(nilai) + ') yang otomatis tercatat sebagai Hasil. Jangan catat penjualannya lagi di sini agar penghasilan tidak terhitung dua kali.');
+    if (!d.id && d.kat === 'jual-panen') h += catatan('Hasil yang dicatat di sini tidak punya jumlah barang, jadi tidak masuk HPP, BEP, dan harga jual minimum.') +
+      '<button type="button" class="btn" data-do="hasil-ke-panen" style="width:100%;margin-top:8px">Catat sebagai panen</button>';
+    return h;
   },
   vCatat() {
     const d = this.draft || (this.baru(), this.draft);
@@ -454,33 +502,36 @@ const App = {
       '<label for="f_siklus">Siklus (opsional)</label><select id="f_siklus"><option value="">Tanpa siklus</option>' +
       Siklus.opsi(Siklus.daftar().filter((s) => s.status === 'berjalan' || s.id === d.siklus), d.siklus, (x) => Siklus.nama(x.id)) + '</select>' +
       '<label for="f_tanggal">Tanggal</label><input type="date" id="f_tanggal" value="' + d.tanggal + '">' +
+      '<div id="f_info" aria-live="polite">' + this.infoHasil() + '</div>' +
+      Utang.kotak(d, 'f', d.jenis === 'keluar' ? 'Pemasok / pihak' : 'Pembeli / pihak', '') +
       '<label for="f_catatan">Catatan (opsional)</label><input id="f_catatan" maxlength="120" value="' + esc(d.catatan) + '" placeholder="mis. NPK 5 kg">' +
       Nota.kotak() +
       '<button class="btn gold" data-do="simpan">Simpan</button>' +
       (edit ? '' : '<button class="btn" data-do="simpan-baru" style="width:100%;margin-top:10px">Simpan &amp; catat lagi</button>') +
       (edit ? '<button class="btn" data-do="dup-tx" style="width:100%;margin-top:10px">Duplikat sebagai transaksi baru</button>' : '') +
       '<button class="btn" data-do="batal" style="width:100%;margin-top:10px">Batal</button>' +
-      (edit ? '<button class="btn danger" data-do="hapus-tx" style="width:100%;margin-top:10px">' + (this.hapusMinta === d.id ? 'Ketuk lagi untuk menghapus' : 'Hapus transaksi') + '</button>' : '') +
+      (edit ? '<button class="btn danger" data-do="hapus-tx" style="width:100%;margin-top:10px">' + 'Hapus transaksi' + '</button>' : '') +
       '</section>';
   },
 
   /* ---------- tampilan: lainnya ---------- */
   vLainnya() {
     const kustom = this.data.kategori.filter((k) => !k.terhapus);
-    return '<section><h2>Kategori sendiri</h2><p class="note">Kategori bawaan tidak bisa dihapus. Tambahkan yang khusus usaha Anda.</p>' +
+    return '<section><h2>Rencana keuangan</h2><p class="note">Anggaran per siklus, arus kas dan proyeksi, aset dan penyusutan, balik modal, utang/piutang.</p><button class="btn" data-go="rencana" style="width:100%;margin-top:12px">Buka rencana keuangan</button></section>' +
+      '<section><h2>Kategori sendiri</h2><p class="note">Kategori bawaan tidak bisa dihapus. Tambahkan yang khusus usaha Anda.</p>' +
       (kustom.length ? kustom.map((k) => '<div class="row"><span>' + esc(k.nama) + ' <span class="mu">· ' + (k.jenis === 'keluar' ? 'modal' : 'hasil') + '</span></span>' +
         '<button class="btn" data-do="hapus-kat" data-id="' + k.id + '" style="flex:0 0 auto;padding:4px 10px;font-size:12px">Hapus</button></div>').join('') : '') +
       '<label for="k_nama">Nama kategori</label><input id="k_nama" maxlength="40" placeholder="mis. Bambu penyangga">' +
       '<label for="k_jenis">Jenis</label><select id="k_jenis"><option value="keluar">Modal (keluar)</option><option value="masuk">Hasil (masuk)</option></select>' +
       '<button class="btn gold" data-do="tambah-kat">Tambah kategori</button></section>' +
+      '<section><h2>Ekspor Excel</h2><p class="note">Satu berkas .xlsx berisi lembar Siklus, Transaksi, Panen, Utang dan piutang, Aset, Harga pasar, dan Jadwal. Untung dan R/C memakai rumus Excel. Cadangan yang bisa dipulihkan tetap JSON di Setelan.</p>' +
+      '<button class="btn" data-do="ekspor-xlsx" style="width:100%;margin-top:12px">Ekspor Excel (.xlsx)</button><div class="note" id="xlsMsg" role="status" aria-live="polite" style="margin-top:8px"></div></section>' +
       '<section><h2>Ekspor &amp; impor CSV</h2><p class="note">Kolom: tanggal, jenis (keluar/masuk), kategori, siklus, jumlah, catatan. Cadangan penuh (JSON) ada di Setelan.</p>' +
       '<div class="seg tiga" style="margin-top:12px"><button class="btn" data-do="ekspor-csv">Ekspor CSV</button><button class="btn" data-do="impor-csv">Impor teks</button>' +
       '<button class="btn" data-do="berkas-csv">Pilih berkas</button></div>' +
       '<input type="file" id="csvFile" accept=".csv,text/csv" hidden>' +
       '<textarea id="csvBox" class="settings-text" rows="6" aria-label="Data CSV" placeholder="Hasil ekspor muncul di sini; tempel CSV untuk impor"></textarea>' +
       '<div class="note" id="csvMsg" role="status" aria-live="polite" style="margin-top:8px"></div></section>' +
-      '<section><h2>Rencana keuangan</h2><p class="note">Anggaran per siklus, arus kas dan proyeksi, aset dan penyusutan, balik modal, utang/piutang.</p><button class="btn" data-go="rencana" style="width:100%;margin-top:12px">Buka rencana keuangan</button></section>' +
-      '<section><h2>Unit &amp; komoditas</h2><p class="note">Kelola lahan/unit dan jenis komoditas untuk siklus tanam.</p><button class="btn" data-go="master" style="width:100%;margin-top:12px">Kelola unit &amp; komoditas</button></section>' +
       '';
   },
 
@@ -502,21 +553,21 @@ const App = {
     } else if (a === 'batal') { Nota.buang(this.draft); this.draft = null; this.go(this.balik || 'beranda'); }
     else if (a === 'simpan' || a === 'simpan-baru') this.simpanTx(a === 'simpan-baru');
     else if (a === 'dup-tx') {
-      const d = this.bacaForm(); Nota.buang(d); this.draft = Object.assign({}, d, { id: null, tanggal: isoHari(), nota: null, notaLama: null }); this.hapusMinta = null;
+      const d = this.bacaForm(); Nota.buang(d); this.draft = Object.assign({}, d, { id: null, tanggal: isoHari(), nota: null, notaLama: null, kunci: false }); this.hapusMinta = null;
       this.toast('Disalin sebagai transaksi baru — ubah bila perlu, lalu Simpan'); this.go('catat', true);
     } else if (a === 'hapus-tx') {
-      const d = this.draft;
-      if (this.hapusMinta === d.id) {
-        const t = this.data.transaksi.find((x) => x.id === d.id);
-        if (t) { t.terhapus = true; t.diubah = nowIso(); this.simpan(); }
-        this.hapusMinta = null; this.draft = null; this.toast('Transaksi dihapus'); this.go(this.balik || 'beranda');
-      } else { this.bacaForm(); this.hapusMinta = d.id; this.go('catat', true); }
+      const t = this.data.transaksi.find((x) => x.id === this.draft.id);
+      if (!t || Utang.tahan(t)) return;
+      t.terhapus = true; t.diubah = nowIso(); Utang.ikut(t, true); this.simpan();
+      this.hapusMinta = null; this.draft = null; this.go(this.balik || 'beranda');
+      this.toast('Transaksi dihapus', { label: 'Urungkan', fn: () => { t.terhapus = false; t.diubah = nowIso(); Utang.ikut(t, false); this.simpan(); this.go(this.tab, true); } });
     }
     else if (a === 'tambah-kat') this.tambahKat();
     else if (a === 'hapus-kat') {
       const k = this.data.kategori.find((x) => x.id === el.dataset.id);
       if (k) { k.terhapus = true; this.simpan(); this.go('lainnya', true); }
     }
+    else if (a === 'ekspor-xlsx') { try { const n = Xlsx.unduh(); $('xlsMsg').textContent = 'Berkas Excel dibuat: ' + n + ' lembar berisi data.'; } catch (err) { $('xlsMsg').textContent = 'Ekspor Excel gagal. Coba ekspor CSV atau cadangan JSON.'; } }
     else if (a === 'ekspor-csv') this.eksporCsv();
     else if (a === 'impor-csv') this.imporCsv();
     else if (a === 'berkas-csv') $('csvFile').click();
@@ -527,30 +578,34 @@ const App = {
     const d = this.bacaForm();
     if (d.jumlah <= 0) { this.toast('Isi jumlah lebih dari 0'); return; }
     if (!/^\d{4}-\d{2}-\d{2}$/.test(d.tanggal)) { this.toast('Isi tanggal'); return; }
+    const tLama = d.id && this.data.transaksi.find((x) => x.id === d.id), gal = Utang.cek(d.jumlah, d, tLama && Utang.tertaut(tLama));
+    if (gal) { this.toast(gal); return; }
     const kat = this.semuaKat().find((k) => k.id === d.kat);
     const sifat = d.jenis === 'keluar' ? (kat && kat.sifatBiaya) || 'variabel' : null;
+    let tx;
     if (d.id) {
-      const t = this.data.transaksi.find((x) => x.id === d.id);
+      const t = tx = this.data.transaksi.find((x) => x.id === d.id);
       Object.assign(t, { tanggal: d.tanggal, jenis: d.jenis, kategoriId: d.kat, jumlah: d.jumlah, sifatBiaya: sifat, catatan: d.catatan, siklusId: d.siklus || null, notaId: d.nota || null, diubah: nowIso() });
     } else {
-      this.data.transaksi.push({ id: uid('t'), tanggal: d.tanggal, jenis: d.jenis, kategoriId: d.kat, jumlah: d.jumlah, siklusId: d.siklus || null,
+      this.data.transaksi.push(tx = { id: uid('t'), tanggal: d.tanggal, jenis: d.jenis, kategoriId: d.kat, jumlah: d.jumlah, siklusId: d.siklus || null,
         sifatBiaya: sifat, catatan: d.catatan, notaId: d.nota || null, dibuat: nowIso(), diubah: nowIso(), terhapus: false });
     }
+    Utang.sinkron(tx, d);
     this.lastKat[d.jenis] = d.kat;
     if (d.notaLama && d.notaLama !== d.nota) Nota.hapus(d.notaLama);
     this.simpan();
     if (lagi) {
-      this.draft = { id: null, jenis: d.jenis, jumlah: 0, kat: d.kat, tanggal: d.tanggal, catatan: '', siklus: d.siklus, nota: null, notaLama: null };
-      this.toast('Tersimpan'); this.go('catat', true);
+      this.draft = { id: null, jenis: d.jenis, jumlah: 0, kat: d.kat, tanggal: d.tanggal, catatan: '', siklus: d.siklus, nota: null, notaLama: null, ...Utang.d0() };
+      this.toast('Transaksi tersimpan'); this.go('catat', true);
       const j = $('f_jumlah'); if (j) j.focus();
-    } else { this.draft = null; this.toast('Tersimpan'); this.go(['transaksi', 'siklus-detail'].includes(this.balik) ? this.balik : 'beranda'); }
+    } else { this.draft = null; this.toast(d.id ? 'Transaksi diperbarui' : 'Transaksi tersimpan'); this.go(['transaksi', 'siklus-detail'].includes(this.balik) ? this.balik : 'beranda'); }
   },
   tambahKat() {
     const nama = $('k_nama').value.trim(), jenis = $('k_jenis').value;
     if (!nama) { this.toast('Isi nama kategori'); return; }
     if (this.kategori(jenis).some((k) => k.nama.toLowerCase() === nama.toLowerCase())) { this.toast('Kategori sudah ada'); return; }
     this.data.kategori.push({ id: uid('c'), nama, jenis, sifatBiaya: jenis === 'keluar' ? 'variabel' : null, bawaan: false, terhapus: false });
-    this.simpan(); this.toast('Kategori ditambah'); this.go('lainnya', true);
+    this.simpan(); this.toast('Kategori ditambahkan'); this.go('lainnya', true);
   },
 
   /* ---------- CSV ---------- */

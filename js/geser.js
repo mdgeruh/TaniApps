@@ -4,8 +4,9 @@ const Geser = {
   tutup() { document.querySelectorAll('.tx.geser').forEach((e) => { e.classList.remove('geser'); e.style.transform = ''; }); },
   hapus(id) {
     const t = App.data.transaksi.find((x) => x.id === id); if (!t || t.terhapus) return;
-    t.terhapus = true; t.diubah = nowIso(); App.simpan(); App.go(App.tab, true);
-    App.toast('Transaksi dihapus', { label: 'Urungkan', fn: () => { t.terhapus = false; t.diubah = nowIso(); App.simpan(); App.go(App.tab, true); } });
+    if (Utang.tahan(t)) { this.tutup(); return; }
+    t.terhapus = true; t.diubah = nowIso(); Utang.ikut(t, true); App.simpan(); App.go(App.tab, true);
+    App.toast('Transaksi dihapus', { label: 'Urungkan', fn: () => { t.terhapus = false; t.diubah = nowIso(); Utang.ikut(t, false); App.simpan(); App.go(App.tab, true); } });
   },
   mulai(e) {
     const r = e.target.closest && e.target.closest('.tx[data-edit]');
