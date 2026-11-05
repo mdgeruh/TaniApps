@@ -94,8 +94,9 @@ const Analisa = {
     xls: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v10"/><path d="M8 11l4 4 4-4"/><path d="M5 19h14"/></svg>'
   },
   vLaporan() {
+    clearTimeout(this._cf); this._cf = null;
     const tabs = [['ringkasan', 'Ringkasan'], ['grafik', 'Grafik'], ['rincian', 'Rincian']];
-    return '<div class="lap-aksi no-print"><button type="button" class="ikon-btn" data-an="cetak" aria-label="Cetak atau simpan PDF">' + this.IKON.cetak + '<span>Cetak</span></button>' +
+    return '<div class="lap-aksi no-print"><button type="button" class="ikon-btn" data-an="cetak" aria-label="Cetak semua bagian laporan atau simpan PDF">' + this.IKON.cetak + '<span>Cetak</span></button>' +
       '<button type="button" class="ikon-btn" data-an="xls" aria-label="Ekspor ke Excel">' + this.IKON.xls + '<span>Excel</span></button></div>' +
       '<div class="lap-tabs no-print" role="tablist" aria-label="Bagian laporan">' + tabs.map((t) => '<button type="button" role="tab" class="lap-tab' + (this.sub === t[0] ? ' on' : '') + '" aria-selected="' + (this.sub === t[0]) + '" tabindex="' + (this.sub === t[0] ? 0 : -1) + '" data-lt="' + t[0] + '">' + t[1] + '</button>').join('') + '</div>' +
       '<div class="lap-panel" role="tabpanel">' + this.vLaporanIsi() + '</div>';
@@ -146,7 +147,98 @@ const Analisa = {
       '<section class="dash"><h2>Komposisi modal</h2>' + this.komposisi() + '</section>' +
       '<section class="dash"><h2>Komoditas teratas</h2>' + this.topKom() + '</section>';
   },
-  cetak() { window.print(); },
+  /* ---------- Cetak polos (v0.1.074): dokumen khusus cetak, terlepas dari tema, efek kaca, dan tampilan layar ---------- */
+  cetak() { this.cetakPasang(); window.print(); },
+  cetakAman(btn) { // mode Tersembunyi: kertas selalu memuat angka lengkap, jadi minta ketukan kedua
+    const lb = btn.querySelector('span');
+    if (Samar.aktif() && !this._cf) {
+      if (lb) lb.textContent = 'Ketuk lagi';
+      App.toast('Angka akan tercetak lengkap — ketuk Cetak sekali lagi');
+      this._cf = setTimeout(() => { this._cf = null; if (lb && lb.isConnected) lb.textContent = 'Cetak'; }, 4000); return;
+    }
+    clearTimeout(this._cf); this._cf = null; if (lb) lb.textContent = 'Cetak'; this.cetak();
+  },
+  BLN: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+  namaPer() { const n = new Date(); return this.per === 'bulan' ? 'Bulan ini (' + this.BLN[n.getMonth()] + ' ' + n.getFullYear() + ')' : this.per === 'tahun' ? 'Tahun ini (' + n.getFullYear() + ')' : 'Semua periode'; },
+  cetakKop(judul, baris2) {
+    return '<div class="ct-kop"><h1>Laporan Usaha Tani</h1><p class="ct-sub">' + judul + '</p><table class="ct-meta"><tr><th>Periode</th><td>' + this.namaPer() + '</td><th>Dicetak</th><td>' + Setelan.tgl(isoHari()) + '</td></tr>' +
+      '<tr><th>' + baris2[0] + '</th><td>' + baris2[1] + '</td><th>Aplikasi</th><td>Tani Keuangan v' + VERSI + '</td></tr></table></div>';
+  },
+  cetakRingkasan(k) { // k === false: tanpa kop (dipakai cetakSemua)
+    const L = this.hitung(), T = L.reduce((a, r) => ({ m: a.m + r.modal, h: a.h + r.hasil }), { m: 0, h: 0 }), un = T.h - T.m;
+    const kv = (k, v) => '<tr><th>' + k + '</th><td class="n">' + v + '</td></tr>';
+    return (k === false ? '' : this.cetakKop('Ringkasan', ['Cakupan', 'Seluruh transaksi'])) +
+      '<div class="ct-bag"><h2>Untung / rugi</h2><table class="ct-tab ct-kv">' + kv('Untung / rugi', '<b>' + rp(un) + '</b>') + kv('R/C ratio', T.m ? fmtRC(T.h / T.m) : '—') + kv('Modal', rp(T.m)) + kv('Hasil', rp(T.h)) + '</table></div>' + this.cetakBanding();
+  },
+  cetakBanding() {
+    const ke = (n) => { const x = new Date(); x.setDate(1); x.setMonth(x.getMonth() + n); return isoHari(x).slice(0, 7); };
+    const per = (k) => { const tx = App.aktif().filter((t) => t.tanggal.slice(0, 7) === k), m = App.jumlah(tx, 'keluar'), h = App.jumlah(tx, 'masuk'); return { m, h, u: h - m, n: tx.length }; };
+    const lalu = [-3, -2, -1].map((n) => per(ke(n))).filter((r) => r.n), ini = per(ke(0));
+    if (!lalu.length) return '<div class="ct-bag"><h2>Bulan ini vs rata-rata 3 bulan</h2><p class="ct-cat">Belum ada transaksi di 3 bulan sebelumnya sebagai pembanding.</p></div>';
+    const avg = (f) => lalu.reduce((a, r) => a + r[f], 0) / lalu.length;
+    const baris = (nama, f, baikNaik) => { const a = avg(f), c = ini[f], d = c - a, pct = a ? Math.round(d / Math.abs(a) * 100) : null, baik = (d >= 0) === baikNaik;
+      const t = d === 0 ? 'sama' : (pct === null ? '—' : (d > 0 ? '+' : '−') + Math.abs(pct) + '%') + (baik ? ' (membaik)' : ' (memburuk)');
+      return '<tr><td>' + nama + '</td><td class="n">' + rp(c) + '</td><td class="n">' + rp(Math.round(a)) + '</td><td class="n">' + t + '</td></tr>'; };
+    return '<div class="ct-bag"><h2>Bulan ini vs rata-rata 3 bulan</h2><table class="ct-tab"><thead><tr><th>Ukuran</th><th class="n">Bulan ini</th><th class="n">Rata-rata ' + lalu.length + ' bulan</th><th class="n">Selisih</th></tr></thead><tbody>' +
+      baris('Untung', 'u', true) + baris('Modal', 'm', false) + baris('Hasil', 'h', true) + '</tbody></table><p class="ct-cat">Rata-rata dari ' + lalu.length + ' bulan sebelumnya yang ada transaksinya. Membaik = untung atau hasil naik, atau modal turun.</p></div>';
+  },
+  cetakGrafik(k) {
+    const T = this.bulanN(this.rentang), N = T.length, W = 700, X0 = 44, X1 = 694, Y0 = 16, Y1 = 170;
+    const mx = Math.max(1, ...T.map((r) => Math.max(r.m, r.h))), yy = (v) => Y1 - v / mx * (Y1 - Y0), gw = (X1 - X0) / N, bw = Math.min(22, gw * 0.36), lintas = T[0].thn !== T[N - 1].thn;
+    const grid = [0, 1, 2, 3].map((i) => { const v = mx * i / 3, y = yy(v).toFixed(1);
+      return '<line x1="' + X0 + '" x2="' + X1 + '" y1="' + y + '" y2="' + y + '" stroke="#bbb" stroke-width=".6"/><text x="' + (X0 - 5) + '" y="' + (Number(y) + 3) + '" text-anchor="end" font-size="8.5" fill="#333">' + this.ringkasAngka(v) + '</text>'; }).join('');
+    const bar = (v, x, isi) => { const h = v / mx * (Y1 - Y0);
+      return '<rect x="' + x.toFixed(1) + '" y="' + (Y1 - Math.max(v ? 1.5 : 0, h)).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + Math.max(v ? 1.5 : 0, h).toFixed(1) + '" fill="' + isi + '" stroke="#000" stroke-width=".8"/>' +
+        (v ? '<text x="' + (x + bw / 2).toFixed(1) + '" y="' + (Y1 - h - 3).toFixed(1) + '" text-anchor="middle" font-size="7.5" fill="#000">' + this.ringkasAngka(v) + '</text>' : ''); };
+    const batang = T.map((r, i) => { const cx = X0 + gw * (i + 0.5);
+      return bar(r.h, cx - bw - 1, '#444') + bar(r.m, cx + 1, 'url(#ct-h)') + '<text x="' + cx.toFixed(1) + '" y="184" text-anchor="middle" font-size="9" fill="#000">' + r.n + (N > 6 || lintas ? ' ' + String(r.thn).slice(2) : '') + '</text>'; }).join('');
+    const tot = T.reduce((a, r) => ({ h: a.h + r.h, m: a.m + r.m }), { h: 0, m: 0 });
+    const svg = '<svg viewBox="0 0 ' + W + ' 192" width="100%" role="img" aria-label="Grafik batang hasil dan modal per bulan"><defs><pattern id="ct-h" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="4" height="4" fill="#fff"/><line x1="0" y1="0" x2="0" y2="4" stroke="#000" stroke-width="1.4"/></pattern></defs>' + grid + batang + '</svg>';
+    const leg = '<p class="ct-cat"><svg width="12" height="9" aria-hidden="true"><rect x=".5" y=".5" width="11" height="8" fill="#444" stroke="#000"/></svg> Hasil &nbsp;&nbsp; <svg width="12" height="9" aria-hidden="true"><rect x=".5" y=".5" width="11" height="8" fill="url(#ct-h)" stroke="#000"/></svg> Modal · tren ' + N + ' bulan terakhir (tidak dipengaruhi pilihan periode)</p>';
+    const tab = '<table class="ct-tab"><thead><tr><th>Bulan</th><th class="n">Hasil</th><th class="n">Modal</th><th class="n">Untung</th></tr></thead><tbody>' +
+      T.map((r) => '<tr><td>' + r.n + ' ' + r.thn + '</td><td class="n">' + rp(r.h) + '</td><td class="n">' + rp(r.m) + '</td><td class="n">' + rp(r.h - r.m) + '</td></tr>').join('') +
+      '<tr class="ct-tot"><td>Total</td><td class="n">' + rp(tot.h) + '</td><td class="n">' + rp(tot.m) + '</td><td class="n">' + rp(tot.h - tot.m) + '</td></tr></tbody></table>';
+    return (k === false ? '' : this.cetakKop('Grafik', ['Tren', N + ' bulan terakhir'])) + '<div class="ct-bag"><h2>Tren hasil dan modal</h2>' + svg + leg + tab + '</div>' + this.cetakKomposisi() + this.cetakTop();
+  },
+  cetakKomposisi() {
+    const per = {}; let tot = 0;
+    App.aktif().filter((t) => t.jenis === 'keluar' && this.masuk(t.tanggal)).forEach((t) => { per[t.kategoriId] = (per[t.kategoriId] || 0) + t.jumlah; tot += t.jumlah; });
+    if (!tot) return '<div class="ct-bag"><h2>Komposisi modal</h2><p class="ct-cat">Belum ada modal pada periode ini.</p></div>';
+    const ks = Object.keys(per).sort((a, b) => per[b] - per[a]), sisa = ks.slice(6).reduce((a, k) => a + per[k], 0);
+    const baris = (nama, v) => { const p = Math.round(v / tot * 100); return '<tr><td>' + esc(nama) + '</td><td class="n">' + p + '%</td><td class="n">' + rp(v) + '</td><td class="ct-bc"><span class="ct-bar"><i style="width:' + p + '%"></i></span></td></tr>'; };
+    return '<div class="ct-bag"><h2>Komposisi modal</h2><p class="ct-cat">Periode: ' + this.namaPer() + '</p><table class="ct-tab"><thead><tr><th>Kategori</th><th class="n">Porsi</th><th class="n">Jumlah</th><th></th></tr></thead><tbody>' +
+      ks.slice(0, 6).map((k) => baris(App.namaKat(k), per[k])).join('') + (sisa ? baris('Lainnya', sisa) : '') + '<tr class="ct-tot"><td>Total modal</td><td class="n">100%</td><td class="n">' + rp(tot) + '</td><td></td></tr></tbody></table></div>';
+  },
+  cetakTop() {
+    const keep = this.dim; this.dim = 'komoditas'; const L = this.hitung().filter((r) => r.nama !== 'Tanpa siklus').slice(0, 3); this.dim = keep;
+    if (!L.length) return '<div class="ct-bag"><h2>Komoditas teratas</h2><p class="ct-cat">Belum ada komoditas bersiklus pada periode ini.</p></div>';
+    return '<div class="ct-bag"><h2>Komoditas teratas</h2><p class="ct-cat">Periode: ' + this.namaPer() + '</p><table class="ct-tab"><thead><tr><th>No.</th><th>Komoditas</th><th class="n">Untung</th></tr></thead><tbody>' +
+      L.map((r, i) => '<tr><td>' + (i + 1) + '</td><td>' + esc(r.nama) + '</td><td class="n">' + rp(r.untung) + '</td></tr>').join('') + '</tbody></table></div>';
+  },
+  cetakRincian(k) {
+    const L = this.hitung(), dim = (this.DIM.find((x) => x[0] === this.dim) || [0, ''])[1], kop = k === false ? '' : this.cetakKop('Rincian per ' + dim.toLowerCase(), ['Dikelompokkan per', dim]);
+    if (!L.length) return kop + '<p class="ct-cat">Belum ada transaksi pada periode ini.</p>';
+    const T = L.reduce((a, r) => ({ m: a.m + r.modal, h: a.h + r.hasil }), { m: 0, h: 0 }), n = (v) => '<td class="n">' + v + '</td>';
+    const fs = (v, r) => v === null ? '—' : rp(Math.round(v)) + '/' + esc(r.satuan);
+    const mg = Math.round(L[0].mg * 100);
+    return kop + '<table class="ct-tab ct-rinci"><thead><tr><th>' + dim + '</th><th class="n">Modal</th><th class="n">Hasil</th><th class="n">Untung</th><th class="n">R/C</th><th class="n">Panen bersih</th><th class="n">HPP</th><th class="n">Harga rata-rata</th><th class="n">Harga min. (margin ' + mg + '%)</th><th class="n">BEP</th></tr></thead><tbody>' +
+      L.map((r, i) => '<tr><td>' + (i === 0 && r.untung > 0 ? '★ ' : '') + esc(r.nama) + '</td>' + n(rp(r.modal)) + n(rp(r.hasil)) + n('<b>' + (r.untung > 0 ? '+' : '') + rp(r.untung) + '</b>') + n(r.rc === null ? '—' : fmtRC(r.rc)) +
+        n(r.qty ? r.qty.toLocaleString('id-ID') + ' ' + esc(r.satuan) : '—') + n(fs(r.hpp, r)) + n(fs(r.harga, r)) + n(fs(r.hmin, r)) + n(r.bep === null ? '—' : Math.ceil(r.bep).toLocaleString('id-ID') + ' ' + esc(r.satuan)) + '</tr>').join('') +
+      '<tr class="ct-tot"><td>Total</td>' + n(rp(T.m)) + n(rp(T.h)) + n('<b>' + rp(T.h - T.m) + '</b>') + n(T.m ? fmtRC(T.h / T.m) : '—') + '<td></td><td></td><td></td><td></td><td></td></tr></tbody></table>' +
+      '<p class="ct-cat">★ = untung terbesar. HPP = modal (di luar pembelian alat) ÷ panen bersih. Harga rata-rata tidak menghitung penjualan bibit dan bantuan. Harga min. = HPP ÷ (1 − margin). BEP = titik impas dari biaya tetap dan biaya variabel per satuan. — = belum ada data (mis. belum ada panen berharga atau tidak ada biaya tetap).</p>';
+  },
+  cetakSemua() { // v0.1.075: satu dokumen untuk ketiga tab (Ringkasan, Grafik, Rincian), satu kop
+    const dim = (this.DIM.find((x) => x[0] === this.dim) || [0, ''])[1].toLowerCase();
+    const bab = (n, t, isi, cls) => '<div class="ct-bab-wrap' + (cls ? ' ' + cls : '') + '"><h2 class="ct-bab">' + n + '. ' + t + '</h2>' + isi + '</div>';
+    return this.cetakKop('Ringkasan, grafik, dan rincian', ['Isi', 'Ringkasan · Grafik · Rincian per ' + dim]) +
+      bab(1, 'Ringkasan', this.cetakRingkasan(false)) + bab(2, 'Grafik', this.cetakGrafik(false)) + bab(3, 'Rincian per ' + dim, this.cetakRincian(false), 'ct-rincian-bag');
+  },
+  cetakPasang() { // dipanggil sebelum mencetak: hanya halaman Laporan yang punya dokumen cetak sendiri
+    this.cetakLepas(); if (App.tab !== 'laporan') return;
+    const d = document.createElement('div'); d.id = 'cetak-lap'; d.className = 'ct-semua'; d.innerHTML = this.cetakSemua();
+    document.body.appendChild(d); document.documentElement.classList.add('cetak-lap');
+  },
+  cetakLepas() { const d = document.getElementById('cetak-lap'); if (d) d.remove(); document.documentElement.classList.remove('cetak-lap'); },
   eksporXls() {
     const L = this.hitung(), n = (v) => v === null ? '' : Math.round(v * 100) / 100;
     const h = '<table border="1"><tr><th>Nama</th><th>Modal</th><th>Hasil</th><th>Untung</th><th>R/C</th><th>Panen bersih</th><th>HPP</th><th>Harga rata-rata</th><th>Harga min</th><th>BEP (satuan)</th></tr>' +
@@ -167,12 +259,29 @@ const Analisa = {
     return out;
   },
   ringkasAngka(n) { n = Math.abs(n); return n >= 1e6 ? (n / 1e6).toFixed(n >= 1e7 ? 0 : 1).replace('.', ',') + ' jt' : n >= 1e3 ? Math.round(n / 1e3) + ' rb' : String(Math.round(n)); },
-  kurva(P) { // bezier halus tanpa melampaui titik
-    let d = 'M' + P[0][0] + ' ' + P[0][1];
-    for (let i = 0; i < P.length - 1; i++) {
-      const a = P[i], b = P[i + 1], p0 = P[i - 1] || a, p3 = P[i + 2] || b, lo = Math.min(a[1], b[1]), hi = Math.max(a[1], b[1]);
-      const c = (v) => Math.min(hi, Math.max(lo, v));
-      d += ' C' + (a[0] + (b[0] - p0[0]) / 6).toFixed(1) + ' ' + c(a[1] + (b[1] - p0[1]) / 6).toFixed(1) + ' ' + (b[0] - (p3[0] - a[0]) / 6).toFixed(1) + ' ' + c(b[1] - (p3[1] - a[1]) / 6).toFixed(1) + ' ' + b[0] + ' ' + b[1];
+  /* Kurva kubik monoton (Fritsch–Butland, ujung pchip): mulus (kemiringan kontinu di tiap titik), melewati semua titik data,
+     tidak pernah melampaui nilai titik tetangganya (tanpa lonjakan di atas nol atau di luar sumbu), tanpa tekukan di puncak/lembah. */
+  kurva(P) {
+    const n = P.length, f = (v) => (Math.round(v * 100) / 100), M = 'M' + f(P[0][0]) + ' ' + f(P[0][1]);
+    if (n < 2) return M;
+    const h = [], m = [];
+    for (let i = 0; i < n - 1; i++) { h[i] = (P[i + 1][0] - P[i][0]) || 1e-6; m[i] = (P[i + 1][1] - P[i][1]) / h[i]; }
+    const t = new Array(n);
+    if (n === 2) { t[0] = t[1] = m[0]; }
+    else {
+      for (let i = 1; i < n - 1; i++) t[i] = m[i - 1] * m[i] <= 0 ? 0 : 3 * (h[i - 1] + h[i]) / ((2 * h[i] + h[i - 1]) / m[i - 1] + (h[i] + 2 * h[i - 1]) / m[i]);
+      const ujung = (h0, h1, m0, m1) => {
+        let d = ((2 * h0 + h1) * m0 - h0 * m1) / (h0 + h1);
+        if (d * m0 <= 0) d = 0; else if (m0 * m1 <= 0 && Math.abs(d) > 3 * Math.abs(m0)) d = 3 * m0;
+        return d;
+      };
+      t[0] = ujung(h[0], h[1], m[0], m[1]);
+      t[n - 1] = ujung(h[n - 2], h[n - 3], m[n - 2], m[n - 3]);
+    }
+    let d = M;
+    for (let i = 0; i < n - 1; i++) {
+      const a = P[i], b = P[i + 1], k = h[i] / 3;
+      d += ' C' + f(a[0] + k) + ' ' + f(a[1] + t[i] * k) + ' ' + f(b[0] - k) + ' ' + f(b[1] - t[i + 1] * k) + ' ' + f(b[0]) + ' ' + f(b[1]);
     }
     return d;
   },
@@ -209,7 +318,7 @@ const Analisa = {
     const pct = p.x / 320 * 100; tip.style.left = Math.min(Math.max(pct, 24), 76) + '%';
   },
   klik(e) {
-    const an = e.target.closest('[data-an]'); if (an) { if (an.dataset.an === 'cetak') this.cetak(); else this.eksporXls(); return true; }
+    const an = e.target.closest('[data-an]'); if (an) { if (an.dataset.an === 'cetak') this.cetakAman(an); else this.eksporXls(); return true; }
     const lr = e.target.closest('[data-lr]'); if (lr) { this.rentang = Number(lr.dataset.lr); App.go(App.tab === 'beranda' ? 'beranda' : 'laporan', true); return true; }
     const lt = e.target.closest('[data-lt]'); if (lt) { this.sub = lt.dataset.lt; App.go('laporan', true); return true; }
     const sh = e.target.closest('[data-sh]'), sbb = e.target.closest('[data-sb]');

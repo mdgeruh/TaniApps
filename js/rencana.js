@@ -28,7 +28,7 @@ const Rencana = {
   },
   v_anggaran() {
     const L = Siklus.daftar();
-    if (!L.length) return '<section><p class="note">Belum ada siklus. Buat siklus dulu di tab Siklus.</p></section>';
+    if (!L.length) return '<section><p class="note">Belum ada siklus. Buat dulu di menu Siklus.</p></section>';
     const X = L.map((s) => { const r = Siklus.ringkas(s.id).modal, ang = s.anggaran || 0; return { s: s, r: r, ang: ang, p: ang ? Math.round(r / ang * 100) : -1 }; }).sort((x, y) => y.p - x.p);
     const baris = (x) => '<button type="button" class="ang-baris" data-rc="ang-detail" data-id="' + x.s.id + '" aria-label="Detail anggaran ' + esc(Siklus.nama(x.s.id)) + '"><div class="bar-top"><strong>' + esc(Siklus.nama(x.s.id)) + '</strong><span class="mu">' + (x.ang ? x.p + '%' : 'tanpa anggaran') + '</span></div>' +
       (x.ang ? '<div class="bar-ang' + (x.p > 100 ? ' x' : x.p >= 90 ? ' w' : '') + '"><i style="width:' + Math.min(100, x.p) + '%"></i></div><div class="note">' + rp(x.r) + ' / ' + rp(x.ang) + '</div>' : '<div class="note">Modal terpakai ' + rp(x.r) + '</div>') + '</button>';
@@ -216,11 +216,11 @@ const Rencana = {
   dlgBuka(j, arg) {
     const f = this.FORM[j]; if (!f || this.dlg || Modal.m) return false;
     if (f.ada && !f.ada(arg)) return false;
-    if (j === 'harga' && !Siklus.koms().length) { App.toast('Belum ada komoditas. Tambahkan dulu di tab Unit'); return false; }
+    if (j === 'harga' && !Siklus.koms().length) { App.toast('Belum ada komoditas — tambahkan dulu di menu Unit'); return false; }
     if (j === 'angDetail' && !Siklus.cari(arg)) return false;
     if ((j === 'hargaDetail' || j === 'hargaUbah') && !Harga.cari(arg)) return false;
     if ((j === 'asetDetail' && !this.cari('aset', arg)) || (j === 'utangDetail' && !this.cari('utang', arg))) return false;
-    if (j === 'anggaran' && !Siklus.daftar().length) { App.toast('Belum ada siklus. Buat siklus dulu di tab Siklus'); return false; }
+    if (j === 'anggaran' && !Siklus.daftar().length) { App.toast('Belum ada siklus — buat dulu di menu Siklus'); return false; }
     const ed = !!(arg && f.judulUbah), jd = f.judulFn ? f.judulFn(arg) : ed ? f.judulUbah : f.judul;
     this.dlg = { j: j, arg: arg };
     const el = Modal.buka({

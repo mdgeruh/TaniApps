@@ -30,7 +30,7 @@ const Harga = {
   baris(a, b) { return '<div class="row"><span class="mu">' + a + '</span><span>' + b + '</span></div>'; },
   v() {
     const K = Siklus.koms();
-    if (!K.length) return '<section><p class="note">Belum ada komoditas. Tambahkan dulu di tab Unit.</p></section>';
+    if (!K.length) return '<section><p class="note">Belum ada komoditas. Tambahkan dulu di menu Unit.</p></section>';
     const k = K.find((x) => x.id === this.pilih) || K[0]; this.pilih = k.id;
     const L = this.daftar(k), t = L[0], u = this.ubah(k);
     const opsi = K.map((x) => '<option value="' + x.id + '"' + (x.id === k.id ? ' selected' : '') + '>' + esc(x.nama) + '</option>').join('');

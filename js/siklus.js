@@ -66,13 +66,13 @@ const Siklus = {
     const ada = this.daftar(), fu = this.fu && this.unit(this.fu) ? this.fu : '', fk = this.fk && this.kom(this.fk) ? this.fk : '';
     const base = ada.filter((s) => (!fu || s.unitId === fu) && (!fk || s.komoditasId === fk));
     const tampil = base.filter((s) => s.status === this.sub).sort((a, b) => { if (this.sub === 'berjalan') { const x = this.panenPerkiraan(a), y = this.panenPerkiraan(b); return (x ? x.sisa : 1e9) - (y ? y.sisa : 1e9) || b.mulai.localeCompare(a.mulai); } return b.mulai.localeCompare(a.mulai); });
-    return '<section><div class="seg">' + [['berjalan', 'Berjalan'], ['selesai', 'Selesai']].map((x) =>
-      '<button type="button" class="btn' + (this.sub === x[0] ? ' on' : '') + '" data-do="siklus-tab" data-val="' + x[0] + '">' + x[1] + ' (' + base.filter((s) => s.status === x[0]).length + ')</button>').join('') + '</div>' +
+    return '<section><div class="seg tiga">' + [['berjalan', 'Berjalan'], ['selesai', 'Selesai'], ['agenda', 'Agenda']].map((x) =>
+      '<button type="button" class="btn' + (this.sub === x[0] ? ' on' : '') + '" data-do="siklus-tab" data-val="' + x[0] + '">' + x[1] + ' (' + (x[0] === 'agenda' ? Jadwal.itemAgenda(base).length : base.filter((s) => s.status === x[0]).length) + ')</button>').join('') + '</div>' +
       (ada.length > 3 ? '<div class="two"><div><label for="sf_u">Unit</label><select id="sf_u" data-sfl="unit"><option value="">Semua unit</option>' + this.opsi(this.units(true).filter((u) => ada.some((s) => s.unitId === u.id)), fu, (u) => u.nama) + '</select></div>' +
         '<div><label for="sf_k">Komoditas</label><select id="sf_k" data-sfl="kom"><option value="">Semua komoditas</option>' + this.opsi(this.koms(true).filter((k) => ada.some((s) => s.komoditasId === k.id)), fk, (k) => k.nama) + '</select></div></div>' : '') +
       (tampil.length > 1 ? (() => { const m = tampil.reduce((a, s) => { const r = this.ringkas(s.id); a.m += r.modal; a.h += r.hasil; return a; }, { m: 0, h: 0 }), u = m.h - m.m;
         return '<div class="sum" style="margin-top:14px"><div><span class="note">Modal</span><strong class="down">' + rp(m.m) + '</strong></div><div><span class="note">Hasil</span><strong class="up">' + rp(m.h) + '</strong></div><div><span class="note">' + (u < 0 ? 'Rugi' : 'Untung') + '</span><strong class="' + (u < 0 ? 'down' : 'up') + '">' + rp(u) + '</strong></div></div><p class="note" style="margin:6px 0 4px">Total ' + tampil.length + ' siklus ' + this.sub + (fu || fk ? ' (disaring)' : '') + '</p>'; })() : '') +
-      (tampil.length ? tampil.map((s) => {
+      (this.sub === 'agenda' ? Jadwal.agenda(base) : tampil.length ? tampil.map((s) => {
         const r = this.ringkas(s.id), k = this.kom(s.komoditasId), pp = this.panenPerkiraan(s);
         return '<div class="sc-card" data-do="buka-siklus" data-id="' + s.id + '" role="button" tabindex="0"><div class="sc-head"><span class="sc-name">' + esc(this.nama(s.id)) + '</span>' +
           '<span class="badge' + (s.status === 'berjalan' ? ' live' : '') + '">' + (s.status === 'berjalan' ? 'hari ' + this.hari(s) + (k && k.umurPanenHari ? '/' + k.umurPanenHari : '') : 'selesai') + '</span></div>' +
@@ -284,7 +284,7 @@ const Siklus = {
     }
     else if (a === 'hapus-unit' || a === 'hapus-kom') {
       const j = a === 'hapus-unit' ? 'unit' : 'kom', id = el.dataset.id, n = this.pakai(j === 'unit' ? 'unitId' : 'komoditasId', id);
-      if (n) { App.toast('Masih dipakai ' + n + ' siklus — gunakan Arsipkan'); return true; }
+      if (n) { App.toast('Tidak bisa dihapus: masih dipakai ' + n + ' siklus — gunakan Arsipkan'); return true; }
       this.bacaMaster();
       if (this.minta !== j + ':' + id) { this.minta = j + ':' + id; App.go('master', true); return true; }
       const x = (j === 'unit' ? D.unit : D.komoditas).find((y) => y.id === id && !y.terhapus); if (!x) return true;
