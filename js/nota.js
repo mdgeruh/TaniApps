@@ -130,17 +130,13 @@ var Nota = (function () {
     if (Samar.aktif()) { App.toast('Ketuk tombol mata dulu untuk melihat foto'); return; }
     ambil(id).then(function (r) {
       if (!r) return;
-      var u = URL.createObjectURL(r.blob), lama = document.activeElement;
-      var o = document.createElement('div'); o.className = 'nota-lihat';
-      o.setAttribute('role', 'dialog'); o.setAttribute('aria-modal', 'true'); o.setAttribute('aria-label', 'Foto nota');
-      var im = document.createElement('img'); im.alt = 'Foto nota'; im.src = u;
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'btn'; b.textContent = 'Tutup';
-      o.appendChild(im); o.appendChild(b);
-      function tutup() { document.removeEventListener('keydown', tek, true); o.remove(); URL.revokeObjectURL(u); if (lama && lama.focus) lama.focus(); }
-      function tek(e) { if (e.key === 'Escape') { e.preventDefault(); tutup(); } else if (e.key === 'Tab') { e.preventDefault(); b.focus(); } }
-      b.onclick = tutup; o.onclick = function (e) { if (e.target === o) tutup(); };
-      document.addEventListener('keydown', tek, true);
-      document.body.appendChild(o); b.focus();
+      if (Modal.m) return;
+      var u = URL.createObjectURL(r.blob);
+      var el = Modal.buka({ judulId: 'nlJudul', fokus: 'nlTutup', lapis: 'nota-lihat', kartu: 'nota-kartu', tutupLatar: true,
+        html: '<h2 id="nlJudul" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Foto nota</h2><img alt="Foto nota" src="' + u + '"><button type="button" class="btn" id="nlTutup">Tutup</button>',
+        klik: function (e) { if (e.target.closest('#nlTutup')) Modal.tutup(); },
+        onTutup: function () { URL.revokeObjectURL(u); } });
+      if (!el) URL.revokeObjectURL(u);
     }).catch(function () { App.toast('Foto tidak bisa dibuka'); });
   }
 

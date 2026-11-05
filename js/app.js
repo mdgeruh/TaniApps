@@ -1,5 +1,5 @@
 /* Tani Keuangan — Fase 1: pencatatan transaksi + efek kaca (v0.1.039) */
-const VERSI = '0.1.067';
+const VERSI = '0.1.077';
 const KUNCI = 'tani.v1';
 const IKON = {
   master: '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><path d="M16.5 13v7M13 16.5h7"/>',
@@ -213,7 +213,8 @@ const App = {
       t.value = fmtInput(n); t.dispatchEvent(new Event('input', { bubbles: true })); if (t.dataset.rp !== undefined) t.dispatchEvent(new Event('change', { bubbles: true }));
     });
     $('eye2').addEventListener('click', () => { this.buka = !this.buka; this.ringkas(); });
-    window.addEventListener('beforeprint', () => Samar.cetak(true)); window.addEventListener('afterprint', () => Samar.cetak(false));
+    window.addEventListener('beforeprint', () => { Samar.cetak(true); if (typeof Analisa !== 'undefined') Analisa.cetakPasang(); });
+    window.addEventListener('afterprint', () => { if (typeof Analisa !== 'undefined') Analisa.cetakLepas(); Samar.cetak(false); });
     Samar.pasang($('app'));
     $('app').addEventListener('input', (e) => {
       if (e.target.id === 'f_jumlah' || e.target.id === 'p_harga' || e.target.dataset.rp !== undefined) {
@@ -230,7 +231,7 @@ const App = {
     Fab.init();
     Panduan.init();
     $('eye').addEventListener('click', () => { this.buka = !this.buka; this.ringkas(); });
-    this.go('beranda');
+    Rute.awal(); Rute.pasang();
     if (pertama) Panduan.otomatis();
     setTimeout(() => Nota.rapikan(), 4000);
   },
@@ -298,7 +299,7 @@ const App = {
         const mx = Math.max(1, ...T.map(Math.abs)), W = 300, H = 40, mg = 5;
         const P = T.map((u, i) => [i * W / (T.length - 1), H / 2 - u / mx * (H / 2 - mg)]);
         sp.innerHTML = '<line x1="0" y1="' + H / 2 + '" x2="' + W + '" y2="' + H / 2 + '" class="hs-nol" vector-effect="non-scaling-stroke"/>' +
-          '<path d="' + P.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ') + '" class="hs-garis" vector-effect="non-scaling-stroke"/>';
+          '<path d="' + Analisa.kurva(P) + '" class="hs-garis" vector-effect="non-scaling-stroke"/>';
       }
     }
     const sembunyi = Setelan.get('sembunyi') && !this.buka;
@@ -368,9 +369,10 @@ const App = {
     this.ringkas();
     if (!tetap) window.scrollTo(0, 0);
     if (!this.rw) this.riwayatAwal(t);
+    Rute.sinkron();
   },
 
-  /* ---------- judul halaman aktif (v0.1.033) ---------- */
+  /* ---------- header dinamis: judul halaman aktif (v0.1.033; pindah ke header di v0.1.071) ---------- */
   /* Pengumuman halaman untuk pembaca layar (wilayah aria-live), hanya saat halaman berganti. */
   umumkan(teks) {
     const el = $('srHal'); if (!el || this._umum === teks) return; this._umum = teks;
@@ -387,10 +389,16 @@ const App = {
       rencana: ['Rencana keuangan', 'lainnya', 'Lainnya'],
       catat: [this.draft && this.draft.id ? 'Ubah transaksi' : this.draft && this.draft.jenis === 'masuk' ? 'Catat hasil' : 'Catat modal']
     }[t];
-    const box = $('judulHal'), ind = $('judulInduk');
-    if (!J) { box.hidden = true; document.title = 'Tani Keuangan'; this.umumkan('Beranda'); return; }
-    box.hidden = false; $('judulTeks').textContent = J[0];
-    ind.hidden = !J[1]; if (J[1]) { ind.dataset.go = J[1]; ind.textContent = '‹ ' + J[2]; }
+    const h1 = $('hdrJudul'), bk = $('hdrBack'), tag = $('hdrTag');
+    if (!J) {
+      h1.innerHTML = 'Tani <em>Keuangan</em>'; h1.removeAttribute('title'); tag.textContent = 'Keuangan pertanian rumahan';
+      bk.hidden = true; bk.removeAttribute('data-go');
+      document.title = 'Tani Keuangan'; this.umumkan('Beranda'); return;
+    }
+    h1.textContent = J[0]; h1.title = J[0]; tag.textContent = 'Tani Keuangan';
+    bk.hidden = !J[1];
+    if (J[1]) { bk.dataset.go = J[1]; bk.setAttribute('aria-label', 'Kembali ke ' + J[2]); bk.title = 'Kembali ke ' + J[2]; }
+    else { bk.removeAttribute('data-go'); bk.removeAttribute('title'); }
     document.title = J[0] + ' · Tani Keuangan';
     this.umumkan(J[0]);
   },

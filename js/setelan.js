@@ -66,7 +66,7 @@ var Setelan = (function () {
       row('Mode', 'Otomatis mengikuti pengaturan perangkat.', seg('mode', [['light', 'Terang'], ['dark', 'Gelap'], ['auto', 'Otomatis']])) +
       row('Skema warna', 'Hijau Padi adalah palet bawaan Tani Keuangan; Emas Klasik sama dengan Jurnal Trading.',
         seg('skema', [['hijau', 'Hijau Padi', '<i class="dot" style="background:#81AE64"></i>'], ['emas', 'Emas Klasik', '<i class="dot" style="background:#C9A24B"></i>']])) +
-      row('Efek kaca', 'Kartu dan navigasi kaca buram di atas latar gradasi dari warna palet. Bisa dipakai dengan skema dan mode apa saja; otomatis padat bila browser tidak mendukung blur.', seg('kaca', [[false, 'Mati'], [true, 'Nyala']])) +
+      row('Efek kaca', 'Liquid Glass bergaya iOS: kartu, kontrol kapsul, dan navigasi bawah melayang dari kaca bening di atas latar bentuk geometri. Bisa dipakai dengan skema dan mode apa saja; otomatis padat bila browser tidak mendukung blur atau perangkat memilih Kurangi Transparansi.', seg('kaca', [[false, 'Mati'], [true, 'Nyala']])) +
       row('Ukuran tampilan', 'Perkecil atau perbesar seluruh aplikasi.', seg('ukuran', [[90, '90%'], [100, '100%'], [110, '110%'], [120, '120%']])) +
       row('Kembali ke bawaan', 'Terang, Hijau Padi, tanpa efek kaca, 100%, format tanggal dan target margin bawaan.', '<button type="button" class="btn" data-act="reset">Atur ulang</button>');
     var pref = head('Preferensi', 'Berlaku di seluruh aplikasi.') +

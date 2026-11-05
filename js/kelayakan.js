@@ -45,7 +45,7 @@ const Kelayakan = {
   aksi(a, b) {
     const s = this.muat();
     if (a === 'kl-unit') { s.unit = b.dataset.id === 'tahun' ? 'tahun' : 'bulan'; }
-    else if (a === 'kl-isi') { s.net = String(Math.round(Rencana.rata3())); s.unit = 'bulan'; if (!Number(s.net)) App.toast('Belum ada arus kas 3 bulan terakhir. Isi manual.'); }
+    else if (a === 'kl-isi') { s.net = String(Math.round(Rencana.rata3())); s.unit = 'bulan'; if (!Number(s.net)) App.toast('Belum ada arus kas 3 bulan terakhir — isi manual'); }
     this.simpan(); App.go('rencana', true); return true;
   },
   masuk(e) {

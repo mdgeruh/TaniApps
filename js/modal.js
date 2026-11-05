@@ -1,5 +1,5 @@
 /* Tani Keuangan — mesin modal bersama (v0.1.061, docs/MODAL.md)
-   Satu mesin untuk semua jendela: Rencana (formulir dan detail), Siklus (unit/komoditas), Bayar utang.
+   Satu mesin untuk semua jendela (juga Panduan cepat dan foto nota, v0.1.076): Rencana (formulir dan detail), Siklus (unit/komoditas), Bayar utang.
    Menangani: role dialog, kunci gulir, Esc, jebakan Tab, Enter menyimpan, klik latar, format Rupiah, penyamaran angka (Samar),
    pesan galat di dalam modal, pengembalian fokus, dan satu entri riwayat browser (tombol kembali menutup modal). */
 const Modal = {
@@ -8,8 +8,8 @@ const Modal = {
   buka(o) {
     if (this.m) return null;
     const pemicu = o.pemicu || document.activeElement, el = document.createElement('div');
-    el.className = 'dm-lapis'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); if (o.judulId) el.setAttribute('aria-labelledby', o.judulId);
-    el.innerHTML = '<div class="dm-kartu" tabindex="-1">' + (o.html || '') + '</div>';
+    el.className = 'dm-lapis' + (o.lapis ? ' ' + o.lapis : ''); el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); if (o.judulId) el.setAttribute('aria-labelledby', o.judulId);
+    el.innerHTML = '<div class="dm-kartu' + (o.kartu ? ' ' + o.kartu : '') + '" tabindex="-1">' + (o.html || '') + '</div>';
     if (o.antes) o.antes(el);
     document.body.appendChild(el); if (typeof Form !== 'undefined') Form.upgrade(el);
     const m = this.m = { el: el, o: o, pemicu: pemicu, sel: this.selektor(pemicu), kunci: document.body.style.overflow };
@@ -38,7 +38,10 @@ const Modal = {
     document.addEventListener('keydown', m.kd);
     if (typeof Samar !== 'undefined' && Samar.aktif()) Samar.sapu(el);
     this.dorong();
-    const i = o.fokus && el.querySelector('#' + o.fokus); if (i) { i.focus(); if (i.select && i.value) i.select(); } else el.firstChild.focus();
+    let i = o.fokus && el.querySelector('#' + o.fokus);
+    if (i && i.offsetParent === null) { const c = i.parentNode && i.parentNode.querySelector('.cx-btn'); if (c) i = c; } // isian asli disembunyikan Form.upgrade: fokus ke penggantinya
+    if (i) { i.focus(); if (i.tagName === 'INPUT' && i.value) i.select(); }
+    if (!el.contains(document.activeElement)) el.firstChild.focus(); // cadangan: fokus tidak boleh tertinggal di belakang modal
     return el;
   },
   /* tanpaFokus: jangan kembalikan fokus (pemanggil memanggil pulihFokus setelah menggambar ulang halaman) */

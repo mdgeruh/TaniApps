@@ -41,7 +41,7 @@ const Utang = {
   /* utang tertaut yang sudah ada pembayarannya menahan penghapusan transaksi */
   tahan(t) {
     const u = this.tertaut(t);
-    if (u && this.ada(u)) { App.toast('Sudah ada pembayaran. Buka lagi dulu di Rencana → Utang/piutang'); return true; }
+    if (u && this.ada(u)) { App.toast('Sudah ada pembayaran — buka lagi dulu di Rencana → Utang/piutang'); return true; }
     return false;
   },
   /* ---------- pembayaran / cicilan (tahap 2, v0.1.049) ----------
@@ -109,7 +109,7 @@ const Utang = {
     this.catatBayar(u, j, tgl);
     const sisa = this.sisa(u);
     Modal.tutup(true); App.simpan(); App.go('rencana', true); Modal.pulihFokus();
-    App.toast(sisa <= 0 ? 'Lunas. Pembayaran tersimpan' : 'Pembayaran tersimpan, sisa ' + rp(sisa));
+    App.toast(sisa <= 0 ? 'Pembayaran tersimpan — lunas' : 'Pembayaran tersimpan — sisa ' + rp(sisa));
   },
 
   /* ---------- kas: uang yang benar-benar bergerak ---------- */

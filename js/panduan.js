@@ -1,6 +1,6 @@
 /* Tani Keuangan — panduan cepat 4 layar, tampil otomatis saat pertama dibuka (v0.1.034) */
 var Panduan = (function () {
-  var KUNCI = 'tani.panduan', i = 0, el = null, pemicu = null, kunciGulir = '';
+  var KUNCI = 'tani.panduan', i = 0, el = null;
   var IK = {
     tunas: '<path d="M12 21v-8M12 13c0-4 3-7 8-7 0 5-3 7-8 7zM12 15c0-3-2-5-6-5 0 4 2 5 6 5z"/>',
     plus: '<path d="M12 5v14M5 12h14"/>',
@@ -15,7 +15,7 @@ var Panduan = (function () {
       { ik: 'plus', j: 'Catat dengan tombol +', t: ['Ketuk tombol + untuk mencatat modal (pengeluaran) atau hasil (pemasukan). Pilih siklusnya agar biaya dan hasil terhitung per siklus.',
         'Di daftar Transaksi, geser baris ke kiri untuk menghapus; ada tombol Urungkan bila salah.'] },
       { ik: 'grafik', j: 'Siklus dan Laporan', t: ['Siklus adalah satu putaran tanam atau produksi. Catat panennya agar harga pokok per satuan terhitung.',
-        'Tab Laporan menampilkan untung, R/C, titik impas, dan harga jual minimum, plus simulasi bila harga berubah.'] },
+        'Menu Laporan menampilkan untung, R/C, titik impas, dan harga jual minimum, plus simulasi bila harga berubah.'] },
       { ik: 'aman', j: 'Data aman dan bisa dibawa', t: ['Cadangan otomatis tersimpan di browser ini. Ekspor berkas dan sinkron cloud (opsional) ada di Setelan.',
         'Tema, efek kaca, dan ukuran tampilan juga diatur di Setelan. Panduan ini bisa dibuka lagi dari Setelan, bagian Tentang.'] }
     ];
@@ -34,23 +34,13 @@ var Panduan = (function () {
       '<div class="pd-aksi"><div class="pd-kiri">' + kiri + '</div><button type="button" class="btn gold pd-maju" data-pd="' + (akhir ? 'selesai' : 'maju') + '">' + (akhir ? 'Mulai' : 'Lanjut') + '</button></div>';
     var p = el.querySelector('.pd-maju'); if (p) p.focus();
   }
-  function buka() {
-    if (el) return;
-    pemicu = document.activeElement; i = 0;
-    el = document.createElement('div');
-    el.className = 'pd-lapis'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'pdJudul');
-    el.innerHTML = '<div class="pd-kartu"></div>';
-    document.body.appendChild(el);
-    kunciGulir = document.body.style.overflow; document.body.style.overflow = 'hidden';
-    gambar();
+  function buka() { // memakai mesin Modal (v0.1.076): Back, Esc, fokus, dan kunci gulir sama dengan modal lain
+    if (el || Modal.m) return;
+    i = 0;
+    el = Modal.buka({ judulId: 'pdJudul', kartu: 'pd-kartu', tutupLatar: false, html: '', onTutup: function () { el = null; Penyimpanan.set(KUNCI, '1'); } });
+    if (el) gambar();
   }
-  function tutup() {
-    if (!el) return;
-    el.remove(); el = null;
-    document.body.style.overflow = kunciGulir;
-    Penyimpanan.set(KUNCI, '1');
-    if (pemicu && pemicu.focus && document.body.contains(pemicu)) pemicu.focus();
-  }
+  function tutup() { Modal.tutup(); }
   function otomatis() { if (Penyimpanan.get(KUNCI) === null) setTimeout(buka, 500); }
   function html() {
     return '<div class="settings-row"><div class="settings-desc"><strong>Panduan cepat</strong><span>Pengenalan singkat 4 layar: mencatat, siklus, laporan, dan cadangan.</span></div>' +
@@ -64,16 +54,6 @@ var Panduan = (function () {
       else if (a === 'maju') { i = Math.min(i + 1, layar().length - 1); gambar(); }
       else if (a === 'mundur') { i = Math.max(i - 1, 0); gambar(); }
       else tutup();
-    });
-    document.addEventListener('keydown', function (e) {
-      if (!el) return;
-      if (e.key === 'Escape') { e.preventDefault(); tutup(); }
-      else if (e.key === 'Tab') {
-        var f = el.querySelectorAll('button'); if (!f.length) return;
-        var a = f[0], z = f[f.length - 1];
-        if (e.shiftKey && document.activeElement === a) { e.preventDefault(); z.focus(); }
-        else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a.focus(); }
-      }
     });
   }
   return { init: init, otomatis: otomatis, buka: buka, html: html };
