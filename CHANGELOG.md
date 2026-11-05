@@ -1,5 +1,37 @@
 # Changelog
 
+## Dokumen — 2026-11-05 (tanpa rilis kode)
+- `roadmap.md`: ditambahkan **Fase 6D — Tampilan Desktop** (usulan, belum dikerjakan; tiga tahap, 16 butir) beserta temuan terbuka tentang Cetak yang memanggil `window.print` dua kali. Tanggal pembaruan dokumen diperbarui. Versi aplikasi tetap v0.1.079.
+
+## v0.1.079 — 2026-11-05
+Laporan menjadi satu halaman tanpa tab, lebih ringkas dan berurutan dari ringkasan ke detail.
+
+### Diubah
+- Tab Ringkasan/Grafik/Rincian dihapus. Urutan satu halaman: **Filter** (periode dan pengelompokan, satu kali di atas) → **Ringkasan** (untung/rugi besar, modal, hasil, R/C) → **Tren hasil/modal** → **Bulan ini vs rata-rata 3 bulan** → **Komposisi modal** → **Rincian per siklus/komoditas/unit** → **Simulasi**.
+- Filter periode dan pengelompokan kini satu set di atas dan berlaku untuk semua bagian (sebelumnya diulang di dua tab dan tidak berlaku di Grafik).
+- **Rincian** berupa baris lipat: tiap kelompok satu baris (nama, untung, R/C); ketuk untuk detail (modal/hasil, margin, panen, HPP, harga, BEP). Halaman lebih pendek (±2.400 px dengan data contoh, dengan tujuh kelompok tertutup).
+- **Simulasi** berupa lipatan yang tertutup bawaan dan tetap terbuka saat memilih persen.
+- Dihapus karena menggandakan isi lain: grafik batang "Tren 6 bulan" (sudah ada grafik garis) dan "Komoditas teratas" (sudah ada di Rincian yang berurut).
+- Alamat lama `#laporan-grafik` dan `#laporan-rincian` tetap berfungsi dan membuka Laporan. Navigasi panah antar-tab dan gaya tab/panel dihapus.
+- Cetak dan Excel tidak berubah: dokumen cetak tetap memuat tiga bab (ringkasan, grafik, rincian).
+- `js/analisa.js`, `js/rute.js`, `js/app.js`, `css/style.css`, `sw.js` (`tani-keuangan-v0_1_079`), `index.html`, `tani-keuangan.html`, `docs/LAPORAN.md`, `docs/PANDUAN.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Diuji di Chromium lebar 390 dan 360: tidak ada tab tersisa, ketujuh bagian muncul, baris rincian membuka detail, pindah pengelompokan memperbarui judul rincian, Simulasi tetap terbuka saat memilih persen, ekspor Excel terunduh, tanpa galat. Belum diuji di HP sungguhan.
+- Temuan terbuka (sudah ada di v0.1.078, bukan dari perubahan ini): satu ketukan Cetak memanggil `window.print` dua kali pada uji headless; penyebabnya belum ditemukan dan belum dipastikan terjadi di browser sungguhan.
+
+## v0.1.078 — 2026-11-05
+Pengaman navbar bawah yang terlihat lebih lebar dari layar saat Beranda digeser sampai dasar di Chrome Android.
+
+### Diperbaiki
+- `html` dan `body` memakai `overflow-x: clip` agar elemen yang keluar dari layar (bulatan latar Efek kaca, angka atau teks panjang) tidak melebarkan layout viewport; navbar fixed mengikuti lebar layout viewport itu.
+- Navbar bawah: `box-sizing: border-box`, isi dipotong di tepinya, label tombol tidak melampaui tombol. `will-change: transform` dilepas dari navbar (tetap di tombol +) karena lapisan komposit tambahan di navbar fixed sering bermasalah di Chrome Android.
+- Teks panjang tanpa spasi (nama, catatan) di baris dan keterangan membungkus, bukan mendorong halaman melebar.
+
+### Catatan
+- **Belum terkonfirmasi di perangkat.** Penyebab pastinya belum bisa dimunculkan ulang di emulasi Chrome Android (lebar 360–430, ukuran tampilan 90–120%, Efek kaca hidup dan mati); ini pengaman untuk penyebab paling umum. Bila masih terjadi, kirim tangkapan layar beserta pengaturan Efek kaca dan Ukuran tampilan.
+- Tidak mengubah skema data. `css/style.css`, `js/app.js`, `sw.js` (cache `tani-keuangan-v0_1_078`), `index.html`, `tani-keuangan.html`, `README.md`, `roadmap.md`, `VERSION`.
+
 ## v0.1.077 — 2026-11-05
 Rute web. Dokumen: `docs/RUTE.md`.
 

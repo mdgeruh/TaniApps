@@ -1,6 +1,6 @@
 # Roadmap — Web App Keuangan Pertanian Rumahan
 
-> Status dokumen: draf v0.1 · Terakhir diperbarui: 4 November 2026 · Fase 5 selesai; Fase 6 berjalan: cadangan otomatis + dasar PWA; FAB kontekstual; chart di Beranda; data contoh otomatis; sinkron Supabase (v0.1.023); penyempurnaan UX (v0.1.024); kartu hero Beranda (v0.1.025); judul halaman (v0.1.026); foto nota lokal (v0.1.037); optimasi performa/aksesibilitas bagian 1 (v0.1.038); pembayaran utang/piutang tahap 1 (v0.1.048) dan tahap 2: tombol Bayar + cicilan (v0.1.049); Catat panen vs Catat hasil (v0.1.050); jadwal kegiatan per siklus (v0.1.051); katalog harga pasar (v0.1.052); kalkulator kelayakan usaha (v0.1.053); ekspor Excel (v0.1.054); isian Rencana keuangan lewat modal FAB (v0.1.055); ringkasan, sub-tab geser, ubah aset/utang (v0.1.056); daftar anggaran dengan detail (v0.1.057); daftar aset dan utang dengan detail (v0.1.058); grafik arus kas, saringan utang, simpan & tambah lagi, tren harga (v0.1.059); Jadwal dan Panen lewat modal detail (v0.1.060); modal bersama, tombol kembali, hapus seragam (v0.1.061); detail siklus dipadatkan (v0.1.066); duplikat FAB dibersihkan (v0.1.067)
+> Status dokumen: draf v0.1 · Terakhir diperbarui: 5 November 2026 · Fase 5 selesai; Fase 6 berjalan: cadangan otomatis + dasar PWA; FAB kontekstual; chart di Beranda; data contoh otomatis; sinkron Supabase (v0.1.023); penyempurnaan UX (v0.1.024); kartu hero Beranda (v0.1.025); judul halaman (v0.1.026); foto nota lokal (v0.1.037); optimasi performa/aksesibilitas bagian 1 (v0.1.038); pembayaran utang/piutang tahap 1 (v0.1.048) dan tahap 2: tombol Bayar + cicilan (v0.1.049); Catat panen vs Catat hasil (v0.1.050); jadwal kegiatan per siklus (v0.1.051); katalog harga pasar (v0.1.052); kalkulator kelayakan usaha (v0.1.053); ekspor Excel (v0.1.054); isian Rencana keuangan lewat modal FAB (v0.1.055); ringkasan, sub-tab geser, ubah aset/utang (v0.1.056); daftar anggaran dengan detail (v0.1.057); daftar aset dan utang dengan detail (v0.1.058); grafik arus kas, saringan utang, simpan & tambah lagi, tren harga (v0.1.059); Jadwal dan Panen lewat modal detail (v0.1.060); modal bersama, tombol kembali, hapus seragam (v0.1.061); detail siklus dipadatkan (v0.1.066); duplikat FAB dibersihkan (v0.1.067)
 
 ## 1. Visi & Tujuan
 
@@ -118,6 +118,34 @@ Aplikasi web sederhana untuk mencatat dan menganalisa keuangan pertanian skala r
 - [x] Template komoditas dengan estimasi biaya standar (sayur daun, cabai, tomat, lele, ayam petelur) — proporsi biaya (bukan harga rupiah) (v0.1.030)
 - [x] Foto nota/bukti transaksi (lokal dulu) — satu foto per transaksi, dikecilkan, disimpan di IndexedDB; tidak ikut ekspor/sinkron (v0.1.037, docs/NOTA.md); belum diuji di kamera HP sungguhan
 - **Hasil:** pengguna baru membuat siklus dalam satu ketukan dan bisa menguji skenario harga
+
+### Fase 6D — Tampilan Desktop (usulan, belum dikerjakan)
+Dasar: pemeriksaan v0.1.079 di Chromium headless lebar 1440 (belum di Firefox/Safari/komputer sungguhan). Temuan: isi satu kolom 920 px di tengah (±260 px kosong di tiap sisi); tab navigasi di Beranda muncul di bawah kartu hero, di halaman lain di atas isi (tidak konsisten); teks pada grafik ikut membesar karena SVG diskalakan penuh.
+
+**Tahap 1 — murah dan berdampak**
+- [ ] Wadah lebih lebar (±1200 px di layar ≥1024 px) dengan grid dua kolom: Beranda (hero + perhatian | grafik), Laporan (ringkasan | tren); lebar baca teks tetap terbatas
+- [ ] Navigasi desktop konsisten di semua halaman (sidebar kiri tetap berisi ikon dan label; bilah bawah tetap untuk HP) — menggantikan tab atas yang letaknya berbeda di Beranda
+- [ ] Grafik: ukuran font tetap dan tinggi dibatasi (ukur lebar dengan ResizeObserver, gambar ulang); 12 bulan sebagai bawaan di desktop
+- [ ] Angka: `font-variant-numeric: tabular-nums` dan rata kanan di semua daftar dan tabel jumlah
+- [ ] Keamanan data multi-tab: deteksi perubahan dari tab lain (`storage` event / `BroadcastChannel`) dan muat ulang atau beri peringatan sebelum menimpa (sekarang tab terakhir yang menyimpan menimpa tanpa peringatan)
+- [ ] Pintasan keyboard: `N` catat baru, `/` cari, `G` lalu `B/T/S/L` pindah halaman, `?` daftar pintasan; tooltip pada tombol ikon
+
+**Tahap 2 — lebih besar**
+- [ ] Transaksi sebagai tabel di desktop (tanggal, kategori, siklus, catatan, jumlah): header lengket, bisa diurutkan, baris hover
+- [ ] Pola master–detail: daftar di kiri, detail/ubah di panel kanan (bukan pindah halaman penuh)
+- [ ] Modal menjadi dialog atau drawer selebar 480–560 px di desktop; formulir dua kolom untuk isian pendek; urutan Tab dan fokus otomatis
+- [ ] Interaksi mouse: `@media (hover:hover) and (pointer:fine)` — efek hover, target klik lebih rapat, ikon hapus di baris (geser tidak berguna dengan mouse), pilih banyak dengan kotak centang untuk hapus massal
+- [ ] 3–4 kartu KPI dalam satu baris
+
+**Tahap 3 — pelengkap**
+- [ ] Cadangan ke folder pilihan (File System Access API, Chromium) dan seret-dan-lepas berkas untuk impor
+- [ ] Cetak: `@page` A4 (margin, nomor halaman, `break-inside: avoid`)
+- [ ] PWA desktop: manifest dengan `display_override`, jendela mandiri; tema otomatis mengikuti `prefers-color-scheme`
+- [ ] Aksesibilitas desktop: landmark `nav`/`main`, `aria-current` menu aktif, cek kontras AA tema terang, uji zoom 200% dan skala Windows 125–150%
+- [ ] Uji otomatis di lebar 1024/1280/1440/1920 pada Chromium, Firefox, WebKit, dengan tangkapan layar pembanding
+
+**Temuan terbuka**
+- [ ] Satu ketukan Cetak memanggil `window.print` dua kali pada uji headless (sama di v0.1.078 dan v0.1.079); penyebab belum ditemukan, belum dipastikan terjadi di browser sungguhan
 
 ### Fase 7 — Rilis v1.0 (Minggu 17–18)
 - [ ] Pengujian dengan data nyata (minimal 1–2 siklus)
@@ -253,6 +281,8 @@ Aplikasi web sederhana untuk mencatat dan menganalisa keuangan pertanian skala r
 | 0.1.071 | 2026-11-05 | Header dinamis: judul halaman aktif pindah ke header, tombol kembali bulat untuk halaman turunan, blok judul di bawah menu dihapus (docs/STYLE.md) |
 | 0.1.072 | 2026-11-05 | Perbaikan efek kaca di HP: backdrop-filter 25–47 → 4 elemen, latar tetap terisolasi, navbar/FAB di lapisan sendiri (belum diuji di HP sungguhan) |
 | 0.1.073 | 2026-11-05 | Kurva tren Laporan dan Beranda lebih halus: kubik monoton (tanpa tekukan dan lonjakan), sparkline Beranda tidak lagi garis patah |
+| 0.1.078 | 2026-11-05 | Pengaman navbar bawah: overflow-x clip di html/body, navbar dan label tidak bisa melebihi layar, teks panjang membungkus |
+| 0.1.079 | 2026-11-05 | Laporan satu halaman tanpa tab; rincian lipat; filter satu set |
 | 0.1.077 | 2026-11-05 | Rute web: alamat #nama per halaman, buka langsung dan muat ulang, pintasan PWA Catat modal/hasil (docs/RUTE.md) |
 | 0.1.076 | 2026-11-05 | Konsistensi modal: Panduan dan foto nota memakai mesin Modal, fokus awal modal, teks pesan diseragamkan (docs/MODAL.md, docs/STYLE.md) |
 | 0.1.075 | 2026-11-05 | Cetak laporan: satu dokumen untuk ketiga tab sekaligus (Ringkasan, Grafik, Rincian) |
