@@ -48,7 +48,7 @@ const Analisa = {
   kartu(r, i) {
     const f = (n) => n === null ? '—' : rp(Math.round(n)), u = r.untung >= 0;
     const baris = (a, b) => '<div class="row"><span class="mu">' + a + '</span><span>' + b + '</span></div>';
-    return '<section class="lap-kartu"><div class="sec-head"><h2>' + (i === 0 && r.untung > 0 ? '★ ' : '') + esc(r.nama) + '</h2><span class="tx-a ' + (u ? 'up' : 'down') + '">' + (u ? '+' : '') + rp(r.untung).replace('Rp ', 'Rp\u00a0') + '</span></div>' +
+    return '<details class="lap-kartu"><summary><span class="lk-n">' + (i === 0 && r.untung > 0 ? '★ ' : '') + esc(r.nama) + '</span><span class="lk-v"><b class="' + (u ? 'up' : 'down') + '">' + (u ? '+' : '') + rp(r.untung) + '</b><span class="mu">R/C ' + (r.rc === null ? '—' : fmtRC(r.rc)) + '</span></span></summary><div class="lk-isi">' +
       baris('Modal / Hasil', rp(r.modal) + ' / ' + rp(r.hasil)) +
       baris('R/C ratio', r.rc === null ? '—' : fmtRC(r.rc) + (r.rc >= 1 ? ' (untung)' : ' (rugi)')) +
       baris('Margin', r.margin === null ? '—' : Math.round(r.margin * 100) + '%') +
@@ -57,7 +57,7 @@ const Analisa = {
       baris('Harga jual rata-rata', f(r.harga)) +
       baris('Harga min. (margin ' + Math.round(r.mg * 100) + '%)', f(r.hmin)) +
       baris('Titik impas (BEP)', r.bep === null ? (r.tetap ? 'butuh panen berharga' : 'tak ada biaya tetap') : Math.ceil(r.bep).toLocaleString('id-ID') + ' ' + esc(r.satuan) + ' · ' + rp(Math.round(r.bep * r.harga))) +
-      '</section>';
+      '</div></details>';
   },
   vBanding() {
     const ke = (n) => { const x = new Date(); x.setDate(1); x.setMonth(x.getMonth() + n); return isoHari(x).slice(0, 7); };
@@ -77,7 +77,7 @@ const Analisa = {
     const sim = (r) => { const h = r.hasil * fh, m = r.modal * fb; return { h, m, u: h - m, rc: m ? h / m : null }; };
     const T = L.reduce((a, r) => { const x = sim(r); return { u0: a.u0 + r.untung, u: a.u + x.u, h: a.h + x.h, m: a.m + x.m }; }, { u0: 0, u: 0, h: 0, m: 0 });
     const cls = (v) => (v >= 0 ? 'up' : 'down'), fmt = (v) => (v > 0 ? '+' : '') + this.simH;
-    return '<section><h2>Simulasi: bagaimana jika…</h2><p class="note">Harga jual berubah</p>' +
+    return '<section class="lap-sim"><details class="lap-det" id="lapSim"' + (this.simBuka ? ' open' : '') + '><summary>Simulasi: bagaimana jika…</summary><p class="note">Harga jual berubah</p>' +
       this.chip([[-20, '−20%'], [-10, '−10%'], [0, '0'], [10, '+10%'], [20, '+20%']], this.simH, 'sh') + '<p class="note">Biaya (modal) berubah</p>' +
       this.chip([[-10, '−10%'], [0, '0'], [10, '+10%'], [20, '+20%']], this.simB, 'sb') +
       '<div class="row"><span class="mu">Untung sekarang</span><span class="' + cls(T.u0) + '">' + rp(T.u0) + '</span></div>' +
@@ -86,32 +86,26 @@ const Analisa = {
       L.slice(0, 6).map((r) => { const x = sim(r), batas = r.hasil ? Math.round((1 - r.modal / r.hasil) * 100) : null;
         return '<div style="margin-top:10px"><strong>' + esc(r.nama) + '</strong><div class="row"><span class="mu">Untung</span><span>' + rp(r.untung) + ' → <span class="' + cls(x.u) + '">' + rp(Math.round(x.u)) + '</span></span></div>' +
           '<div class="row"><span class="mu">Harga boleh turun maks.</span><span>' + (batas === null ? '—' : batas > 0 ? batas + '% sebelum rugi' : '<span class="down">sudah rugi</span>') + '</span></div></div>'; }).join('') +
-      '<p class="note">Hitungan sederhana: hasil dan modal dikali persen perubahan (volume dianggap tetap). Mengikuti periode dan pengelompokan di bawah.</p></section>';
+      '<p class="note">Hitungan sederhana: hasil dan modal dikali persen perubahan (volume dianggap tetap). Mengikuti periode dan pengelompokan di atas.</p></details></section>';
   },
-  sub: 'ringkasan',
   IKON: {
     cetak: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V4h10v5"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M7 14h10v6H7z"/></svg>',
     xls: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v10"/><path d="M8 11l4 4 4-4"/><path d="M5 19h14"/></svg>'
   },
+  simBuka: false,
+  /* Laporan satu halaman (v0.1.079): filter → ringkasan → tren → banding → komposisi → rincian → simulasi */
   vLaporan() {
     clearTimeout(this._cf); this._cf = null;
-    const tabs = [['ringkasan', 'Ringkasan'], ['grafik', 'Grafik'], ['rincian', 'Rincian']];
-    return '<div class="lap-aksi no-print"><button type="button" class="ikon-btn" data-an="cetak" aria-label="Cetak semua bagian laporan atau simpan PDF">' + this.IKON.cetak + '<span>Cetak</span></button>' +
-      '<button type="button" class="ikon-btn" data-an="xls" aria-label="Ekspor ke Excel">' + this.IKON.xls + '<span>Excel</span></button></div>' +
-      '<div class="lap-tabs no-print" role="tablist" aria-label="Bagian laporan">' + tabs.map((t) => '<button type="button" role="tab" class="lap-tab' + (this.sub === t[0] ? ' on' : '') + '" aria-selected="' + (this.sub === t[0]) + '" tabindex="' + (this.sub === t[0] ? 0 : -1) + '" data-lt="' + t[0] + '">' + t[1] + '</button>').join('') + '</div>' +
-      '<div class="lap-panel" role="tabpanel">' + this.vLaporanIsi() + '</div>';
-  },
-  vLaporanIsi() {
     const L = this.hitung(), T = L.reduce((a, r) => ({ m: a.m + r.modal, h: a.h + r.hasil }), { m: 0, h: 0 }), un = T.h - T.m;
-    const filter = this.chip(this.PER, this.per, 'lp') + this.chip(this.DIM, this.dim, 'ld');
-    const kepala = '';
-    if (this.sub === 'grafik') return kepala + this.vDashboard();
-    if (this.sub === 'rincian') return kepala + '<section>' + filter + '<p class="note">Urut dari untung terbesar. HPP = modal (di luar pembelian alat) ÷ panen bersih; harga rata-rata tidak menghitung penjualan bibit dan bantuan; BEP dihitung dari biaya tetap, harga rata-rata, dan biaya variabel per satuan.</p></section>' +
-      (L.length ? L.map((r, i) => this.kartu(r, i)).join('') : '<section><p class="note">Belum ada transaksi pada periode ini. Catat modal/hasil atau isi data contoh di Beranda.</p></section>');
-    return kepala + '<section>' + filter +
-      '<div class="row"><span class="mu">Untung / rugi</span><strong class="' + (un >= 0 ? 'up' : 'down') + '">' + rp(un) + '</strong></div>' +
-      '<div class="row"><span class="mu">R/C ratio</span><span>' + (T.m ? fmtRC(T.h / T.m) : '—') + '</span></div>' +
-      '<div class="row"><span class="mu">Modal / Hasil</span><span>' + rp(T.m) + ' / ' + rp(T.h) + '</span></div></section>' + this.vBanding() + this.vSimulasi();
+    const lab = (arr, k) => (arr.find((x) => x[0] === k) || ['', ''])[1];
+    const aksi = '<div class="lap-aksi no-print"><button type="button" class="ikon-btn" data-an="cetak" aria-label="Cetak semua bagian laporan atau simpan PDF">' + this.IKON.cetak + '<span>Cetak</span></button>' +
+      '<button type="button" class="ikon-btn" data-an="xls" aria-label="Ekspor ke Excel">' + this.IKON.xls + '<span>Excel</span></button></div>';
+    const filter = '<section class="lap-filter no-print"><div class="lap-fl">Periode</div>' + this.chip(this.PER, this.per, 'lp') + '<div class="lap-fl">Kelompokkan per</div>' + this.chip(this.DIM, this.dim, 'ld') + '</section>';
+    const kpi = '<section><div class="lap-untung"><span class="mu">Untung / rugi · ' + (this.per === 'semua' ? 'semua waktu' : lab(this.PER, this.per).toLowerCase()) + '</span><strong class="' + (un >= 0 ? 'up' : 'down') + '">' + rp(un) + '</strong></div>' +
+      '<div class="lap-kpi"><div><span class="mu">Modal</span><b>' + rp(T.m) + '</b></div><div><span class="mu">Hasil</span><b>' + rp(T.h) + '</b></div><div><span class="mu">R/C ratio</span><b>' + (T.m ? fmtRC(T.h / T.m) : '—') + '</b></div></div></section>';
+    const rinci = '<section class="lap-rinci"><h2>Rincian per ' + lab(this.DIM, this.dim).toLowerCase() + '</h2><p class="note">Urut dari untung terbesar; ketuk satu baris untuk detail. HPP = modal (di luar pembelian alat) ÷ panen bersih; harga rata-rata tidak menghitung penjualan bibit dan bantuan; BEP dihitung dari biaya tetap, harga rata-rata, dan biaya variabel per satuan.</p>' +
+      (L.length ? L.map((r, i) => this.kartu(r, i)).join('') : '<p class="note">Belum ada transaksi pada periode ini. Catat modal/hasil atau isi data contoh di Beranda.</p>') + '</section>';
+    return aksi + filter + kpi + this.vGrafik() + this.vBanding() + '<section class="dash"><h2>Komposisi modal</h2>' + this.komposisi() + '</section>' + rinci + this.vSimulasi();
   },
   /* ---------- Fase 4: dashboard, cetak, Excel ---------- */
   tren() {
@@ -320,7 +314,6 @@ const Analisa = {
   klik(e) {
     const an = e.target.closest('[data-an]'); if (an) { if (an.dataset.an === 'cetak') this.cetakAman(an); else this.eksporXls(); return true; }
     const lr = e.target.closest('[data-lr]'); if (lr) { this.rentang = Number(lr.dataset.lr); App.go(App.tab === 'beranda' ? 'beranda' : 'laporan', true); return true; }
-    const lt = e.target.closest('[data-lt]'); if (lt) { this.sub = lt.dataset.lt; App.go('laporan', true); return true; }
     const sh = e.target.closest('[data-sh]'), sbb = e.target.closest('[data-sb]');
     if (sh || sbb) { if (sh) this.simH = Number(sh.dataset.sh); else this.simB = Number(sbb.dataset.sb); App.go('laporan', true); return true; }
     const p = e.target.closest('[data-lp]'), d = e.target.closest('[data-ld]');
@@ -331,3 +324,5 @@ const Analisa = {
 
 document.addEventListener('pointerdown', (e) => Analisa.sentuh(e));
 document.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse' || e.buttons || e.pressure) Analisa.sentuh(e); });
+
+document.addEventListener('toggle', (e) => { if (e.target && e.target.id === 'lapSim') Analisa.simBuka = e.target.open; }, true);
