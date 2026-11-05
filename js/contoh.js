@@ -54,7 +54,9 @@ const Contoh = {
     panen(s3, kKangkung, 98, 120, 8, 3000, 'Pasar pagi'); panen(s3, kKangkung, 96, 100, 5, 3000, 'Pasar pagi'); panen(s3, kKangkung, 94, 90, 6, 3500, 'Warung Bu Made');
 
     /* Cabai rawit: berjalan, panen bertahap, untung */
+    kCabai.hargaPasar = [{ id: uid('h'), tanggal: T(20), harga: 52000, sumber: 'Pasar Induk' }, { id: uid('h'), tanggal: T(6), harga: 58000, sumber: 'Pasar Induk' }];
     const s4 = sik(uKebun, kCabai, 105, null, 1600000, 'Polybag 100 batang');
+    s4.jadwal = [{ id: uid('j'), nama: 'Pupuk susulan NPK', tanggal: T(-2), ulang: 14, selesai: false, terakhir: T(12) }, { id: uid('j'), nama: 'Semprot hama', tanggal: T(1), ulang: 7, selesai: false, terakhir: T(6) }];
     tx(s4, 105, 'keluar', 'benih', 200000, 'Bibit cabai rawit 200 batang'); tx(s4, 104, 'keluar', 'media', 180000, 'Polybag dan tanah kompos'); tx(s4, 100, 'keluar', 'pupuk', 120000, 'Pupuk kandang');
     tx(s4, 90, 'keluar', 'pupuk', 95000, 'NPK 5 kg'); tx(s4, 70, 'keluar', 'pupuk', 85000, 'Pupuk daun'); tx(s4, 50, 'keluar', 'pupuk', 95000, 'NPK susulan');
     tx(s4, 60, 'keluar', 'pestisida', 140000, 'Insektisida dan fungisida'); tx(s4, 35, 'keluar', 'pestisida', 52000, 'Fungisida');

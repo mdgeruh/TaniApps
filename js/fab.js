@@ -1,21 +1,24 @@
-/* Tani Keuangan — FAB mengikuti halaman aktif (v0.1.020) */
+/* Tani Keuangan — FAB mengikuti halaman aktif (v0.1.020; Rencana lewat modal v0.1.055) */
 const Fab = {
   c: null, terbuka: false,
   catat(jenis, sid) { App.draft = { id: null, jenis }; App.baru(sid); },
-  fokus(id) { const e = document.getElementById(id); if (e) { e.scrollIntoView({ block: 'center', behavior: 'smooth' }); e.focus({ preventScroll: true }); } },
   /* null = FAB disembunyikan; { nama, aksi } = satu ketukan; { nama, pilih: [[label, fungsi]] } = pilihan melayang */
   cfg() {
     const t = App.tab, tx = (sid) => [['Catat modal', () => Fab.catat('keluar', sid)], ['Catat hasil', () => Fab.catat('masuk', sid)]];
-    if (t === 'beranda' || t === 'transaksi' || t === 'lainnya') return { nama: 'Catat transaksi', pilih: tx() };
+    if (t === 'beranda' || t === 'transaksi') return { nama: 'Catat transaksi', pilih: tx() };
+    if (t === 'master') return { nama: 'Tambah unit atau komoditas', pilih: [['Tambah unit', () => Siklus.aksi('form-baru', { dataset: { j: 'unit' } })], ['Tambah komoditas', () => Siklus.aksi('form-baru', { dataset: { j: 'kom' } })]] };
     if (t === 'siklus') return { nama: 'Siklus baru', aksi: () => App.go('siklus-form') };
     if (t === 'siklus-detail') {
       const s = Siklus.cari(Siklus.sid);
-      return s && s.status === 'berjalan' ? { nama: 'Catat untuk siklus ini', pilih: tx(s.id).concat([['Catat panen', () => Siklus.aksi('catat-panen', {})]]) } : null;
+      return s && s.status === 'berjalan' ? { nama: 'Catat untuk siklus ini', pilih: tx(s.id).concat([['Catat panen', () => Siklus.aksi('catat-panen', {})], ['Tambah jadwal kegiatan', () => Rencana.dlgBuka('jadwal')]]) } : null;
     }
     if (t === 'rencana') {
-      if (Rencana.sub === 'kas') return { nama: 'Catat transaksi', pilih: tx() };
-      if (Rencana.sub === 'aset') return { nama: 'Tambah aset', aksi: () => Fab.fokus('as_nama') };
-      if (Rencana.sub === 'utang') return { nama: 'Catat utang atau piutang', aksi: () => Fab.fokus('ut_pihak') };
+      const R = (j) => () => Rencana.dlgBuka(j);
+      if (Rencana.sub === 'kas') return { nama: 'Catat transaksi atau atur saldo awal', pilih: tx().concat([['Atur saldo awal kas', R('awal')]]) };
+      if (Rencana.sub === 'anggaran') return { nama: 'Atur anggaran', aksi: R('anggaran') };
+      if (Rencana.sub === 'aset') return { nama: 'Tambah aset', aksi: R('aset') };
+      if (Rencana.sub === 'harga') return { nama: 'Catat harga pasar', aksi: R('harga') };
+      if (Rencana.sub === 'utang') return { nama: 'Catat utang atau piutang', aksi: R('utang') };
     }
     return null;
   },

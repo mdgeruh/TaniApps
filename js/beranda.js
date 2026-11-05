@@ -10,23 +10,28 @@ const Beranda = {
   },
   perhatian() {
     const out = [], hari = isoHari(), d7 = isoHari(new Date(Date.now() + 7 * 864e5));
+    const ke = (t, a) => ({ t, a }); // t = teks, a = atribut tujuan ketukan
     App.data.utang.filter((u) => !u.terhapus && !u.lunas && u.jatuhTempo && u.jatuhTempo <= d7).forEach((u) =>
-      out.push((u.jatuhTempo < hari ? '⚠ ' : '⏰ ') + (u.jenis === 'utang' ? 'Utang ke ' : 'Piutang dari ') + esc(u.pihak) + ' ' + rp(u.jumlah) + (u.jatuhTempo < hari ? ' sudah lewat jatuh tempo' : ' jatuh tempo ' + Setelan.tgl(u.jatuhTempo))));
+      out.push(ke((u.jatuhTempo < hari ? '⚠ ' : '⏰ ') + (u.jenis === 'utang' ? 'Utang ke ' : 'Piutang dari ') + esc(u.pihak) + ' ' + rp(Utang.sisa(u)) + (u.jatuhTempo < hari ? ' sudah lewat jatuh tempo' : ' jatuh tempo ' + Setelan.tgl(u.jatuhTempo)), 'data-bu="1" aria-label="Buka Rencana, Utang/piutang"')));
     Siklus.daftar().filter((s) => s.status === 'berjalan' && s.anggaran).forEach((s) => {
       const r = Siklus.ringkas(s.id).modal, p = Math.round(r / s.anggaran * 100);
-      if (p >= 90) out.push((p > 100 ? '⚠ ' : '⏰ ') + esc(Siklus.nama(s.id)) + ': modal ' + p + '% dari anggaran');
+      if (p >= 90) out.push(ke((p > 100 ? '⚠ ' : '⏰ ') + esc(Siklus.nama(s.id)) + ': modal ' + p + '% dari anggaran', 'data-do="buka-siklus" data-id="' + s.id + '" aria-label="Buka siklus ' + esc(Siklus.nama(s.id)) + '"'));
     });
     const pn = []; Siklus.daftar().forEach((s) => { const pp = Siklus.panenPerkiraan(s); if (!pp || pp.sisa > 7) return;
-      pn.push([pp.sisa, pp.sisa < 0 ? '⚠ ' + esc(Siklus.nama(s.id)) + ': lewat perkiraan panen ' + (-pp.sisa) + ' hari' : '⏰ ' + esc(Siklus.nama(s.id)) + ': perkiraan panen ' + (pp.sisa === 0 ? 'hari ini' : pp.sisa + ' hari lagi')]); });
+      pn.push([pp.sisa, ke(pp.sisa < 0 ? '⚠ ' + esc(Siklus.nama(s.id)) + ': lewat perkiraan panen ' + (-pp.sisa) + ' hari' : '⏰ ' + esc(Siklus.nama(s.id)) + ': perkiraan panen ' + (pp.sisa === 0 ? 'hari ini' : pp.sisa + ' hari lagi'), 'data-do="buka-siklus" data-id="' + s.id + '" aria-label="Buka siklus ' + esc(Siklus.nama(s.id)) + '"')]); });
+    Siklus.daftar().forEach((s) => { const k = Siklus.kom(s.komoditasId);
+      Siklus.panenOf(s.id).filter((p) => !p.transaksiId && !p.hargaPerSatuan && p.tanggal <= hari).forEach((p) =>
+        out.push(ke('⏰ ' + esc(Siklus.nama(s.id)) + ': panen ' + Setelan.tgl(p.tanggal) + ' (' + fmtN(p.kuantitasKotor - p.susut) + (k ? ' ' + esc(k.satuan) : '') + ') belum dijual', 'data-do="panen-belum-jual" data-id="' + p.id + '" data-sid="' + s.id + '" aria-label="Isi harga jual panen ' + esc(Siklus.nama(s.id)) + '"'))); });
+    Jadwal.mendekat().forEach((x) => out.push(ke((x.n < 0 ? '⚠ ' : '⏰ ') + esc(Siklus.nama(x.s.id)) + ': ' + esc(x.j.nama) + ' ' + Jadwal.teks(x.j), 'data-do="buka-siklus" data-id="' + x.s.id + '" aria-label="Buka siklus ' + esc(Siklus.nama(x.s.id)) + '"')));
     out.unshift(...pn.sort((x, y) => x[0] - y[0]).map((x) => x[1])); // pengingat panen paling atas
     const tampil = this.semua ? out : out.slice(0, 3);
-    return out.length ? '<section><h2>Perlu perhatian</h2>' + tampil.map((t) => '<div class="row"><span>' + t + '</span></div>').join('') +
+    return out.length ? '<section><h2>Perlu perhatian</h2>' + tampil.map((x) => '<div class="row row-tuju" role="button" tabindex="0" ' + x.a + '><span>' + x.t + '</span><span class="mu" aria-hidden="true">›</span></div>').join('') +
       (out.length > 3 ? '<button type="button" class="btn" data-bp="1" style="width:100%;margin-top:10px">' + (this.semua ? 'Ringkas' : 'Lihat semua (' + out.length + ')') + '</button>' : '') + '</section>' : '';
   },
   atas() {
     const ini = bulanIni(), lalu = bulanLalu(), a = this.per(ini), b = this.per(lalu);
-    const saldo = (Number(App.data.pengaturan.saldoAwal) || 0) + App.aktif().reduce((s, t) => s + (t.jenis === 'masuk' ? t.jumlah : -t.jumlah), 0);
-    const U = App.data.utang.filter((u) => !u.terhapus && !u.lunas), tot = (j) => U.filter((u) => u.jenis === j).reduce((s, u) => s + u.jumlah, 0);
+    const saldo = Utang.saldo();
+    const U = App.data.utang.filter((u) => !u.terhapus && !u.lunas), tot = (j) => U.filter((u) => u.jenis === j).reduce((s, u) => s + Utang.sisa(u), 0);
     const row = (x, y) => '<div class="row"><span class="mu">' + x + '</span><span>' + y + '</span></div>';
     if (!App.aktif().length) return '';
     return this.perhatian() +
