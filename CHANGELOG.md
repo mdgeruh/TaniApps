@@ -1,5 +1,49 @@
 # Changelog
 
+## v0.1.067 — 2026-11-05
+Duplikat dengan FAB di halaman lain dihapus (lanjutan v0.1.066).
+
+### Hasil pemeriksaan
+Semua halaman dan sub-tab dipindai (data contoh dan data kosong): Beranda, Transaksi, Siklus (berjalan/selesai), Unit/Komoditas, Lainnya, Rencana (Kas, Anggaran, Aset, Harga, Utang, Kelayakan), dan Laporan. Dua tombol yang menggandakan FAB ditemukan; sisanya sudah bersih.
+
+### Dihapus (duplikat)
+- **Unit/Komoditas, keadaan kosong:** tombol **Tambah unit** / **Tambah komoditas** (sama dengan FAB). Kalimat petunjuk yang muncul dua kali ("Ketuk tombol + untuk menambah …") kini hanya satu; petunjuk bawah hanya tampil bila daftar sudah berisi.
+- **Rencana → Arus kas:** tombol **Atur saldo awal** (sama dengan **Atur saldo awal kas** di FAB, dan bertentangan dengan `docs/RENCANA.md` bahwa isian hanya lewat tombol +). Diganti petunjuk "Ketuk tombol + lalu pilih Atur saldo awal kas untuk mengubahnya." Handler `awal-atur` yang tidak lagi dipakai ikut dihapus.
+
+### Tidak diubah
+- **Lainnya → Tambah kategori:** bukan duplikat; halaman Lainnya tidak punya FAB.
+- Tombol di formulir (Simpan, Batal) dan aksi yang tidak ada di FAB (Ubah, Selesaikan, Hapus, Atur saldo awal lewat FAB tetap ada).
+
+### Diubah (berkas)
+- `js/siklus.js` (`vMaster`), `js/rencana.js` (tab Kas), `js/app.js` (versi), `sw.js` (`tani-keuangan-v0_1_067`), `index.html`, `tani-keuangan.html`, `docs/FAB.md`, `docs/RENCANA.md`, `docs/STYLE.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Diuji di Chromium lebar HP: pemindaian ulang semua halaman tidak lagi menemukan duplikat; FAB di Unit/Komoditas (kosong) membuka form Tambah unit; FAB di Kas membuka dan menyimpan saldo awal; tanpa galat. Belum diuji di HP sungguhan.
+
+## v0.1.066 — 2026-11-04
+Halaman detail siklus dipadatkan; aksi yang sudah ada di tombol + (FAB) tidak lagi diulang di halaman.
+
+### Dihapus (duplikat)
+- Tombol **Catat transaksi** dan **Catat panen** di kartu Ringkasan: isinya sama dengan FAB (Catat modal, Catat hasil, Catat panen) di siklus berjalan. Handler `catat-siklus` yang tidak lagi dipakai ikut dihapus.
+- Tombol **Kembali ke daftar** di bawah Ringkasan: sudah ada tombol induk **‹ Siklus** di judul halaman dan tombol kembali browser.
+
+### Diubah (optimasi)
+- **Panen** menampilkan 3 terbaru dan **Transaksi siklus** 5 terbaru; tombol **Lihat semua (N)** / **Ringkas** membentangkan atau mengecilkan daftarnya. Tombol memakai `aria-expanded`, fokus tetap di tombol, posisi gulir dipertahankan, dan daftar kembali ringkas saat pindah ke siklus lain.
+- **Hapus siklus** dipindah ke bagian paling bawah halaman (tidak lagi di kartu Ringkasan) agar aksi yang merusak tidak berdekatan dengan aksi sehari-hari. Perilakunya sama: siklus yang masih punya transaksi tidak bisa dihapus.
+- Tinggi halaman pada data contoh: siklus berjalan 3078 px → 2014 px (sekitar 35% lebih pendek); siklus selesai 2201 px → 1635 px.
+- Daftar transaksi tidak lagi diurutkan ulang di atas data aslinya (memakai salinan).
+- Siklus berjalan kini punya dua tombol aksi di Ringkasan (**Ubah siklus**, **Selesaikan siklus**); siklus selesai tetap **Ubah siklus**, **Buka kembali**, **Ulangi siklus ini**.
+
+### Diperbaiki
+- `sw.js`: nama cache masih `tani-keuangan-v0_1_061` meski changelog v0.1.062–065 mencatat pembaruannya. Sekarang `tani-keuangan-v0_1_066`.
+
+### Diubah (berkas)
+- `js/siklus.js` (`vDetail`, handler `lg-toggle`), `js/app.js` (versi), `sw.js`, `index.html`, `tani-keuangan.html`, `docs/SIKLUS.md`, `docs/FAB.md`, `docs/STYLE.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Diuji di Chromium lebar HP dan desktop: isi FAB siklus berjalan (Catat modal, Catat hasil, Catat panen, Tambah jadwal kegiatan), FAB tersembunyi di siklus selesai, Lihat semua/Ringkas (jumlah baris, label, `aria-expanded`, fokus, posisi gulir), reset saat pindah siklus, tombol ‹ Siklus, Selesaikan siklus dan Urungkan, Hapus siklus yang diblokir, tanpa galat. Belum diuji di HP sungguhan.
+- Aturan ini hanya diterapkan pada detail siklus. Halaman lain yang mungkin menggandakan FAB belum diperiksa.
+
 ## v0.1.065 — 2026-11-04
 Aturan surface edit (butir audit terakhir): modal untuk isian sedikit, halaman untuk isian banyak. Aturan tertulis di `docs/MODAL.md`.
 
