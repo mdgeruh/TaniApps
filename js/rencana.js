@@ -51,7 +51,7 @@ const Rencana = {
     let sal = this.saldoSd(B[5]);
     const P = [1, 2, 3].map((n) => { sal += r; return [this.bulanKe(n), r, sal]; });
     const tr = (k, n, sd, pr) => '<tr' + (pr ? ' style="opacity:.7"' : '') + '><td>' + this.namaBln(k) + (pr ? ' *' : '') + '</td><td class="' + (n >= 0 ? 'up' : 'down') + '">' + rp(Math.round(n)) + '</td><td>' + rp(Math.round(sd)) + '</td></tr>';
-    return '<section><h2>Saldo awal kas</h2><p class="note">Uang yang sudah ada sebelum transaksi pertama dicatat (modal awal usaha). Dihitung di saldo kas, tidak dihitung sebagai hasil atau untung.</p><div class="row" style="margin-top:8px"><span class="mu">Saldo awal</span><strong>' + rp(this.saldoAwal()) + '</strong></div><div class="seg sm" style="justify-content:flex-start;margin-top:8px"><button type="button" class="btn" data-rc="awal-atur">Atur saldo awal</button></div></section>' +
+    return '<section><h2>Saldo awal kas</h2><p class="note">Uang yang sudah ada sebelum transaksi pertama dicatat (modal awal usaha). Dihitung di saldo kas, tidak dihitung sebagai hasil atau untung.</p><div class="row" style="margin-top:8px"><span class="mu">Saldo awal</span><strong>' + rp(this.saldoAwal()) + '</strong></div><p class="note" style="margin-top:8px">Ketuk tombol + lalu pilih Atur saldo awal kas untuk mengubahnya.</p></section>' +
       '<section><h2>Arus kas</h2>' + this.grafikKas(B, P, r) + '<div class="gulir"><table class="lg-tab"><tr><th>Bulan</th><th>Bersih</th><th>Saldo</th></tr>' + B.map((k) => tr(k, this.net(k), this.saldoSd(k))).join('') + P.map((x) => tr(x[0], x[1], x[2], 1)).join('') +
       '</table></div><p class="note">* Proyeksi sederhana: rata-rata arus bersih 3 bulan terakhir yang ada transaksinya (' + rp(Math.round(r)) + ' per bulan), bukan jaminan.</p></section>';
   },
@@ -256,7 +256,6 @@ const Rencana = {
     const det = { 'ang-detail': 'angDetail', 'aset-detail': 'asetDetail', 'utang-detail': 'utangDetail', 'harga-detail': 'hargaDetail' };
     if (det[a]) { this.dlgBuka(det[a], id); return true; }
     if (a === 'uf') { this.uf = b.dataset.v; App.go('rencana', true); return true; }
-    if (a === 'awal-atur') { this.dlgBuka('awal'); return true; }
     if (a === 'kl-unit' || a === 'kl-isi') return Kelayakan.aksi(a, b);
     return false;
   },
