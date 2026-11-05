@@ -1,5 +1,5 @@
 /* Tani Keuangan — service worker (luring). Naikkan V setiap versi agar cache lama diganti. */
-var V = 'tani-keuangan-v0_1_061';
+var V = 'tani-keuangan-v0_1_067';
 var BERKAS = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', function (e) {

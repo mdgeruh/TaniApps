@@ -11,6 +11,7 @@ const JENIS_UNIT = [['kebun', 'Kebun / lahan'], ['hidroponik', 'Hidroponik'], ['
 const num = (s) => { const n = parseFloat(String(s || '').replace(/\./g, '').replace(',', '.')); return isFinite(n) ? n : 0; };
 const fmtN = (n) => (Math.round(n * 100) / 100).toLocaleString('id-ID');
 const Siklus = {
+  lg: {}, lgSid: null, /* daftar yang dibentangkan di detail siklus (v0.1.066) */
   sid: null, sub: 'berjalan', msub: 'unit', fu: '', fk: '', pd: null, minta: null, sf: null, mf: null,
   d() { return App.data; },
   unit(id) { return this.d().unit.find((x) => x.id === id); },
@@ -102,7 +103,10 @@ const Siklus = {
     const s = this.cari(this.sid);
     if (!s) return this.vList();
     const r = this.ringkas(s.id), k = this.kom(s.komoditasId), sat = k ? k.satuan : '', jalan = s.status === 'berjalan', u = r.hasil - r.modal;
-    const panen = this.panenOf(s.id).map((p) => '<div class="tx"' + ' data-do="panen-detail" data-id="' + p.id + '" role="button" tabindex="0" aria-haspopup="dialog"' + '><div class="tx-l"><div class="tx-n">' +
+    if (this.lgSid !== s.id) { this.lg = {}; this.lgSid = s.id; }
+    const BP = 3, BT = 5, pAll = this.panenOf(s.id), tAll = r.tx.slice().sort((a, b) => b.tanggal.localeCompare(a.tanggal));
+    const lagi = (k, n, batas) => n > batas ? '<button type="button" class="btn" data-do="lg-toggle" data-k="' + k + '" aria-expanded="' + !!this.lg[k] + '" style="width:100%;margin-top:10px;min-height:44px">' + (this.lg[k] ? 'Ringkas' : 'Lihat semua (' + n + ')') + '</button>' : '';
+    const panen = (this.lg.pn ? pAll : pAll.slice(0, BP)).map((p) => '<div class="tx"' + ' data-do="panen-detail" data-id="' + p.id + '" role="button" tabindex="0" aria-haspopup="dialog"' + '><div class="tx-l"><div class="tx-n">' +
       fmtN(p.kuantitasKotor - p.susut) + ' ' + esc(sat) + ' bersih</div><div class="note">' + Setelan.tgl(p.tanggal) + ' · susut ' + fmtN(p.susut) + (p.pembeli ? ' · ' + esc(p.pembeli) : '') + '</div></div>' +
       '<div class="tx-a">' + (p.hargaPerSatuan ? rp(p.hargaPerSatuan) + '/' + esc(sat) : '—') + '</div></div>').join('');
     return '<section><div class="sc-head"><h2 style="margin:0">Ringkasan</h2><span class="badge' + (jalan ? ' live' : '') + '">' + (jalan ? 'berjalan' : 'selesai') + '</span></div>' +
@@ -111,16 +115,14 @@ const Siklus = {
       '<div><span class="note">' + (u < 0 ? 'Rugi' : 'Untung') + '</span><strong class="' + (u < 0 ? 'down' : 'up') + '">' + rp(u) + '</strong></div></div>' +
       '<div class="row"><span class="mu">Unit</span>' + this.tautan('unit', s.unitId) + '</div><div class="row"><span class="mu">Komoditas</span>' + this.tautan('kom', s.komoditasId) + '</div>' +
       '<div class="row"><span class="mu">Panen bersih</span><span>' + fmtN(r.bersih) + ' ' + esc(sat) + '</span></div>' +
-      (jalan ? '<div class="seg" style="margin-top:12px"><button class="btn" data-do="catat-siklus">Catat transaksi</button><button class="btn" data-do="catat-panen">Catat panen</button></div>' +
-        '<div class="seg" style="margin-top:10px"><button class="btn" data-do="ubah-siklus">Ubah siklus</button><button class="btn" data-do="selesai-siklus">Selesaikan siklus</button></div>'
+      (jalan ? '<div class="seg" style="margin-top:12px"><button class="btn" data-do="ubah-siklus">Ubah siklus</button><button class="btn" data-do="selesai-siklus">Selesaikan siklus</button></div>'
         : '<p class="note" style="margin-top:12px">Siklus selesai tidak menerima transaksi atau panen baru. Buka kembali untuk mengubahnya.</p>' +
           '<div class="seg" style="margin-top:6px"><button class="btn" data-do="ubah-siklus">Ubah siklus</button><button class="btn" data-do="buka-lagi">Buka kembali</button></div>' +
-          '<button class="btn" data-do="ulangi-siklus" style="width:100%;margin-top:10px">Ulangi siklus ini</button>') +
-      '<button class="btn danger" data-do="hapus-siklus" style="width:100%;margin-top:10px">' + 'Hapus siklus' + '</button>' +
-      '<button class="btn" data-go="siklus" style="width:100%;margin-top:10px">Kembali ke daftar</button></section>' +
+          '<button class="btn" data-do="ulangi-siklus" style="width:100%;margin-top:10px">Ulangi siklus ini</button>') + '</section>' +
       Jadwal.v(s) +
-      '<section><h2>Panen</h2>' + (panen ? panen + '<p class="note">Ketuk panen untuk detail' + (jalan ? ', mengubah, atau menghapus' : '') + '.</p>' : '<p class="note">Belum ada panen.' + (jalan ? ' Ketuk tombol + lalu pilih Catat panen saat hasil siap.' : '') + '</p>') + '</section>' +
-      '<section><h2>Transaksi siklus</h2>' + (r.tx.length ? r.tx.sort((a, b) => b.tanggal.localeCompare(a.tanggal)).map((t) => App.barisTx(t)).join('') : '<p class="note">Belum ada transaksi terhubung.' + (jalan ? ' Ketuk tombol + untuk mencatat modal atau hasil siklus ini.' : '') + '</p>') + '</section>';
+      '<section><h2>Panen</h2>' + (panen ? panen + lagi('pn', pAll.length, BP) + '<p class="note">Ketuk panen untuk detail' + (jalan ? ', mengubah, atau menghapus' : '') + '.</p>' : '<p class="note">Belum ada panen.' + (jalan ? ' Ketuk tombol + lalu pilih Catat panen saat hasil siap.' : '') + '</p>') + '</section>' +
+      '<section><h2>Transaksi siklus</h2>' + (r.tx.length ? (this.lg.tx ? tAll : tAll.slice(0, BT)).map((t) => App.barisTx(t)).join('') + lagi('tx', tAll.length, BT) : '<p class="note">Belum ada transaksi terhubung.' + (jalan ? ' Ketuk tombol + untuk mencatat modal atau hasil siklus ini.' : '') + '</p>') + '</section>' +
+      '<button class="btn danger" data-do="hapus-siklus" style="width:100%;margin-top:4px">Hapus siklus</button>';
   },
   tautan(j, id) { const x = j === 'unit' ? this.unit(id) : this.kom(id); return x ? '<button type="button" class="btn" data-do="dm-buka" data-j="' + j + '" data-id="' + id + '" aria-haspopup="dialog" style="flex:0 0 auto;padding:4px 10px;font-size:12px;min-height:36px">' + esc(x.nama) + ' ›</button>' : '<span>?</span>'; },
   selesaiBuka(pemicu) {
@@ -167,8 +169,7 @@ const Siklus = {
     return '<div class="seg" role="group" aria-label="Pilih daftar">' + [['unit', 'Unit', nu], ['kom', 'Komoditas', nk]].map((x) =>
       '<button type="button" class="btn' + (this.msub === x[0] ? ' on' : '') + '" aria-pressed="' + (this.msub === x[0]) + '" data-do="master-tab" data-val="' + x[0] + '">' + x[1] + ' (' + x[2] + ')</button>').join('') + '</div>' +
       '<section><h2>' + (un ? 'Unit / lahan' : 'Komoditas') + '</h2>' + (baris || '<p class="note">Belum ada. Ketuk tombol + untuk menambah ' + (un ? 'unit' : 'komoditas') + '.</p>') +
-      '<p class="note" style="margin-top:12px">' + (list.length ? 'Ketuk nama untuk detail dan aksi. ' : '') + 'Ketuk tombol + untuk menambah unit atau komoditas.</p>' +
-      (list.length ? '' : '<button class="btn gold" data-do="form-baru" data-j="' + j + '">Tambah ' + (un ? 'unit' : 'komoditas') + '</button>') + '</section>';
+      (list.length ? '<p class="note" style="margin-top:12px">Ketuk nama untuk detail dan aksi. Ketuk tombol + untuk menambah unit atau komoditas.</p>' : '') + '</section>';
   },
 
   /* ---------- aksi (true bila ditangani) ---------- */
@@ -176,6 +177,7 @@ const Siklus = {
     const D = this.d(), v = (id) => ($(id) ? $(id).value.trim() : '');
     if (Dsk.aksi(a, el) || Jadwal.aksi(a, el)) return true;
     if (a === 'siklus-tab') { this.sub = el.dataset.val; App.go('siklus', true); }
+    else if (a === 'lg-toggle') { const k = el.dataset.k; this.lg[k] = !this.lg[k]; const y = window.scrollY; App.go('siklus-detail', true); window.scrollTo(0, y); const b = document.querySelector('[data-do="lg-toggle"][data-k="' + k + '"]'); if (b) b.focus({ preventScroll: true }); }
     else if (a === 'buka-siklus') { this.dmTutup(false, true); this.sid = el.dataset.id; this.minta = null; App.go('siklus-detail'); }
     else if (a === 'ubah-siklus') {
       const s = this.cari(this.sid); if (!s) return true;
@@ -216,7 +218,6 @@ const Siklus = {
       s.terhapus = true; s.diubah = nowIso(); this.minta = null; App.simpan(); App.go('siklus');
       App.toast('Siklus dihapus', { label: 'Urungkan', fn: () => { s.terhapus = false; s.diubah = nowIso(); App.simpan(); if (App.tab === 'siklus') App.go('siklus', true); } });
     }
-    else if (a === 'catat-siklus') App.baru(this.sid);
     else if (a === 'hasil-ke-panen') { const d = App.bacaForm(); if (!d.siklus) return true; this.sid = d.siklus; App.draft = null; this.aksi('catat-panen', {}); return true; }
     else if (a === 'panen-belum-jual') { this.sid = el.dataset.sid; this.aksi('ubah-panen', el); return true; }
     else if (a === 'catat-panen' || a === 'ubah-panen') {

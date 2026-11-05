@@ -1,6 +1,6 @@
 # Roadmap — Web App Keuangan Pertanian Rumahan
 
-> Status dokumen: draf v0.1 · Terakhir diperbarui: 4 November 2026 · Fase 5 selesai; Fase 6 berjalan: cadangan otomatis + dasar PWA; FAB kontekstual; chart di Beranda; data contoh otomatis; sinkron Supabase (v0.1.023); penyempurnaan UX (v0.1.024); kartu hero Beranda (v0.1.025); judul halaman (v0.1.026); foto nota lokal (v0.1.037); optimasi performa/aksesibilitas bagian 1 (v0.1.038); pembayaran utang/piutang tahap 1 (v0.1.048) dan tahap 2: tombol Bayar + cicilan (v0.1.049); Catat panen vs Catat hasil (v0.1.050); jadwal kegiatan per siklus (v0.1.051); katalog harga pasar (v0.1.052); kalkulator kelayakan usaha (v0.1.053); ekspor Excel (v0.1.054); isian Rencana keuangan lewat modal FAB (v0.1.055); ringkasan, sub-tab geser, ubah aset/utang (v0.1.056); daftar anggaran dengan detail (v0.1.057); daftar aset dan utang dengan detail (v0.1.058); grafik arus kas, saringan utang, simpan & tambah lagi, tren harga (v0.1.059); Jadwal dan Panen lewat modal detail (v0.1.060); modal bersama, tombol kembali, hapus seragam (v0.1.061)
+> Status dokumen: draf v0.1 · Terakhir diperbarui: 4 November 2026 · Fase 5 selesai; Fase 6 berjalan: cadangan otomatis + dasar PWA; FAB kontekstual; chart di Beranda; data contoh otomatis; sinkron Supabase (v0.1.023); penyempurnaan UX (v0.1.024); kartu hero Beranda (v0.1.025); judul halaman (v0.1.026); foto nota lokal (v0.1.037); optimasi performa/aksesibilitas bagian 1 (v0.1.038); pembayaran utang/piutang tahap 1 (v0.1.048) dan tahap 2: tombol Bayar + cicilan (v0.1.049); Catat panen vs Catat hasil (v0.1.050); jadwal kegiatan per siklus (v0.1.051); katalog harga pasar (v0.1.052); kalkulator kelayakan usaha (v0.1.053); ekspor Excel (v0.1.054); isian Rencana keuangan lewat modal FAB (v0.1.055); ringkasan, sub-tab geser, ubah aset/utang (v0.1.056); daftar anggaran dengan detail (v0.1.057); daftar aset dan utang dengan detail (v0.1.058); grafik arus kas, saringan utang, simpan & tambah lagi, tren harga (v0.1.059); Jadwal dan Panen lewat modal detail (v0.1.060); modal bersama, tombol kembali, hapus seragam (v0.1.061); detail siklus dipadatkan (v0.1.066); duplikat FAB dibersihkan (v0.1.067)
 
 ## 1. Visi & Tujuan
 
@@ -227,6 +227,8 @@ Aplikasi web sederhana untuk mencatat dan menganalisa keuangan pertanian skala r
 | 0.1.063 | 2026-11-04 | Gaya baris daftar disatukan (.tx, .ang-baris, .m-row): tinggi, hover/fokus, tanda › |
 | 0.1.064 | 2026-11-04 | Penamaan diseragamkan: kata toast, keadaan kosong menyebut tombol +, aturan awalan tombol |
 | 0.1.065 | 2026-11-04 | Aturan surface edit; Selesaikan siklus menjadi modal |
+| 0.1.066 | 2026-11-04 | Detail siklus dipadatkan: tombol ganda dengan FAB dihapus, daftar Panen/Transaksi diringkas (Lihat semua), Hapus siklus ke bawah |
+| 0.1.067 | 2026-11-05 | Duplikat FAB dihapus di Unit/Komoditas (kosong) dan Arus kas (Atur saldo awal) |
 | 0.1.016 | 2026-11-03 | index.html menjadi versi satu berkas (aman dibuka dari HP); templat pindah ke index.dev.html |
 | 0.1.017 | 2026-11-03 | Hero ringkasan (untung, modal, hasil, R/C) hanya tampil di Beranda |
 | 0.1.018 | 2026-11-03 | Beranda: aksi cepat, perlu perhatian, banding bulan lalu, posisi kas; cache transaksi; font tidak memblokir |
