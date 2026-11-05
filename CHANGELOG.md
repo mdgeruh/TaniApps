@@ -1,5 +1,165 @@
 # Changelog
 
+## v0.1.077 — 2026-11-05
+Rute web. Dokumen: `docs/RUTE.md`.
+
+### Ditambahkan
+- **Alamat per halaman** berbentuk `#nama` (mis. `#transaksi`, `#laporan-grafik`, `#rencana-utang`, `#siklus-s-k3j9x2`). Membuka alamat langsung atau memuat ulang kembali ke halaman yang sama, termasuk bagian tab (Laporan, Rencana, Siklus, Unit/Komoditas), detail siklus, dan ubah transaksi.
+- **Pintasan cepat**: `#catat-modal` dan `#catat-hasil` membuka form transaksi baru. `manifest.webmanifest` memuat `shortcuts` (Catat modal, Catat hasil, Transaksi, Laporan) untuk aplikasi terpasang.
+- Mengubah hash dari luar (tempel tautan di halaman yang sudah terbuka) membuka halamannya.
+
+### Diubah
+- Bilah alamat selalu mengikuti halaman aktif; Back dan Forward mengembalikan alamat yang benar. Pindah tab di dalam halaman tidak menambah riwayat. Alamat tidak dikenal atau id yang tidak ada membuka Beranda.
+
+### Catatan
+- Tidak mengubah skema data. Alamat hanya memakai huruf, angka, dan tanda hubung (id `s_abc` menjadi `s-abc`) agar cocok dengan penampil artefak dan hosting statis. Isian form dan filter tidak masuk alamat.
+- Berkas baru `js/rute.js`; diubah `js/app.js`, `index.dev.html`, `manifest.webmanifest`, `sw.js` (cache `tani-keuangan-v0_1_077`), `index.html`, `tani-keuangan.html`, `docs/RUTE.md`, `docs/MODAL.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+## v0.1.076 — 2026-11-05
+Konsistensi pola dan perilaku, dari audit v0.1.075 (roadmap butir 1–4). Dokumen: `docs/MODAL.md`, `docs/STYLE.md`.
+
+### Diperbaiki
+- **Panduan cepat dan foto nota memakai mesin Modal**: tombol Back menutupnya (sebelumnya halaman berpindah dan jendelanya tetap terbuka), fokus kembali ke pemicu, jebakan Tab dan kunci gulir sama dengan modal lain. Kode ganda di `panduan.js` dan `nota.js` dihapus. Opsi baru `kartu` dan `lapis` pada `Modal.buka`.
+- **Fokus awal modal**: bila isian yang dituju disembunyikan `Form.upgrade` (mis. tanggal di Selesaikan siklus), fokus ke tombol penggantinya; bila tetap gagal, ke kartu modal. Sebelumnya fokus tertinggal di tombol pembuka di belakang modal dan Tab keluar dari modal.
+- **Teks diseragamkan**: penolakan hapus selalu diawali "Tidak bisa dihapus:"; toast tanpa titik akhir dengan "—" untuk langkah berikutnya; "tab Unit/Siklus" menjadi "menu Unit/Siklus" (aturan di `docs/STYLE.md`).
+- **CSS**: satu deklarasi `z-index` untuk `.toast` (120); aturan `.pd-lapis` yang tidak terpakai dihapus.
+
+### Catatan
+- Tidak mengubah skema data. Panduan tetap tampil otomatis sekali dan bisa dibuka dari Setelan.
+
+## v0.1.075 — 2026-11-05
+Cetak laporan kini mencetak ketiga tab sekaligus, bukan hanya tab yang sedang terbuka. Dokumen: `docs/LAPORAN.md`.
+
+### Diubah
+- Tombol Cetak (atau Ctrl+P) menghasilkan **satu dokumen** berisi 1 Ringkasan, 2 Grafik, 3 Rincian, dengan satu kop (judul, periode, pengelompokan, tanggal cetak, versi), apa pun tab yang sedang dilihat.
+- Ringkasan dan Grafik mengalir di halaman potret; Rincian selalu mulai di halaman baru berorientasi lanskap, header tabel berulang bila lebih dari satu halaman. Nomor halaman "x dari y" mencakup seluruh dokumen.
+- Pengelompokan Rincian (Komoditas, Unit, dan seterusnya) dan periode mengikuti pilihan di layar.
+
+### Catatan
+- Tidak mengubah skema data atau Excel. `js/analisa.js`, `css/style.css`, `js/app.js`, `sw.js` (cache `tani-keuangan-v0_1_075`), `index.html`, `tani-keuangan.html`, `docs/LAPORAN.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+## v0.1.074 — 2026-11-05
+Cetak laporan polos. Hasil pemeriksaan PDF v0.1.073: kertas tidak menyebut periode, simulasi dan petunjuk sentuh ikut tercetak, batang komposisi kosong, Rincian 4 halaman, dan tema gelap menghasilkan teks pucat. Tidak ada perubahan data.
+
+### Ditambahkan
+- **Dokumen cetak khusus** (`#cetak-lap`, dibuat di `Analisa.cetakPasang` saat tombol Cetak atau Ctrl+P, dibuang setelah cetak): mencetak sub-tab Laporan yang sedang terbuka, terpisah dari tampilan layar. Warna literal hitam di atas putih; tidak terpengaruh tema gelap, Efek kaca, atau Samarkan.
+- **Kop**: Laporan Usaha Tani, sub-tab, periode (mis. "Bulan ini (November 2026)"), pengelompokan atau cakupan, tanggal cetak, versi aplikasi.
+- **Rincian**: satu tabel perbandingan (modal, hasil, untung, R/C, panen bersih, HPP, harga rata-rata, harga minimum, BEP) dengan baris total, header berulang, dan keterangan rumus; halaman lanskap. Pada data contoh 4 halaman menjadi 1.
+- **Grafik**: batang Hasil (solid) dan Modal (arsir) berangka, terbaca di cetak hitam-putih; tabel angka selalu tampil; komposisi modal dengan baris "Lainnya" dan total, batang berbingkai yang tercetak walau latar tidak dicetak.
+- **Ringkasan**: tabel untung/rugi dan perbandingan bulan ini vs rata-rata 3 bulan dengan kata "membaik/memburuk" (bukan hanya warna).
+- **Kaki halaman** "Halaman x dari y" dan margin A4 lewat `@page`.
+- **Mode Tersembunyi**: Cetak meminta ketukan kedua ("Angka akan tercetak lengkap"); kedaluwarsa 4 detik. Kertas tetap memuat angka lengkap (aturan lama), layar kembali disamarkan setelah cetak.
+
+### Diubah
+- Simulasi "bagaimana jika", petunjuk "sentuh grafik", dan grafik batang 6 bulan ganda tidak lagi dicetak (grafik batang kini berasal dari tren yang sama dengan tabel).
+- Halaman lain yang dicetak langsung (Transaksi, Siklus, dst.) memakai token warna terang dan tanpa Efek kaca walau tema gelap aktif.
+
+### Catatan
+- Diuji di Chromium (Playwright, PDF A4 dengan `prefer_css_page_size`): 41 pemeriksaan lolos (tiga sub-tab, kop, tanpa elemen layar, jumlah halaman, lanskap Rincian, periode × pengelompokan, tema gelap + kaca, beforeprint/afterprint, Tersembunyi, data kosong), tanpa galat JavaScript. **Belum diuji** di printer, Firefox, Safari, atau HP sungguhan.
+- Nomor halaman memakai margin box CSS (Chrome/Edge modern); peramban lain bisa menampilkan cetak tanpa nomor halaman.
+- Butir 8 usulan (blok "Dibuat oleh / Mengetahui") belum dikerjakan; tercatat di roadmap.
+- Berkas: `js/analisa.js`, `js/app.js` (kait beforeprint/afterprint, versi), `css/style.css`, `sw.js`, `docs/LAPORAN.md`, `README.md`, `roadmap.md`, `VERSION`, `index.html`, `tani-keuangan.html` (hasil build).
+
+## v0.1.073 — 2026-11-05
+Kurva tren dibuat lebih halus di Laporan dan Beranda (JS saja; tidak ada perubahan data).
+
+### Diubah
+- **Satu fungsi kurva untuk semua grafik tren** (`Analisa.kurva`): kurva kubik monoton (Fritsch–Butland, ujung pchip). Kurva melewati semua titik data, kemiringannya kontinu di tiap titik, dan tidak pernah melampaui nilai titik tetangganya.
+- **Laporan → Grafik (Hasil/Modal):** bezier sebelumnya memotong titik kontrol ke rentang tiap ruas sehingga ada tekukan kecil di puncak dan lembah serta awal kurva yang curam; kini puncak dan lembah membulat dan sambungan antarruas mulus.
+- **Beranda (sparkline Untung 6 bulan di kartu utama):** dari garis lurus patah menjadi kurva mulus, tanpa lonjakan melewati garis nol di antara titik.
+- Koordinat dibulatkan 2 desimal (sebelumnya campuran) sehingga jalur SVG lebih ringkas.
+
+### Catatan
+- Diuji di Chromium: 300 deret acak (2–12 titik) — semua titik terlewati, tidak ada lonjakan di luar nilai tetangga, selisih kemiringan di titik sambung maks. 0,0004; kasus 1 dan 2 titik aman; grafik Laporan dan sparkline Beranda tergambar; tanpa galat JavaScript. Perbandingan sebelum/sesudah dicek secara visual.
+- Garis tren harga pasar di Harga (`js/harga.js`) belum diubah (masih garis lurus); bisa disamakan bila diinginkan.
+- Berkas: `js/analisa.js`, `js/app.js` (sparkline dan versi), `sw.js`, `README.md`, `roadmap.md`, `VERSION`, `index.html`, `tani-keuangan.html` (hasil build).
+
+## v0.1.072 — 2026-11-05
+Perbaikan: navbar bawah dan FAB menghilang (dan area konten sempat kosong) saat halaman digulir di Chrome Android dengan Efek kaca Nyala. Hanya CSS dan versi; tidak ada perubahan data.
+
+### Penyebab
+Efek kaca membuat puluhan lapisan `backdrop-filter` sekaligus (tiap kartu, tombol, dan kolom isian: 25 elemen di Beranda, 47 di Setelan), bertumpuk di dalam kartu yang juga memakai blur, ditambah latar gradasi `background-attachment: fixed` (digambar ulang tiap gulir) dan sembilan bentuk latar yang masing-masing diberi `filter`. Di HP, memori GPU habis dan Chrome melepas lapisan: navbar dan FAB (yang `position: fixed`) hilang, tile konten tidak tergambar.
+
+### Diubah
+- **Blur hanya untuk permukaan melayang**: navigasi bawah, toast, popup, dan kartu bawah (Panduan, Detail). Kartu isi, tombol, dan kolom isian tidak lagi memakai `backdrop-filter` (di dalam kartu yang sudah kaca, blur kedua nyaris tak terlihat tetapi mahal). Elemen ber-blur di layar: 25–47 menjadi 4.
+- **Latar gradasi mode gelap** pindah dari `body` (`background-attachment: fixed`) ke lapisan tetap `.gbg` yang diisolasi (`contain: strict`), tergambar sekali. Penyaring `saturate` per bentuk dibuang.
+- **Navbar bawah dan FAB** diberi `will-change: transform` agar tetap berada di lapisan sendiri.
+- Isian putih kaca terang dinaikkan sedikit (32/13% → 38/20%) untuk mengganti blur yang hilang pada kartu isi.
+
+### Catatan
+- Diuji di Chromium (emulasi HP 390 px, sentuh): navbar tetap terlihat dan menempel di bawah setelah gulir ke dasar; FAB muncul kembali saat gulir naik; tanpa galat JavaScript; tampilan terang dan gelap nyaris sama dengan v0.1.071. Dalam mode terang, bentuk latar sedikit lebih terlihat tembus kartu karena blur dilepas.
+- **Belum dapat diuji di GPU/HP sungguhan** (masalah ini hanya muncul di perangkat). Bila navbar atau FAB masih hilang, matikan Setelan → Efek kaca dan laporkan tipe HP dan versi Chrome.
+- Berkas: `css/style.css`, `js/app.js` (versi), `sw.js`, `docs/STYLE.md`, `README.md`, `roadmap.md`, `VERSION`, `index.html`, `tani-keuangan.html` (hasil build).
+
+## v0.1.071 — 2026-11-05
+Header dinamis: judul halaman aktif pindah ke header.
+
+### Diubah
+- **Judul halaman ada di header.** Beranda menampilkan merek "Tani Keuangan" dan tagline; halaman lain (Transaksi, Siklus, Laporan, Lainnya, Setelan, Unit & komoditas, Catat modal/hasil, Ubah transaksi, dan seterusnya) menampilkan judulnya di tempat merek, dengan baris kecil "Tani Keuangan · versi" di bawahnya (indikator sinkron tetap ada).
+- **Tombol kembali bulat "‹"** di kiri judul untuk halaman turunan (Siklus baru/Ubah siklus, detail siklus, Catat/Ubah panen, Rencana keuangan); `aria-label` dan `title` menyebut tujuannya ("Kembali ke Siklus").
+- Judul panjang (mis. nama siklus) dibatasi dua baris di header; nama lengkap tetap ada di atribut `title`.
+- Judul di header ikut berubah saat jenis transaksi diganti (Catat modal ↔ Catat hasil); `document.title` dan pengumuman pembaca layar tetap mengikuti.
+- Tombol dan tampilan mengikuti mode terang, gelap, dan efek kaca; tombol kembali tidak tercetak.
+
+### Dihapus
+- Blok judul di bawah menu (`#judulHal`, `#judulTeks`, `#judulInduk`) beserta CSS-nya; halaman kini langsung dimulai di bawah header sehingga lebih hemat tinggi layar.
+
+### Catatan
+- Diuji di Chromium lebar HP dan desktop: 19 skenario (judul per halaman, tombol kembali, halaman turunan, satu `h1`, tinggi header stabil, tanpa galat JS) serta uji Liquid Glass (10) tetap lolos. Belum diuji di perangkat sungguhan.
+- Header belum menempel (sticky); jika diinginkan bisa menjadi langkah berikutnya, memakai bahan kaca yang sama.
+- Berkas: `index.dev.html`, `js/app.js`, `css/style.css`, `sw.js`, `docs/STYLE.md`, `README.md`, `roadmap.md`, `VERSION`, `index.html`, `tani-keuangan.html` (hasil build).
+
+## v0.1.070 — 2026-11-05
+Liquid Glass dibeningkan dan latar diberi bentuk geometri (CSS, satu elemen dekoratif, dan teks Setelan; tidak ada perubahan data).
+
+### Diubah
+- **Kaca lebih bening dan tidak tebal:** isian putih turun dari 26–60% menjadi 8–32%, blur dari 24px menjadi 14px (gelap 16px), saturasi 190% menjadi 160%, cahaya dalam dibuang, tepi dan bayangan dibuat tipis. Tombol dan kolom isian memakai blur 8px dan 6px.
+- **Kaca berwarna** (FAB, tombol utama, pilihan FAB, kartu hero) ditipiskan agar sejalan.
+- **Keterbacaan dijaga:** mode gelap memakai lapisan peredam gelap di bawah kaca; keterangan versi dan tanda panah memakai warna teks sekunder yang lebih kuat. Kontras teks diukur di atas latar (lihat Catatan).
+
+### Ditambahkan
+- **Geometri latar** (`.gbg`, 9 bentuk: lingkaran gradasi, cincin, persegi membulat, segitiga, segi enam, garis diagonal, kisi titik, lingkaran kaca, seperempat lingkaran). Hanya tampil saat Efek kaca Nyala; berwarna dari palet skema; lebih redup di mode gelap; tidak tercetak.
+
+### Catatan
+- Pengukuran kontras otomatis (rata-rata latar di belakang tiap teks, 3 halaman × 2 mode): teks isi di Setelan mode gelap seluruhnya ≥ 4,5:1; sebagian angka berwarna (hijau/merah) berada di 3,8–4,5:1 pada mode terang dan gelap, dan tanda panah › dekoratif di Beranda mode gelap terendah (±2,0:1) karena melintas di atas kisi titik latar. Belum diuji di perangkat sungguhan.
+- Geometri sengaja statis; animasi di belakang `backdrop-filter` memaksa blur dihitung ulang tiap frame dan memberatkan HP.
+- Berkas: `css/style.css`, `index.dev.html`, `js/setelan.js`, `js/app.js` (versi), `sw.js`, `docs/STYLE.md`, `README.md`, `roadmap.md`, `VERSION`, `index.html`, `tani-keuangan.html` (hasil build).
+
+## v0.1.069 — 2026-11-05
+Efek kaca diperbarui menjadi Liquid Glass bergaya iOS (hanya CSS dan teks Setelan; tidak ada perubahan data).
+
+### Diubah
+- **Bahan kaca berlapis:** sorot spekular di kiri-atas, isian tembus pandang, blur 24px dengan saturasi 190%, tepi bercahaya terarah (terang kiri-atas, redup kanan-bawah), dan bayangan dua lapis. Berlaku untuk kartu, modal, sheet, popover pilihan, toast, dan navigasi.
+- **Bentuk iOS:** kartu radius 28px; tombol dan tab berbentuk kapsul; kolom isian kaca cekung; modal dan sheet membulat besar.
+- **Navigasi bawah melayang** berbentuk kapsul dengan tab aktif sebagai "lensa" kaca; tab atas di layar lebar juga kapsul kaca. FAB, pilihan FAB, dan toast naik agar tidak menimpa navigasi.
+- **Kaca berwarna:** FAB, tombol utama, dan kartu hero ditinting dari warna aksen skema.
+- **Gerak pegas** saat tombol ditekan; mati bila perangkat memilih Kurangi Gerakan.
+- **Latar** gradasi diperkaya (4 gelombang warna) agar kaca punya sesuatu untuk dibiaskan; versi gelap disetel terpisah.
+- Aturan kaca yang tersebar (kartu pop-up, modal, popover) digabung ke satu blok; teks keterangan di Setelan diperbarui.
+
+### Ditambahkan
+- Kurangi Transparansi (`prefers-reduced-transparency`) mengembalikan permukaan padat tanpa blur.
+
+### Catatan
+- Pembiasan sungguhan (lensing) ala iOS 26 tidak dipakai karena bergantung filter SVG yang hanya didukung sebagian browser; tampilannya ditiru dengan sorot, tepi, dan blur.
+- Berkas: `css/style.css`, `js/setelan.js`, `js/app.js` (versi), `sw.js`, `docs/STYLE.md`, `README.md`, `roadmap.md`, `VERSION`, `index.html`, `tani-keuangan.html` (hasil build).
+
+## v0.1.068 — 2026-11-05
+Agenda lintas siklus (lanjutan butir backlog "Kalender tanam + pengingat", docs/JADWAL.md).
+
+### Ditambahkan
+- **Siklus → Agenda (n):** chip ketiga di tab Siklus yang menggabungkan kegiatan jadwal yang belum selesai dan perkiraan panen dari semua siklus berjalan, dikelompokkan Terlambat, Hari ini, 7 hari ke depan, 8–30 hari ke depan, dan Lebih dari 30 hari, urut dari yang terdekat.
+- **✓ di agenda:** menandai kegiatan sudah dikerjakan tanpa membuka siklus dan tanpa meninggalkan agenda, dengan aturan yang sama seperti di detail siklus (berulang dijadwalkan lagi N hari sejak hari ini, sekali jadi selesai) dan **Urungkan** yang kembali ke agenda.
+- Ketuk baris membuka detail siklusnya; saringan Unit dan Komoditas ikut berlaku; keadaan kosong memberi petunjuk.
+- Setiap baris dan tombol punya nama aksesibel (kegiatan, siklus, status); target ketuk ≥ 44 px; ✓ bisa dengan keyboard.
+
+### Diubah
+- `js/jadwal.js` (`itemAgenda`, `agenda`, `teksN`; `aksi` menangani `agenda-selesai` dan memakai rute asal untuk Urungkan), `js/siklus.js` (`vList`: chip Agenda), `css/style.css` (`.ag-*`, `.seg.tiga` bila belum ada), `js/app.js` (versi), `sw.js` (`tani-keuangan-v0_1_068`), `index.html`, `tani-keuangan.html`, `docs/JADWAL.md`, `docs/SIKLUS.md`, `docs/STYLE.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Tidak ada perubahan data: agenda hanya membaca `siklus.jadwal` dan umur panen komoditas, jadi cadangan, impor, dan sinkron tidak terpengaruh.
+- Diuji di Chromium (lebar 390 dan 320 px, terang dan gelap, skenario tanggal terkontrol): urutan dan pengelompokan, ✓ untuk kegiatan berulang dan sekali, Urungkan, ketuk baris, saringan, keadaan kosong, keyboard, target ketuk, tanpa gulir mendatar, regresi tab Berjalan dan Selesai, tanpa galat JavaScript. Belum diuji di HP sungguhan; belum ada notifikasi di luar aplikasi.
+
 ## v0.1.067 — 2026-11-05
 Duplikat dengan FAB di halaman lain dihapus (lanjutan v0.1.066).
 

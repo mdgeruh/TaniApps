@@ -130,7 +130,7 @@ Aplikasi web sederhana untuk mencatat dan menganalisa keuangan pertanian skala r
 
 - Template komoditas (sayur daun, cabai, tomat, lele, ayam petelur) dengan estimasi biaya standar (selesai di v0.1.030)
 - Analisa sensitivitas: "bagaimana jika harga jual turun 10%?" (selesai di v0.1.029)
-- Kalender tanam + pengingat jadwal pupuk/panen — **jadwal kegiatan per siklus selesai di v0.1.051** (docs/JADWAL.md); pengingat panen sudah ada sejak v0.1.028; belum ada tampilan kalender gabungan lintas siklus maupun notifikasi di luar aplikasi
+- Kalender tanam + pengingat jadwal pupuk/panen — **jadwal kegiatan per siklus selesai di v0.1.051** (docs/JADWAL.md); pengingat panen sudah ada sejak v0.1.028; **tampilan agenda gabungan lintas siklus selesai di v0.1.068** (tab Siklus → Agenda, docs/JADWAL.md; diuji di Chromium, belum di HP sungguhan); belum ada notifikasi di luar aplikasi
 - Pencatatan cuaca/hasil per kondisi untuk korelasi
 - Katalog harga pasar (input manual) dan pembanding harga (selesai di v0.1.052, docs/HARGA.md; belum diuji di browser/HP sungguhan)
 - Kalkulator kelayakan usaha (NPV, IRR sederhana) (selesai di v0.1.053, docs/KELAYAKAN.md; belum diuji di browser/HP sungguhan)
@@ -154,6 +154,16 @@ Aplikasi web sederhana untuk mencatat dan menganalisa keuangan pertanian skala r
   - [x] Utang/piutang: daftar ringkas dengan detail dan aksi (v0.1.058, juga Aset); lipat yang lunas, saringan Utang / Piutang, lencana "Lewat tempo" (v0.1.059).
   - [x] Modal isian: tombol "Simpan & tambah lagi" untuk aset dan harga pasar (selesai di v0.1.059).
   - [x] Teknis (v0.1.059; gambar ulang sebagian belum, posisi gulir sudah terjaga lewat `App.go('rencana', true)`): jaga posisi gulir dan gambar ulang hanya bagian yang berubah (kini `App.go('rencana', true)` menggambar ulang seluruh halaman); hitung `saldoSd()` sekali lalu simpan sementara agar tidak menghitung ulang seluruh peristiwa kas per bulan; harga pasar mendapat grafik tren kecil dan tombol "lihat semua" (kini hanya 5 catatan terakhir).
+- Optimasi cetak laporan plain (usulan 2026-11-05 dari pemeriksaan PDF v0.1.073; **butir 1–7 selesai di v0.1.074**, docs/LAPORAN.md; diuji lewat PDF Chromium, belum di printer atau HP sungguhan):
+  - [x] 1. Kop khusus cetak: judul, sub-tab, periode, pengelompokan atau cakupan, tanggal cetak, versi (sebelumnya chip periode ikut tersembunyi sehingga kertas tidak menyebut periode).
+  - [x] 2. Rincian jadi satu tabel perbandingan (baris per siklus/komoditas/unit, 10 kolom, baris total, header berulang, lanskap): 4 halaman → 1 halaman pada data contoh.
+  - [x] 3. Gaya cetak polos: dokumen `#cetak-lap` dibuat saat mencetak dengan warna literal hitam di atas putih, tanpa gradasi/bayangan/sudut membulat; tidak terpengaruh tema gelap atau Efek kaca. Halaman lain yang dicetak langsung memakai token terang dan tanpa kaca.
+  - [x] 4. Elemen interaktif tidak tercetak: simulasi "bagaimana jika", petunjuk sentuh grafik; tabel angka grafik selalu terbuka.
+  - [x] 5. Grafik aman hitam-putih: batang Hasil (solid) dan Modal (arsir) dengan angka di atas batang; komposisi modal memakai batang berbingkai yang dicetak walau latar tidak dicetak.
+  - [x] 6. `@page` A4 dengan margin, font cetak, nomor halaman "Halaman x dari y" di kaki (margin box CSS; butuh Chrome/Edge modern, Firefox dan Safari mungkin tanpa nomor halaman).
+  - [x] 7. Mode Tersembunyi: tombol Cetak minta ketukan kedua ("Angka akan tercetak lengkap") karena kertas selalu memuat angka lengkap.
+  - [ ] 8. Opsional: blok "Dibuat oleh / Mengetahui" untuk laporan ke pengurus atau kelompok tani (belum dikerjakan; perlu keputusan apakah bawaan atau pilihan di Setelan).
+  - [x] 9. Satu dokumen untuk ketiga tab (Ringkasan, Grafik, Rincian) sekaligus, satu kop, Rincian di halaman lanskap baru (selesai di v0.1.075; diuji lewat PDF Chromium: 3 halaman pada data contoh).
 - Isian Rencana keuangan lewat modal FAB, bukan isian di halaman (**selesai di v0.1.055**, docs/FAB.md dan docs/RENCANA.md; belum diuji di HP sungguhan; Kelayakan tetap kalkulator di halaman karena hasilnya tampil langsung saat mengetik):
   - Tombol + di Rencana membuka modal: Anggaran → Atur anggaran (pilih siklus), Arus kas → pilihan Catat modal / Catat hasil / Atur saldo awal kas, Aset → Tambah aset, Utang/piutang → Catat utang atau piutang, Harga pasar → Catat harga pasar (pilih komoditas).
   - Isian di halaman dihapus; halaman hanya menampilkan data, dengan tombol Atur anggaran di tiap siklus dan Atur saldo awal di Arus kas sebagai jalan pintas ke modal yang sama.
@@ -172,6 +182,14 @@ Aplikasi web sederhana untuk mencatat dan menganalisa keuangan pertanian skala r
   - Peringatan hasil ganda di Catat hasil bila siklus sudah punya panen berharga.
   - Petunjuk bahwa hasil tanpa jumlah barang tidak masuk HPP/BEP/harga minimum, dengan tombol "Catat sebagai panen".
   - Pengingat "panen belum dijual" di Perlu perhatian; mengarah ke form panen (bukan Catat hasil) agar jumlah barang tetap ikut dihitung.
+
+- Audit konsistensi pola dan perilaku (usulan 2026-11-05 dari pemeriksaan v0.1.075; **butir 1–4 selesai di v0.1.076**, docs/MODAL.md dan docs/STYLE.md; diuji otomatis di Chromium 320–360 px, belum di HP, printer, atau pembaca layar):
+  - [x] Sudah konsisten, jadi acuan: semua modal berbasis `Modal` (unit/komoditas, Selesaikan siklus, tiga formulir Rencana, Bayar utang) punya role dialog + aria-modal, judul berlabel, kunci gulir, Esc, Back menutup modal, fokus kembali, toast di atas modal, tanpa luapan di 320 px, target ketuk minimal 38 px, angka tersamar saat Tersembunyi. Latar: formulir tidak menutup, detail menutup. Esc dengan popup dropdown hanya menutup popup. Versi seragam, `FAB.md` cocok dengan `fab.js`, tidak ada tombol halaman yang menduplikasi FAB.
+  - [x] 1. **Panduan dan penampil foto nota pindah ke mesin `Modal` (v0.1.076; diuji termasuk foto sungguhan: Back, Esc, ketuk latar, fokus kembali, tema kaca).** Keduanya memakai kode sendiri dan tanpa entri riwayat: dari Setelan, tombol Back browser pindah halaman sementara Panduan tetap terbuka di atasnya (terbukti di uji). Nota kemungkinan sama (dari kode; belum diuji langsung karena butuh foto). Hasil yang diharapkan: Back menutup keduanya, fokus kembali ke pemicu, perilaku sama dengan modal lain.
+  - [x] 2. **Fokus awal modal Selesaikan siklus (v0.1.076; cadangan di `Modal.buka`).** Fokus tertinggal di tombol pembuka di belakang modal dan Tab keluar dari modal, karena isian tanggal asli disembunyikan oleh `Form.upgrade` sehingga `focus()` gagal diam-diam. Perbaikan di `Modal.buka`: bila fokus tidak masuk ke modal, arahkan ke pengganti kustom isian itu atau ke kartu modal. Periksa juga modal lain yang `fokus`-nya berupa isian tanggal atau pilihan.
+  - [x] 3. **Keseragaman teks (v0.1.076; aturan di docs/STYLE.md).** (a) Penolakan hapus punya dua gaya: "Masih dipakai n siklus — gunakan Arsipkan" dan "Tidak bisa dihapus: …". (b) Tanda baca toast dan keadaan kosong campur (titik atau tanpa titik, "—" atau ":"). (c) "di tab Unit" dan "di tab Siklus" padahal keduanya menu bawah. (d) dicek ulang saat mengerjakan: "Belum ada jadwal." dan "Belum ada panen." sudah menyebut tombol + untuk siklus berjalan dan sengaja tanpa + untuk siklus selesai (FAB disembunyikan), jadi bukan pelanggaran.
+  - [x] 4. **Kebersihan CSS (v0.1.076).** `.toast` punya dua deklarasi `z-index` (60 dan 120), sisakan satu. `.dm-lapis` dan `.pd-lapis` sama-sama 90 (hilang sendiri bila butir 1 selesai) dan `.nota-lihat` 80 berada di bawah modal: aman selama penampil tidak dibuka dari dalam modal, catat di `docs/MODAL.md` atau samakan.
+  - [ ] 5. **Belum teruji:** penampil foto nota secara langsung, pembaca layar (VoiceOver/TalkBack), printer dan HP sungguhan. Sertakan di uji rilis berikutnya.
 
 ## 8. Metrik Keberhasilan
 
@@ -229,6 +247,16 @@ Aplikasi web sederhana untuk mencatat dan menganalisa keuangan pertanian skala r
 | 0.1.065 | 2026-11-04 | Aturan surface edit; Selesaikan siklus menjadi modal |
 | 0.1.066 | 2026-11-04 | Detail siklus dipadatkan: tombol ganda dengan FAB dihapus, daftar Panen/Transaksi diringkas (Lihat semua), Hapus siklus ke bawah |
 | 0.1.067 | 2026-11-05 | Duplikat FAB dihapus di Unit/Komoditas (kosong) dan Arus kas (Atur saldo awal) |
+| 0.1.068 | 2026-11-05 | Agenda lintas siklus: kegiatan terjadwal dan perkiraan panen dari semua siklus berjalan, dikelompokkan per waktu, dengan ✓ langsung dari agenda |
+| 0.1.069 | 2026-11-05 | Efek kaca menjadi Liquid Glass bergaya iOS: bahan berlapis, tepi bercahaya, kapsul, navigasi bawah melayang dengan lensa aktif, Kurangi Transparansi (docs/STYLE.md) |
+| 0.1.070 | 2026-11-05 | Liquid Glass lebih bening (isian tipis, blur ringan, tanpa cahaya dalam) dan latar bentuk geometri (9 bentuk, hanya saat kaca Nyala); pengukuran kontras teks (docs/STYLE.md) |
+| 0.1.071 | 2026-11-05 | Header dinamis: judul halaman aktif pindah ke header, tombol kembali bulat untuk halaman turunan, blok judul di bawah menu dihapus (docs/STYLE.md) |
+| 0.1.072 | 2026-11-05 | Perbaikan efek kaca di HP: backdrop-filter 25–47 → 4 elemen, latar tetap terisolasi, navbar/FAB di lapisan sendiri (belum diuji di HP sungguhan) |
+| 0.1.073 | 2026-11-05 | Kurva tren Laporan dan Beranda lebih halus: kubik monoton (tanpa tekukan dan lonjakan), sparkline Beranda tidak lagi garis patah |
+| 0.1.077 | 2026-11-05 | Rute web: alamat #nama per halaman, buka langsung dan muat ulang, pintasan PWA Catat modal/hasil (docs/RUTE.md) |
+| 0.1.076 | 2026-11-05 | Konsistensi modal: Panduan dan foto nota memakai mesin Modal, fokus awal modal, teks pesan diseragamkan (docs/MODAL.md, docs/STYLE.md) |
+| 0.1.075 | 2026-11-05 | Cetak laporan: satu dokumen untuk ketiga tab sekaligus (Ringkasan, Grafik, Rincian) |
+| 0.1.074 | 2026-11-05 | Cetak laporan polos: kop, tabel Rincian satu halaman lanskap, grafik hitam-putih, tanpa simulasi, tidak terpengaruh tema/kaca, nomor halaman, konfirmasi saat Tersembunyi (docs/LAPORAN.md) |
 | 0.1.016 | 2026-11-03 | index.html menjadi versi satu berkas (aman dibuka dari HP); templat pindah ke index.dev.html |
 | 0.1.017 | 2026-11-03 | Hero ringkasan (untung, modal, hasil, R/C) hanya tampil di Beranda |
 | 0.1.018 | 2026-11-03 | Beranda: aksi cepat, perlu perhatian, banding bulan lalu, posisi kas; cache transaksi; font tidak memblokir |
