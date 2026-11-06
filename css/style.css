@@ -1,6 +1,6 @@
 /* Tani Keuangan — struktur gaya Jurnal Trading, palet Hijau Padi (#FFF4C9 #C7E78B #81AE64 #709053) */
-:root{--ink:#FFF4C9;--ink-raised:#FFFAE2;--paper:#243019;--paper-dim:#485C33;--paper-faint:#58703F;--gold:#4E6F35;--gold-dim:#709053;--fill:#81AE64;--fill-hi:#C7E78B;--on-fill:#1F2A16;--act-bg:#C7E78B;--act-tx:#1F2A16;--gain:#2B7A3B;--loss:#B0452F;--line:#D3C88C;--line-soft:#E8DDA8;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
-html[data-theme="dark"]{--ink:#161D12;--ink-raised:#1F2918;--paper:#FFF4C9;--paper-dim:#C4C09A;--paper-faint:#A3A07E;--gold:#C7E78B;--gold-dim:#81AE64;--fill:#81AE64;--fill-hi:#C7E78B;--on-fill:#14200E;--act-bg:#1F2918;--act-tx:#C7E78B;--gain:#8FD08A;--loss:#E07A62;--line:#34422A;--line-soft:#27331F;color-scheme:dark}
+:root{--ink:#FFF4C9;--ink-raised:#FFFAE2;--paper:#243019;--paper-dim:#485C33;--paper-faint:#4C6436;--gold:#4E6F35;--gold-dim:#709053;--fill:#81AE64;--fill-hi:#C7E78B;--on-fill:#1F2A16;--act-bg:#C7E78B;--act-tx:#1F2A16;--gain:#25703A;--loss:#9E3826;--line:#D3C88C;--line-soft:#E8DDA8;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+html[data-theme="dark"]{--ink:#161D12;--ink-raised:#1F2918;--paper:#FFF4C9;--paper-dim:#C4C09A;--paper-faint:#B2AE8C;--gold:#C7E78B;--gold-dim:#81AE64;--fill:#81AE64;--fill-hi:#C7E78B;--on-fill:#14200E;--act-bg:#1F2918;--act-tx:#C7E78B;--gain:#8FD08A;--loss:#E88A72;--line:#34422A;--line-soft:#27331F;color-scheme:dark}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;background:var(--ink);transition:background .2s}
 body{margin:0;background:var(--ink);color:var(--paper);font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;line-height:1.5;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
@@ -43,8 +43,8 @@ h2{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:20px;margin:0 
 .row .mu{color:var(--paper-dim)}
 .row-tuju{cursor:pointer;align-items:center;min-height:44px}.row-tuju:hover>span:first-child{color:var(--gold)}.row-tuju:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 label{display:block;font-size:10.5px;color:var(--paper-faint);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 5px}
-input,select{width:100%;font:inherit;font-size:13px;padding:10px 11px;background:var(--ink);color:var(--paper);border:1px solid var(--line);border-radius:8px}
-input:focus,select:focus{outline:2px solid var(--gold);outline-offset:1px}
+input,select,textarea{width:100%;font:inherit;font-size:13px;padding:10px 11px;background:var(--ink);color:var(--paper);border:1px solid var(--line);border-radius:8px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--gold);outline-offset:1px}
 .seg{display:flex;gap:8px}
 .btn{font:inherit;font-size:13px;padding:10px 14px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--paper-dim);cursor:pointer;flex:1}
 .btn:hover{color:var(--gold);border-color:var(--gold)}
@@ -84,8 +84,8 @@ html,body{overflow-x:clip}
 .bottom-nav .bnav-btn{overflow:hidden}
 .bnav-btn span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row>span,.tx-n,.note{overflow-wrap:anywhere}
-html[data-scheme="emas"]{--ink:#F3EDE0;--ink-raised:#E8E0CC;--paper:#2B2415;--paper-dim:#6B6046;--paper-faint:#6F654F;--gold:#9C7526;--gold-dim:#B08F4E;--fill:#C9A24B;--fill-hi:#E8D9A8;--on-fill:#2B2415;--act-bg:#E8E0CC;--act-tx:#2B2415;--gain:#4F7548;--loss:#9C4530;--line:#D9CFB4;--line-soft:#E3DAC3}
-html[data-scheme="emas"][data-theme="dark"]{--ink:#1B1712;--ink-raised:#231E17;--paper:#EDE6D6;--paper-dim:#9C907B;--paper-faint:#8D836F;--gold:#C9A24B;--gold-dim:#8C744E;--fill:#C9A24B;--fill-hi:#C9A24B;--on-fill:#1B1712;--act-bg:#231E17;--act-tx:#C9A24B;--gain:#84AB7C;--loss:#C06B54;--line:#3A3226;--line-soft:#2A251C;color-scheme:dark}
+html[data-scheme="emas"]{--ink:#F3EDE0;--ink-raised:#E8E0CC;--paper:#2B2415;--paper-dim:#62573F;--paper-faint:#5E5541;--gold:#9C7526;--gold-dim:#B08F4E;--fill:#C9A24B;--fill-hi:#E8D9A8;--on-fill:#2B2415;--act-bg:#E8E0CC;--act-tx:#2B2415;--gain:#3F6B38;--loss:#8F3F2B;--line:#D9CFB4;--line-soft:#E3DAC3}
+html[data-scheme="emas"][data-theme="dark"]{--ink:#1B1712;--ink-raised:#231E17;--paper:#EDE6D6;--paper-dim:#C5B9A3;--paper-faint:#B4A890;--gold:#C9A24B;--gold-dim:#8C744E;--fill:#C9A24B;--fill-hi:#C9A24B;--on-fill:#1B1712;--act-bg:#231E17;--act-tx:#C9A24B;--gain:#84AB7C;--loss:#DD8A74;--line:#3A3226;--line-soft:#2A251C;color-scheme:dark}
 .masthead-right{display:flex;align-items:center;gap:10px}
 .theme-toggle.active{color:var(--gold);border-color:var(--gold)}
 .eye{background:none;border:0;color:var(--paper-faint);cursor:pointer;font-size:13px;padding:2px 4px;margin-left:4px}
@@ -544,7 +544,7 @@ html[data-glass="1"] .row-tuju>.mu{color:var(--paper-dim)}
   #cetak-lap svg{display:block;max-width:100%;height:auto}
   #cetak-lap .ct-cat svg{display:inline-block;vertical-align:-1pt}
   /* halaman lain yang dicetak langsung: token terang + tanpa kaca walau tema gelap atau Efek kaca aktif */
-  html[data-theme="dark"]{--ink:#fff;--ink-raised:#fff;--paper:#000;--paper-dim:#333;--paper-faint:#555;--gold:#2f4a1d;--gain:#1b5e20;--loss:#b71c1c;--line:#999;--line-soft:#ccc}
+  html[data-theme="dark"],html[data-theme="dark"][data-scheme]{--ink:#fff;--ink-raised:#fff;--paper:#000;--paper-dim:#333;--paper-faint:#555;--gold:#2f4a1d;--gold-dim:#4e6f35;--gain:#1b5e20;--loss:#b71c1c;--line:#999;--line-soft:#ccc;--fill:#81AE64;--fill-hi:#C7E78B;--on-fill:#1F2A16;--act-bg:#E4F0C8;--act-tx:#1F2A16}
   html[data-glass="1"] section{background:none!important;border:1px solid #999!important;border-radius:6px!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
   .gbg{display:none!important}
 }
@@ -569,3 +569,200 @@ html[data-glass="1"] .row-tuju>.mu{color:var(--paper-dim)}
 .lap-det[open]>summary::after{transform:rotate(90deg)}
 .lap-untung>.mu{font-size:12px;letter-spacing:.04em;color:var(--paper-dim)}
 .lap-kpi{gap:6px}.lap-kpi b{font-size:12.5px;white-space:nowrap;overflow-wrap:normal}
+
+/* ---------- Layout desktop (v0.1.080) ----------
+   Hanya tata letak untuk layar >= 1100px: rail ikon di kiri, header breadcrumb + pill, Beranda sebagai grid dashboard.
+   Warna, font, dan gaya kartu tetap memakai token yang ada. Di bawah 1100px tampilan tidak berubah. */
+.rail-logo{display:none}
+@media (min-width:1100px){
+  .wrap{max-width:1560px;margin:0 auto;padding:24px 36px 64px 124px}
+  .main-tabs{display:none}
+  .fab{right:36px}.fab-dial{right:36px}
+  /* rail kiri (memakai #bnav yang sama) */
+  .rail-logo{display:flex;position:fixed;left:34px;top:34px;width:48px;height:48px;border-radius:16px;align-items:center;justify-content:center;background:var(--ink);color:var(--gold);z-index:51;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+  .rail-logo svg{width:26px;height:26px}
+  .bottom-nav{display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:10px;left:20px;right:auto;top:20px;bottom:20px;width:76px;padding:96px 12px 16px;border:1px solid var(--line);border-radius:38px;background:var(--fill);overflow:visible}
+  .bnav-btn{flex:0 0 auto;width:52px;height:52px;min-width:0;padding:0;border-radius:16px;color:var(--on-fill);justify-content:center;overflow:visible}
+  .bottom-nav .bnav-btn{overflow:visible}
+  .bnav-btn:hover{background:rgba(255,255,255,.24)}
+  .bnav-btn.active{background:var(--ink);color:var(--gold)}
+  .bnav-icon{width:22px;height:22px}
+  .bnav-btn span{position:absolute;width:1px;height:1px;margin:-1px;max-width:none;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  html[data-glass="1"] .bottom-nav{left:20px;right:auto;top:20px;bottom:20px;width:76px;border-radius:38px;padding:96px 12px 16px;border:1px solid var(--glass-edge)}
+  html[data-glass="1"] .bnav-btn{color:var(--paper-dim)}
+  html[data-glass="1"] .bnav-btn:hover{background:var(--act-bg)}
+  html[data-glass="1"] .bnav-btn.active{background:var(--act-bg);color:var(--act-tx)}
+  /* header: breadcrumb kecil di atas judul, tombol dalam pill di kanan */
+  header.masthead{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"crumb right" "title right";align-items:center;column-gap:16px;row-gap:2px;padding:4px 0 22px;border-bottom:0}
+  .masthead-top{display:contents}
+  .updated{grid-area:crumb;margin:0;align-self:end}
+  .mh-kiri{grid-area:title;align-self:start}
+  .masthead-right{grid-area:right;padding:6px 10px;background:var(--ink-raised);border:1px solid var(--line);border-radius:999px}
+  html[data-glass="1"] .masthead-right{background:var(--glass);border-color:var(--glass-edge);-webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%)}
+  .brand{font-size:34px}
+  .panel{margin-top:0}
+  body:not([data-hal="beranda"]) #app{max-width:1180px}
+  /* Beranda: grid dashboard 12 kolom */
+  body[data-hal="beranda"] .wrap{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:20px;row-gap:0;align-items:start;align-content:start}
+  body[data-hal="beranda"] .wrap>.peringatan{grid-column:1/-1;grid-row:1}
+  body[data-hal="beranda"] header.masthead{grid-column:1/-1;grid-row:2}
+  body[data-hal="beranda"] #app{display:contents}
+  body[data-hal="beranda"] #app>.info-contoh{grid-column:1/-1;grid-row:3;margin:0 0 20px}
+  body[data-hal="beranda"] #heroCard{grid-column:1/7;grid-row:4/6;margin:0 0 20px;align-self:stretch;display:flex;flex-direction:column}
+  body[data-hal="beranda"] #heroCard .stats{margin-top:auto}
+  body[data-hal="beranda"] #heroCard>.hero{margin-bottom:14px}
+  body[data-hal="beranda"] #app>[data-bx]{margin:0 0 20px;min-width:0}
+  body[data-hal="beranda"] #app>[data-bx="kas"]{grid-column:7/10;grid-row:4}
+  body[data-hal="beranda"] #app>[data-bx="banding"]{grid-column:7/10;grid-row:5}
+  body[data-hal="beranda"] #app>[data-bx="tx"]{grid-column:10/13;grid-row:4/6;align-self:stretch}
+  body[data-hal="beranda"] #app>[data-bx="perhatian"],body[data-hal="beranda"] #app>[data-bx="siklus"]{grid-column:span 6;grid-row:6}
+  body[data-hal="beranda"] #app>[data-bx="grafik"]{grid-column:1/-1;grid-row:7}
+  /* Grafik Beranda: dua kolom, tinggi grafik dibatasi */
+  .dash-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:20px;align-items:start}
+  .dash-grid>.dash{min-width:0}
+  .dash-grid>.dash:last-child:nth-child(odd){grid-column:1/-1}
+  .dash-grid .dash svg[viewBox="0 0 300 150"]{max-height:250px}
+}
+/* Desktop sempit (1100–1359px): kolom tengah dan kanan digabung agar kartu tidak terlalu tinggi */
+@media (min-width:1100px) and (max-width:1359px){
+  body[data-hal="beranda"] #heroCard{grid-column:1/8}
+  body[data-hal="beranda"] #app>[data-bx="kas"],body[data-hal="beranda"] #app>[data-bx="banding"]{grid-column:8/13}
+  body[data-hal="beranda"] #app>[data-bx="perhatian"],body[data-hal="beranda"] #app>[data-bx="tx"]{grid-column:span 6;grid-row:6;align-self:start}
+  body[data-hal="beranda"] #app>[data-bx="siklus"]{grid-column:1/-1;grid-row:7}
+  body[data-hal="beranda"] #app>[data-bx="grafik"]{grid-row:8}
+}
+/* Beranda kosong (tanpa Posisi kas dan Dibanding): Transaksi terakhir mengisi kolom kanan penuh */
+@media (min-width:1360px){
+  body[data-hal="beranda"] #app:not(:has(>[data-bx="kas"]))>[data-bx="tx"]{grid-column:7/13}
+}
+
+/* ---------- Layout desktop, Tahap 0-C (v0.1.081): kartu Siklus berjalan dan tren hero ---------- */
+.sk-ik,.sk-meta,.sk-bar,.sk-foot,.hero-spark-lbl{display:none}
+@media (min-width:1100px){
+  body[data-hal="beranda"] #heroCard .hero-spark{height:auto;flex:1 1 auto;min-height:90px;max-height:210px}
+  body[data-hal="beranda"] .hero-spark-lbl:not([hidden]){display:flex;justify-content:space-between;font-size:10.5px;color:var(--paper-faint);margin-top:4px}
+  body[data-hal="beranda"] .sk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:14px}
+  body[data-hal="beranda"] .sk-kartu{display:flex;flex-direction:column;align-items:stretch;gap:0;padding:18px 16px 14px;border:1px solid var(--line-soft);border-radius:18px;background:var(--ink);text-align:center}
+  body[data-hal="beranda"] .sk-kartu:hover{border-color:var(--gold-dim)}
+  body[data-hal="beranda"] .sk-kartu::after{display:none}
+  body[data-hal="beranda"] .sk-ik{display:flex;width:48px;height:48px;margin:0 auto 10px;border-radius:16px;align-items:center;justify-content:center;background:var(--act-bg);color:var(--act-tx)}
+  body[data-hal="beranda"] .sk-svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  body[data-hal="beranda"] .sk-kartu .tx-l{min-width:0}
+  body[data-hal="beranda"] .sk-kartu .tx-l .note{display:none}
+  body[data-hal="beranda"] .sk-kartu .tx-n{font-family:'Fraunces',Georgia,serif;font-size:16px;font-weight:500}
+  body[data-hal="beranda"] .sk-kartu .tx-a{font-family:inherit;font-size:12px;font-weight:400;color:var(--paper-dim);margin:2px 0 12px}
+  body[data-hal="beranda"] .sk-meta{display:flex;justify-content:space-between;font-size:11.5px;color:var(--paper-dim);margin-bottom:6px}
+  body[data-hal="beranda"] .sk-meta b{color:var(--paper);font-weight:600}
+  body[data-hal="beranda"] .sk-bar{display:block;height:6px;border-radius:99px;background:var(--line-soft);overflow:hidden}
+  body[data-hal="beranda"] .sk-bar i{display:block;height:100%;background:var(--fill);border-radius:99px}
+  body[data-hal="beranda"] .sk-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px;font-size:11.5px;color:var(--paper-faint)}
+  body[data-hal="beranda"] .sk-pil{padding:3px 10px;border-radius:999px;background:var(--act-bg);color:var(--act-tx);font-size:11px;white-space:nowrap}
+  body[data-hal="beranda"] .sk-pil.lewat{background:transparent;border:1px solid var(--loss);color:var(--loss)}
+  html[data-glass="1"] body[data-hal="beranda"] .sk-kartu{background:var(--glass-input);border-color:var(--glass-edge)}
+}
+@media (min-width:1360px){
+  body[data-hal="beranda"] #app>[data-bx="perhatian"]{grid-column:span 4}
+  body[data-hal="beranda"] #app>[data-bx="siklus"]{grid-column:span 8}
+  body[data-hal="beranda"] #app:not(:has(>[data-bx="perhatian"]))>[data-bx="siklus"]{grid-column:1/-1}
+}
+
+/* ---------- Layout desktop, Tahap 0-D (v0.1.082): halaman selain Beranda ---------- */
+@media screen and (min-width:1100px){
+  body[data-hal="siklus"] #app,body[data-hal="siklus-detail"] #app,body[data-hal="transaksi"] #app,body[data-hal="laporan"] #app{max-width:none}
+  body[data-hal="setelan"] #app,body[data-hal="lainnya"] #app{max-width:1320px}
+  body[data-hal="catat"] #app,body[data-hal="siklus-form"] #app,body[data-hal="panen"] #app,body[data-hal="master"] #app{max-width:720px}
+  /* Siklus: kartu dalam grid */
+  .sc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-top:14px}
+  .sc-grid>.sc-card{margin:0;padding:16px 18px;border:1px solid var(--line-soft);border-radius:18px;background:var(--ink);min-width:0}
+  .sc-grid>.sc-card:hover{border-color:var(--gold-dim)}
+  .sc-grid .sc-head{align-items:flex-start;gap:10px}
+  .sc-grid .badge{white-space:nowrap;flex:0 0 auto}
+  html[data-glass="1"] .sc-grid>.sc-card{background:var(--glass-input);border-color:var(--glass-edge)}
+  /* Detail siklus: Ringkasan dan Jadwal di kiri, Panen dan Transaksi di kanan */
+  body[data-hal="siklus-detail"] #app{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);column-gap:20px;align-items:start}
+  body[data-hal="siklus-detail"] .dt-kiri{grid-column:1}
+  body[data-hal="siklus-detail"] .dt-kanan{grid-column:2}
+  body[data-hal="siklus-detail"] #app>.btn.danger{grid-column:1/-1;justify-self:start;width:auto!important;padding:10px 26px}
+  /* Transaksi: filter di samping (menempel saat menggulir), hasil di kanan */
+  body[data-hal="transaksi"] #app{display:grid;grid-template-columns:minmax(300px,340px) minmax(0,1fr);column-gap:20px;align-items:start}
+  body[data-hal="transaksi"] #app>*{grid-column:1}
+  body[data-hal="transaksi"] #app>#txHasil{grid-column:2;grid-row:1/span 6}
+  body[data-hal="transaksi"] #app>section:first-child{position:sticky;top:20px}
+  /* Laporan: ringkasan | banding, tren | komposisi, rincian | simulasi */
+  body[data-hal="laporan"] #app{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:20px;align-items:start}
+  body[data-hal="laporan"] #app>*{grid-column:1/-1;min-width:0}
+  body[data-hal="laporan"] #app>.lap-aksi{grid-row:1}
+  body[data-hal="laporan"] #app>.lap-filter{grid-row:2}
+  body[data-hal="laporan"] #app>[data-bx="kpi"]{grid-column:1/6;grid-row:3}
+  body[data-hal="laporan"] #app>[data-bx="banding"]{grid-column:6/13;grid-row:3}
+  body[data-hal="laporan"] #app>[data-bx="tren"]{grid-column:1/8;grid-row:4}
+  body[data-hal="laporan"] #app>[data-bx="komp"]{grid-column:8/13;grid-row:4}
+  body[data-hal="laporan"] #app>.lap-rinci{grid-column:1/8;grid-row:5}
+  body[data-hal="laporan"] #app>.lap-sim{grid-column:8/13;grid-row:5}
+  body[data-hal="laporan"] section.dash svg{max-height:340px}
+  /* Setelan dan Lainnya: dua kolom */
+  body[data-hal="setelan"] #app,body[data-hal="lainnya"] #app{column-count:2;column-gap:20px}
+  body[data-hal="setelan"] #app>section,body[data-hal="lainnya"] #app>section{break-inside:avoid;-webkit-column-break-inside:avoid}
+}
+
+/* ---------- Layout desktop, Tahap 0-E (v0.1.083): rail lengkap ---------- */
+.bnav-btn.rail-set,.rail-badge{display:none}
+@media screen and (min-width:1100px){
+  .bnav-btn{position:relative}
+  .bnav-btn.rail-set{display:flex;margin-top:auto}
+  .rail-badge{display:flex;position:absolute;top:1px;right:1px;min-width:18px;height:18px;padding:0 5px;box-sizing:border-box;border-radius:9px;align-items:center;justify-content:center;background:var(--loss);color:#fff;font-size:10.5px;font-weight:700;line-height:1;pointer-events:none}
+}
+/* label muncul saat disorot atau difokus (rail ramping) */
+@media screen and (min-width:1100px) and (max-width:1599px){
+  .bnav-btn:hover span,.bnav-btn:focus-visible span{position:absolute;left:calc(100% + 14px);top:50%;transform:translateY(-50%);width:auto;height:auto;margin:0;clip:auto;overflow:visible;padding:6px 12px;border:1px solid var(--line);border-radius:10px;background:var(--ink);color:var(--paper);font-size:12px;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.2);z-index:60;pointer-events:none}
+  .bnav-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+}
+/* rail diperluas: ikon + label */
+@media screen and (min-width:1600px){
+  .wrap{padding-left:264px}
+  .bottom-nav,html[data-glass="1"] .bottom-nav{width:216px;align-items:stretch;padding-left:12px;padding-right:12px}
+  .bnav-btn{width:auto;height:50px;flex-direction:row;justify-content:flex-start;gap:14px;padding:0 15px}
+  .bnav-btn span{position:static;width:auto;height:auto;margin:0;clip:auto;overflow:visible;font-size:13.5px}
+  .bnav-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .rail-badge{top:50%;right:12px;transform:translateY(-50%)}
+}
+/* layar pendek: rapatkan rail agar item Setelan tidak menimpa item lain */
+@media screen and (min-width:1100px) and (max-height:640px){
+  .bottom-nav,html[data-glass="1"] .bottom-nav{gap:4px;padding-top:84px}
+  .bnav-btn{height:44px}
+  .bnav-btn:not(.rail-set){width:44px}
+}
+
+
+/* v0.1.084 — Tahap 0-F: kontras tema (token teks sekunder dan status disetel ke >= 4,5:1; lencana rail) */
+html[data-theme="dark"] .rail-badge{background:#B5402B;color:#fff}
+html[data-scheme="emas"]:not([data-theme="dark"]) .btn.on{color:#6E5218}
+html[data-scheme="emas"][data-theme="dark"] .btn.on{color:#E2BF6C}
+html[data-scheme="emas"]:not([data-theme="dark"]) .bottom-nav .bnav-btn.active{color:#6E5218}
+@media print{html[data-scheme="emas"][data-theme="dark"] .btn.on{color:#2B2415}}
+@media print{html,html[data-theme="dark"]{color-scheme:light!important}}
+
+textarea{resize:vertical;min-height:96px;line-height:1.5;display:block}
+
+/* v0.1.089 — Linimasa siklus */
+.lm-minggu{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--paper-dim);margin:18px 0 4px;padding-top:4px}
+.lm-minggu .note{text-transform:none;letter-spacing:0;font-weight:400}
+.lm-baris{align-items:flex-start;gap:10px}
+.lm-ik{flex:0 0 26px;width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;background:var(--line-soft);margin-top:2px}
+.lm-turun{opacity:.82}.lm-turun .lm-ik{background:transparent;border:1px solid var(--line-soft)}
+.lm-diam{cursor:default}
+.lm-tag{font-size:11px;font-weight:600;color:var(--paper-dim)}
+.seg.sm.lm-filter,.seg.sm.lm-urut{justify-content:flex-start}.lm-filter{margin-top:12px}.lm-filter .btn.gold{width:auto;margin-top:0}
+.lm-baris .tx-l{flex:1}.lm-baris .tx-l .note{white-space:normal;max-width:none;overflow:visible}
+.dt-kanan+.dt-kiri{margin-top:16px}
+@media (min-width:1100px){
+  body[data-hal="jurnal"] #app{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);column-gap:20px;align-items:start}
+  body[data-hal="jurnal"] .dt-kiri{grid-column:1;grid-row:1;position:sticky;top:20px;margin-top:0}
+  body[data-hal="jurnal"] .dt-kanan{grid-column:2;grid-row:1}
+}
+
+/* v0.1.090 — bilah tahap pertumbuhan */
+.th-bar{position:relative;display:flex;gap:2px;height:10px;margin:12px 0 6px;border-radius:5px}
+.th-bar i{display:block;min-width:4px;background:var(--line-soft);border-radius:3px}
+.th-bar i.sl{background:var(--gold-dim,var(--fill));opacity:.7}.th-bar i.sn{background:var(--fill)}
+.th-bar b{position:absolute;top:-4px;width:2px;height:18px;margin-left:-1px;background:var(--paper);border-radius:1px}
