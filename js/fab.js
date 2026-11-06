@@ -10,7 +10,11 @@ const Fab = {
     if (t === 'siklus') return { nama: 'Siklus baru', aksi: () => App.go('siklus-form') };
     if (t === 'siklus-detail') {
       const s = Siklus.cari(Siklus.sid);
-      return s && s.status === 'berjalan' ? { nama: 'Catat untuk siklus ini', pilih: tx(s.id).concat([['Catat panen', () => Siklus.aksi('catat-panen', {})], ['Tambah jadwal kegiatan', () => Rencana.dlgBuka('jadwal')]]) } : null;
+      return s && s.status === 'berjalan' ? { nama: 'Catat untuk siklus ini', pilih: tx(s.id).concat([['Catat panen', () => Siklus.aksi('catat-panen', {})], ['Catat jurnal', () => Rencana.dlgBuka('jurnal')], ['Tambah jadwal kegiatan', () => Rencana.dlgBuka('jadwal')]]) } : null;
+    }
+    if (t === 'jurnal') {
+      const s = Siklus.cari(Siklus.sid);
+      return s && s.status === 'berjalan' ? { nama: 'Catat jurnal', aksi: () => Rencana.dlgBuka('jurnal') } : null;
     }
     if (t === 'rencana') {
       const R = (j) => () => Rencana.dlgBuka(j);

@@ -2,7 +2,7 @@
 const Contoh = {
   FLAG: 'tani.contoh', minta: null,
   tgl(n) { const d = new Date(); return isoHari(new Date(d.getFullYear(), d.getMonth(), d.getDate() - n)); },
-  ada() { const D = App.data; return ['unit', 'komoditas', 'siklus', 'transaksi', 'panen', 'aset', 'utang'].some((k) => (D[k] || []).some((x) => x.contoh && !x.terhapus)); },
+  ada() { const D = App.data; return ['unit', 'komoditas', 'siklus', 'transaksi', 'panen', 'aset', 'utang', 'jurnal'].some((k) => (D[k] || []).some((x) => x.contoh && !x.terhapus)); },
   /* Terisi otomatis hanya saat pertama kali dibuka (belum ada data dan belum pernah diisi/dihapus) */
   otomatis() {
     if (Penyimpanan.get(KUNCI) !== null || Penyimpanan.get(this.FLAG) !== null) return false;
@@ -67,6 +67,9 @@ const Contoh = {
     panen(s4, kCabai, 6, 10, 0.8, 60000, 'Warung Bu Made'); panen(s4, kCabai, 2, 7.5, 0.5, 58000, 'Pasar Induk');
 
     /* Selada hidroponik siklus 2: berjalan, belum panen */
+    const jr = (s, n, judul, isi) => { (D.jurnal = D.jurnal || []).push(dasar({ id: uid('jr'), siklusId: s.id, tanggal: T(n), jenis: 'catatan', judul: judul, isi: isi })); };
+    jr(s4, 104, 'Polybag disiapkan', 'Tanah dicampur kompos dan pupuk kandang, 100 polybag disusun di barisan selatan.'); jr(s4, 90, 'Bibit mulai berdaun', 'Hampir semua bibit tumbuh. Yang lemah disisihkan dan diganti.');
+    jr(s4, 62, 'Daun menguning', 'Beberapa daun bawah menguning. Penyiraman dikurangi jadi pagi saja.'); jr(s4, 35, 'Mulai berbunga', 'Bunga pertama muncul di sekitar 20 batang.'); jr(s4, 12, 'Panen pertama', 'Buah merah pertama dipetik, jumlahnya belum banyak. Harga pasar sedang naik.');
     const s5 = sik(uHidro, kSelada, 28, null, 700000, 'Siklus kedua');
     tx(s5, 28, 'keluar', 'benih', 60000, 'Benih selada 2 sachet'); tx(s5, 28, 'keluar', 'media', 80000, 'Rockwool'); tx(s5, 27, 'keluar', 'pupuk', 120000, 'Nutrisi AB mix 5 L');
     tx(s5, 12, 'keluar', 'pupuk', 120000, 'Nutrisi AB mix 5 L'); tx(s5, 15, 'keluar', 'air-listrik', 60000, 'Listrik pompa'); tx(s5, 3, 'keluar', 'kemasan', 45000, 'Plastik dan label');
@@ -103,6 +106,7 @@ const Contoh = {
     const D = App.data, sisaSik = new Set(D.siklus.filter((s) => s.contoh).map((s) => s.id));
     ['unit', 'komoditas', 'siklus', 'aset', 'utang'].forEach((k) => { D[k] = D[k].filter((x) => !x.contoh); });
     D.panen = D.panen.filter((p) => !p.contoh && !sisaSik.has(p.siklusId));
+    D.jurnal = (D.jurnal || []).filter((j) => !j.contoh && !sisaSik.has(j.siklusId));
     D.transaksi = D.transaksi.filter((t) => !t.contoh);
     D.transaksi.forEach((t) => { if (t.siklusId && sisaSik.has(t.siklusId)) { t.siklusId = null; t.diubah = nowIso(); } });
     if (D.pengaturan.saldoAwalContoh) { D.pengaturan.saldoAwal = 0; delete D.pengaturan.saldoAwalContoh; }

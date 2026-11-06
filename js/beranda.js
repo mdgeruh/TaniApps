@@ -8,7 +8,7 @@ const Beranda = {
     const baik = (d > 0) === baikNaik;
     return '<span class="' + (baik ? 'up' : 'down') + '">' + (d > 0 ? '▲ ' : '▼ ') + Beranda.m(Math.abs(d)) + '</span>';
   },
-  perhatian() {
+  daftar() {
     const out = [], hari = isoHari(), d7 = isoHari(new Date(Date.now() + 7 * 864e5));
     const ke = (t, a) => ({ t, a }); // t = teks, a = atribut tujuan ketukan
     App.data.utang.filter((u) => !u.terhapus && !u.lunas && u.jatuhTempo && u.jatuhTempo <= d7).forEach((u) =>
@@ -23,9 +23,17 @@ const Beranda = {
       Siklus.panenOf(s.id).filter((p) => !p.transaksiId && !p.hargaPerSatuan && p.tanggal <= hari).forEach((p) =>
         out.push(ke('⏰ ' + esc(Siklus.nama(s.id)) + ': panen ' + Setelan.tgl(p.tanggal) + ' (' + fmtN(p.kuantitasKotor - p.susut) + (k ? ' ' + esc(k.satuan) : '') + ') belum dijual', 'data-do="panen-belum-jual" data-id="' + p.id + '" data-sid="' + s.id + '" aria-label="Isi harga jual panen ' + esc(Siklus.nama(s.id)) + '"'))); });
     Jadwal.mendekat().forEach((x) => out.push(ke((x.n < 0 ? '⚠ ' : '⏰ ') + esc(Siklus.nama(x.s.id)) + ': ' + esc(x.j.nama) + ' ' + Jadwal.teks(x.j), 'data-do="buka-siklus" data-id="' + x.s.id + '" aria-label="Buka siklus ' + esc(Siklus.nama(x.s.id)) + '"')));
+    const ij = Number(Setelan.get('ingatJurnal')) || 0;
+    if (ij) Siklus.daftar().filter((s) => s.status === 'berjalan').forEach((s) => { const L = Jurnal.of(s.id), n = Jurnal.hariKe(s, hari) - Jurnal.hariKe(s, L.length ? L[0].tanggal : s.mulai);
+      if (n >= ij) out.push(ke('✎ ' + esc(Siklus.nama(s.id)) + ': belum ada catatan jurnal ' + n + ' hari', 'data-do="buka-siklus" data-id="' + s.id + '" aria-label="Buka siklus ' + esc(Siklus.nama(s.id)) + '"')); });
     out.unshift(...pn.sort((x, y) => x[0] - y[0]).map((x) => x[1])); // pengingat panen paling atas
+    return out;
+  },
+  jumlah() { return this.daftar().length; },
+  perhatian() {
+    const out = this.daftar();
     const tampil = this.semua ? out : out.slice(0, 3);
-    return out.length ? '<section><h2>Perlu perhatian</h2>' + tampil.map((x) => '<div class="row row-tuju" role="button" tabindex="0" ' + x.a + '><span>' + x.t + '</span><span class="mu" aria-hidden="true">›</span></div>').join('') +
+    return out.length ? '<section data-bx="perhatian"><h2>Perlu perhatian</h2>' + tampil.map((x) => '<div class="row row-tuju" role="button" tabindex="0" ' + x.a + '><span>' + x.t + '</span><span class="mu" aria-hidden="true">›</span></div>').join('') +
       (out.length > 3 ? '<button type="button" class="btn" data-bp="1" style="width:100%;margin-top:10px">' + (this.semua ? 'Ringkas' : 'Lihat semua (' + out.length + ')') + '</button>' : '') + '</section>' : '';
   },
   atas() {
@@ -35,9 +43,9 @@ const Beranda = {
     const row = (x, y) => '<div class="row"><span class="mu">' + x + '</span><span>' + y + '</span></div>';
     if (!App.aktif().length) return '';
     return this.perhatian() +
-      '<section><h2>Dibanding bulan lalu</h2>' + row('Untung', this.delta(a.u, b.u, true)) + row('Modal', this.delta(a.m, b.m, false)) + row('Hasil', this.delta(a.h, b.h, true)) +
+      '<section data-bx="banding"><h2>Dibanding bulan lalu</h2>' + row('Untung', this.delta(a.u, b.u, true)) + row('Modal', this.delta(a.m, b.m, false)) + row('Hasil', this.delta(a.h, b.h, true)) +
       (b.n ? '' : '<p class="note">Belum ada transaksi bulan lalu sebagai pembanding.</p>') + '</section>' +
-      '<section><h2>Posisi kas</h2>' + row('Saldo kas (semua waktu)', '<strong class="' + (saldo >= 0 ? 'up' : 'down') + '">' + this.m(saldo) + '</strong>') +
+      '<section data-bx="kas"><h2>Posisi kas</h2>' + row('Saldo kas (semua waktu)', '<strong class="' + (saldo >= 0 ? 'up' : 'down') + '">' + this.m(saldo) + '</strong>') +
       (U.length ? row('Utang belum lunas', '<span class="down">' + this.m(tot('utang')) + '</span>') + row('Piutang belum lunas', '<span class="up">' + this.m(tot('piutang')) + '</span>') : '') + '</section>';
   },
   /* ---------- grafik di Beranda (v0.1.021) ---------- */

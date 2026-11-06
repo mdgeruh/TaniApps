@@ -1,5 +1,208 @@
 # Changelog
 
+## v0.1.091 — 2026-11-06
+Roadmap Fase 6E, **Tahap 3 selesai**: tiga sisa Tahap pertumbuhan. Dokumen: `docs/JURNAL.md`, `docs/DATA-SCHEMA.md`, `docs/SETELAN.md` (bila ada).
+
+### Ditambahkan
+- **Nama tahap bisa diubah**: di formulir **Ubah komoditas** ada lipatan "Nama tahap pertumbuhan" berisi satu isian per tahap (placeholder = nama bawaan). Isian yang diisi menggantikan nama bawaan di formulir tahap, detail siklus, linimasa, kartu siklus, dan Agenda; mengosongkan isian mengembalikan nama bawaan. Disimpan di `komoditas.tahap` (peta kode → nama, maks. 30 karakter); urutan dan kode tetap.
+- **Tahap di Agenda**: tiap baris kegiatan atau perkiraan panen menyebut tahap siklusnya ("· Tahap Vegetatif").
+- **Pengingat "belum ada catatan"**: pengaturan baru di Setelan (**Ingatkan catatan jurnal**: Mati, 3, 7, atau 14 hari; bawaan **Mati**). Bila hidup, Beranda → Perlu perhatian menampilkan siklus berjalan yang tanggal jurnal terakhirnya (atau tanggal mulai bila belum ada jurnal) sudah lewat batas itu; ketuk membuka siklus. Hanya tampil saat aplikasi dibuka.
+
+### Diubah
+- `js/tahap.js` (`paketKom`, `formNama`, `bacaNama`), `js/siklus.js` (form dan simpan komoditas), `js/jadwal.js`, `js/beranda.js`, `js/setelan.js`, `js/app.js` (versi), `sw.js`, `index.html`, `tani-keuangan.html`, `docs/JURNAL.md`, `docs/DATA-SCHEMA.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Pengaturan baru `ingatJurnal` hanya tersimpan di perangkat ini (seperti pengaturan tampilan), tidak ikut ekspor data.
+- Pengingat ditaruh paling akhir; pada data contoh ada 8 butir perhatian sehingga baru terlihat setelah "Lihat semua", karena Beranda hanya menampilkan 3 teratas.
+- Diuji di Chromium 390 px: ganti dua nama tahap cabai, nama baru dipakai di daftar tahap, mengosongkan isian mengembalikan bawaan; Agenda menyebut tahap; pengingat muncul saat hidup dan hilang saat dimatikan; Setelan menampilkan pengaturan; tanpa galat JavaScript. Belum diuji di HP sungguhan, tema gelap/kaca, atau desktop.
+
+## v0.1.090 — 2026-11-06
+Roadmap Fase 6E, **Tahap 3: Tahap pertumbuhan** (sebagian). Dokumen: `docs/JURNAL.md` (bagian 6 dan 7), `docs/DATA-SCHEMA.md`.
+
+### Ditambahkan
+- **Tahap pertumbuhan** (`js/tahap.js`): daftar tahap bawaan per templat komoditas (Sayur daun, Cabai, Tomat, Lele, Ayam petelur; komoditas lain memakai daftar Umum) dengan saran hari ke-N dari persen umur panen, sesuai `docs/JURNAL.md` bagian 6.
+- Bagian **Tahap** di detail siklus: tahap sekarang dan lama di tahap itu, **bilah tahap bersegmen** dengan penanda hari ini terhadap umur panen, dan tombol **Catat tahap** (modal: tanggal, tahap, catatan opsional; Ubah dan Hapus dengan Urungkan lewat detail jurnal).
+- **Saran tahap** (hanya saran, tidak otomatis): bila menurut hari ke-N tahap berikutnya sudah seharusnya mulai, tampil "seharusnya sudah mulai"; selain itu "Berikutnya: …". Pilihan bawaan di formulir mengikuti saran.
+- Tahap sekarang tampil di **kartu siklus** (tab Siklus) dan di **Siklus berjalan** di Beranda.
+- Entri tahap tampil di **linimasa** dengan ikon dan label Tahap, dan di bagian Jurnal sebagai "Tahap: <nama>".
+
+### Diubah
+- `js/jurnal.js` (judul entri tahap, Ubah membuka formulir tahap), `js/linimasa.js`, `js/siklus.js`, `js/app.js` (versi, Beranda), `index.dev.html`, `css/style.css`, `sw.js`, `index.html`, `tani-keuangan.html`, `docs/JURNAL.md`, `docs/DATA-SCHEMA.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- **Belum dikerjakan di Tahap 3:** layar untuk mengganti nama tahap (kode sudah membaca `komoditas.tahap` bila ada, tetapi belum ada tempat mengisinya); tahap di Agenda; pengingat "belum ada catatan N hari" dan pengaturannya di Setelan.
+- Tidak ada perubahan skema: entri memakai koleksi `jurnal` dengan `jenis: "tahap"` dan field `tahap` (kode) yang sudah tercantum; data lama tetap valid.
+- Diuji di Chromium 390 px: bagian dan bilah tampil, formulir menawarkan 7 tahap cabai, simpan, ubah, dan tampil di detail siklus, kartu siklus, Beranda, dan linimasa, tanpa galat JavaScript. Belum diuji di HP sungguhan, tema gelap/kaca, maupun desktop; uji impor/sinkron dengan entri tahap belum dijalankan.
+
+## v0.1.089 — 2026-11-06
+Roadmap Fase 6E, **Tahap 2: Linimasa siklus**. Dokumen: `docs/JURNAL.md` (bagian 7), `docs/RUTE.md`, `docs/DATA-SCHEMA.md`.
+
+### Ditambahkan
+- **Linimasa** (`js/linimasa.js`): halaman Jurnal siklus (`#jurnal-<id>`) dari tombol **Buka linimasa** di bagian Jurnal. Menyatukan catatan jurnal dengan peristiwa Mulai/Selesai siklus, transaksi, dan panen; hari ke-N, pengelompokan Minggu ke-N, saringan (Semua/Catatan/Uang/Panen/Kegiatan), urutan Terbaru/Terlama, 100 baris + Tampilkan lebih banyak.
+- Peristiwa turunan baca-saja dan redup; ketuk membuka formulir transaksi, modal panen, atau modal catatan.
+- **Riwayat kegiatan otomatis**: menandai jadwal "Sudah dikerjakan" (detail siklus dan Agenda) membuat entri jurnal `kegiatan`; Urungkan menghapusnya.
+- Cetak polos linimasa, FAB Catat jurnal di halaman ini, panel ringkasan di desktop, rute `#jurnal-<id>`.
+
+### Catatan
+- Tidak ada perubahan skema; entri `kegiatan` memakai koleksi `jurnal` yang sudah ada.
+
+## v0.1.088 — 2026-11-05
+Roadmap Fase 6E, **Tahap 1: catatan jurnal teks per siklus**. Dokumen: `docs/JURNAL.md` (bagian 7), `docs/SIKLUS.md`, `docs/DATA-SCHEMA.md`.
+
+### Ditambahkan
+- **Jurnal siklus**: koleksi baru `jurnal` (id `jr_…`) dan modul `js/jurnal.js`. Detail siklus punya bagian **Jurnal** (3 catatan terbaru + Lihat semua, tanggal dengan hari ke-N). Di siklus berjalan, tombol + menawarkan **Catat jurnal** (tanggal, judul opsional, isi); ketuk catatan untuk detail dengan **Ubah** dan **Hapus** (Urungkan).
+- **Evaluasi**: siklus selesai bersifat baca-saja kecuali satu catatan **Evaluasi** (tombol Tulis evaluasi; bisa diubah atau dihapus).
+- **Aturan**: tanggal tidak sebelum mulai siklus dan tidak di masa depan; judul maks. 80 dan isi maks. 2.000 karakter; hapus siklus diblok bila ada jurnal (pesan menyebut jumlah); tanggal mulai siklus tidak boleh setelah catatan tertua. Jurnal tidak memengaruhi kas, anggaran, laporan, atau HPP.
+- Koleksi terdaftar di penyimpanan, validasi, ekspor/impor JSON, cadangan, sinkron per entri, dan data contoh (5 catatan pada siklus cabai; ikut terhapus bersama contoh). Ekspor Excel punya lembar **Jurnal**.
+- Isian `textarea` bergaya sama dengan input; di dalamnya Enter membuat baris baru.
+
+### Catatan
+- Data lama tanpa koleksi `jurnal` tetap valid. Delapan keputusan terbuka diadopsi menurut usulan (docs/JURNAL.md bagian 3) dan bisa diubah di tahap berikutnya.
+- Belum ada: linimasa (Tahap 2), tahap pertumbuhan (3), foto (4), kejadian/ukuran (5), cadangan foto (6), laporan perjalanan siklus (7).
+- `js/jurnal.js` (baru), `js/app.js`, `js/siklus.js`, `js/sinkron.js`, `js/setelan.js`, `js/contoh.js`, `js/xlsx.js`, `js/fab.js`, `css/style.css`, `index.dev.html`, `index.html`, `tani-keuangan.html`, `sw.js` (cache `tani-keuangan-v0_1_088`), `VERSION`, dan dokumen terkait.
+
+## v0.1.087 — 2026-11-05
+Fase 6E **Tahap 0**: rancangan Jurnal Siklus (tanpa kode; aplikasi hanya naik versi). Spesifikasi menunggu konfirmasi pengguna sebelum Tahap 1.
+
+### Ditambahkan
+- **`docs/JURNAL.md`**: tujuan dan pembeda dari Transaksi/Panen/Jadwal, istilah (hari ke-N, minggu ke-N, Evaluasi), tabel delapan keputusan yang diadopsi sementara, **skema koleksi `jurnal`** (field, validasi, contoh JSON), aturan perilaku (siklus selesai baca-saja kecuali satu Evaluasi, hapus siklus diblok bila ada jurnal, tanggal, Urungkan, sinkron, Tersembunyi, cetak), **tahap pertumbuhan bawaan** untuk Sayur daun, Cabai, Tomat, Lele, Ayam petelur, dan Umum (kode, nama, persen umur panen, saran hari ke-N), rancangan linimasa, antarmuka, dan daftar periksa teknis Tahap 1.
+- **`docs/WIREFRAME.md` bagian 7–11**: bagian Jurnal di Detail siklus, modal Catat jurnal dan detail catatan, linimasa HP, linimasa desktop (≥ 1100 px), dan tahap di kartu siklus.
+- `docs/DATA-SCHEMA.md`: bagian `jurnal (rencana)`.
+
+### Keputusan rancangan baru (di luar delapan keputusan roadmap)
+- FAB di detail siklus berjalan menambah **Catat jurnal**; di siklus selesai hanya tombol **Tulis evaluasi** di halaman (FAB tetap tersembunyi).
+- Catatan penutup memakai field `evaluasi` (boolean, maksimal satu per siklus); hapus siklus juga diblok bila ada jurnal; tanggal mulai tidak boleh setelah entri jurnal tertua; alamat linimasa `#jurnal-<id siklus>`.
+
+### Diubah
+- `roadmap.md`: Tahap 0 ditandai (dua butir selesai, butir keputusan menunggu konfirmasi), status keputusan, baris status, dan Changelog Dokumen.
+
+### Catatan
+- Tidak ada perubahan perilaku aplikasi dan skema data; berkas kode hanya `js/app.js` dan `sw.js` (versi dan nama cache).
+- Persen dan saran hari tahap pertumbuhan adalah usulan awal yang perlu dicek petani; dapat diubah sebelum Tahap 3.
+
+## v0.1.086 — 2026-11-05
+Roadmap: **Fase 6E — Jurnal Siklus** (mencatat perjalanan tanaman dari awal sampai panen). Perubahan dokumen saja; kode aplikasi hanya naik versi.
+
+### Ditambahkan di `roadmap.md`
+- Bagian **Fase 6E** (sebelum Fase 7): latar, tujuan, prinsip khusus, rancangan data (koleksi `jurnal`, jenis catatan/tahap/kejadian/ukuran/kegiatan, linimasa gabungan dengan data uang, panen, dan jadwal yang sudah ada), dan **delapan tahap** dengan ukuran dan hasil: 0 rancangan, 1 catatan teks, 2 linimasa, 3 tahap pertumbuhan, 4 foto jurnal, 5 kejadian dan ukuran, 6 laporan/ekspor/cadangan foto, 7 penyempurnaan.
+- Definisi selesai tiap tahap, **delapan keputusan terbuka** (dengan usulan), dan tabel risiko.
+- Model Data (Ringkas), Backlog (cuaca/kondisi), Pertanyaan Terbuka no. 6, baris status, dan Changelog Dokumen diperbarui.
+
+### Catatan
+- Temuan dari membaca kode yang dimasukkan ke rencana: koleksi baru harus didaftarkan di empat tempat (`App.KOLEKSI`/`sah`, `js/sinkron.js`, `js/setelan.js` impor, `js/contoh.js`); `Nota.rapikan()` hanya mengenali `transaksi.notaId` sehingga foto jurnal akan dihapus setelah 30 hari bila tidak diperbaiki lebih dulu (syarat Tahap 4); riwayat kegiatan jadwal belum tersimpan (hanya `terakhir`) sehingga perlu entri otomatis di Tahap 2.
+- Belum ada kode fitur Jurnal; tahap dan keputusan perlu persetujuan sebelum Tahap 1.
+- Berkas: `roadmap.md`, `CHANGELOG.md`, `README.md`, `VERSION`, `js/app.js` (versi), `sw.js`, `index.html`, `tani-keuangan.html` (hasil build).
+
+## v0.1.085 — 2026-11-05
+Layout desktop, Tahap 0-G (sebagian): cetak dari kerangka baru dan audit kompatibilitas (rincian di `docs/DESKTOP.md`). Perubahan hanya pada aturan cetak.
+
+### Diperbaiki
+- **Cetak pada Emas Klasik gelap:** teks tercetak terang di atas kertas putih (tidak terbaca) karena token cetak kalah spesifik dari token Emas gelap; kini token cetak berlaku untuk kedua skema.
+- **Tema gelap saat dicetak:** tepi halaman kertas tercetak hitam; `color-scheme` kini dipaksa terang saat mencetak.
+- **Aksen tema gelap saat dicetak** (`--act-tx`, `--fill-hi`, `--gold-dim`, `--on-fill`, `--act-bg`) dan tombol aktif Emas gelap kini memakai warna gelap di atas kertas putih (sebelumnya teks pil "14 hari lagi" terang).
+
+### Hasil pemeriksaan
+- Cetak (Chromium headless, PDF A4, lebar jendela 1440 px): 4 kombinasi tema × 6 halaman (25 pemeriksaan) lolos: tidak ada elemen layar, teks terang di atas putih, atau kata melewati margin.
+- Catatan "satu ketukan Cetak memanggil `window.print` dua kali" (sejak v0.1.078) ternyata artefak skrip uji, bukan galat aplikasi; satu ketukan memanggil satu kali.
+- Audit statis fitur CSS/JS untuk Safari dan Firefox (daftar di `docs/DESKTOP.md`); butuh Safari 16.2+ dan Firefox 113+ untuk tampilan penuh.
+
+### Diubah
+- `css/style.css` (tiga aturan cetak), `js/app.js` (versi), `sw.js`, `docs/DESKTOP.md`, `README.md`, `roadmap.md`, `VERSION`, `index.html`, `tani-keuangan.html` (hasil build).
+
+### Catatan
+- **Belum diuji:** Firefox dan Safari (tidak tersedia di lingkungan pengembangan), monitor dan skala Windows sungguhan, serta dialog cetak sungguhan. Tahap 0-G tetap terbuka untuk bagian itu.
+
+## v0.1.084 — 2026-11-05
+Layout desktop, Tahap 0-F: variasi tema dan kontras (rincian di `docs/DESKTOP.md`). Perubahan warna berlaku di semua ukuran layar; tata letak tidak berubah.
+
+### Diperbaiki
+- **Lencana "Perlu perhatian" di mode gelap:** teks putih di atas merah muda terang hanya 2,95:1 (Emas gelap 3,84:1); kini latar `#B5402B` (±5,6:1).
+- **Item aktif rail pada Emas Klasik terang:** ikon dan label berwarna emas ±3,6:1; kini `#6E5218` (±6,2:1).
+- **Teks sekunder dan status (token)** disetel agar mayoritas teks mencapai 4,5:1: Hijau terang `--paper-faint`, `--gain`, `--loss`; Hijau gelap `--paper-faint`, `--loss`; Emas terang `--paper-dim`, `--paper-faint`, `--gain`, `--loss`; Emas gelap `--paper-dim`, `--paper-faint`, `--loss`. Teks tombol aktif (`.btn.on`) di Emas disesuaikan. `--gold` tidak diubah.
+
+### Hasil pemeriksaan
+- 8 kombinasi (2 skema × terang/gelap × kaca) × 6 halaman × lebar 1280 dan 1600: teks di bawah 4,5:1 turun dari 17–113 per kombinasi menjadi 0–6.
+- Skala 90/100/110/120% pada lebar 1100, 1280, 1600, 1920 dan tinggi 560: tanpa overflow horizontal, item rail bertumpuk atau keluar rail, isi menimpa rail, atau lencana keluar rail (22 skenario).
+
+### Diubah
+- `css/style.css` (token empat palet, aturan lencana gelap, dua aturan Emas), `js/app.js` (versi), `sw.js`, `docs/STYLE.md` (tabel token, catatan Emas), `docs/DESKTOP.md` (bagian Variasi tema), `README.md`, `roadmap.md`, `VERSION`, `index.html`, `tani-keuangan.html` (hasil build).
+
+### Catatan
+- Sisa di bawah 4,5:1: angka hero dan merek Emas terang ±3,2:1 (teks besar; token emas sengaja tidak diubah demi kesamaan dengan Jurnal Trading); tombol utama kaca pada tema gelap 4,1–4,4:1; simbol dekoratif kecil.
+- Pengukuran memakai rata-rata latar di belakang tiap teks; tidak menggantikan uji pada layar sungguhan. Firefox, Safari, monitor dan skala Windows sungguhan, serta cetak dari kerangka baru masih di Tahap 0-G.
+
+## v0.1.083 — 2026-11-05
+Layout desktop, Tahap 0-E: rail lengkap (rincian di `docs/DESKTOP.md`). Hanya terlihat di layar ≥ 1100 px; HP, tablet, dan 1099 px ke bawah tidak berubah.
+
+### Ditambahkan
+- **Item Setelan di dasar rail** (ikon roda gigi); tombol Setelan di header tetap ada.
+- **Lencana jumlah "Perlu perhatian"** pada item Beranda (angka, "9+" bila lebih dari 9); hilang saat tidak ada peringatan. Tombol Beranda mendapat `title` dan `aria-label` yang menyebut jumlahnya.
+- **Label saat disorot atau difokus keyboard** di rail ramping (nama muncul di kanan rail).
+- **Rail diperluas di layar ≥ 1600 px**: ikon + label selalu terlihat (lebar 216 px), isi bergeser menyesuaikan.
+- **Layar pendek** (tinggi ≤ 640 px): rail dirapatkan agar item tidak bertumpuk.
+
+### Diubah
+- `js/app.js` (`App.lencana()`, ikon dan tombol Setelan di rail, versi), `js/beranda.js` (`daftar()` dan `jumlah()` dipisah dari `perhatian()`; kartu Perlu perhatian tidak berubah), `css/style.css` (blok Tahap 0-E), `sw.js` (`tani-keuangan-v0_1_083`), `index.html` dan `tani-keuangan.html` (hasil build), `docs/DESKTOP.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Diperbaiki
+- Saat dikembangkan, lencana sempat tidak terlihat karena terkena aturan label tersembunyi pada `.bnav-btn span`; sekarang memakai elemen `b` dan ukurannya diuji (18×18 px, di dalam rail, tidak tertutup elemen lain).
+
+### Catatan
+- Diuji di Chromium headless: lebar 1100, 1280, 1440, 1920 (tujuh item rail tanpa tumpang tindih, Setelan di dasar, isi tidak menimpa rail, klik Setelan mengaktifkan hanya satu item, label hover/fokus, lencana tampil dan hilang), tinggi 560 px, delapan kombinasi skema × mode × kaca di 1440 dan 1920 tanpa overflow, serta teks halaman dan item bilah bawah identik dengan v0.1.082 di 390, 800, dan 1099 px; tanpa galat JavaScript. Belum diuji di Firefox/Safari atau layar sungguhan (Tahap 0-G).
+- Belum: variasi tema menyeluruh dan kontras rail (0-F); Rencana keuangan masih satu kolom.
+
+## v0.1.082 — 2026-11-05
+Layout desktop, Tahap 0-D: halaman selain Beranda memakai lebar layar (rincian di `docs/DESKTOP.md`). Hanya tata letak untuk layar ≥ 1100 px; HP, tablet, dan lebar di bawah 1100 px tidak berubah.
+
+### Ditambahkan
+- **Siklus:** kartu siklus dalam grid otomatis (2 kolom di 1100 px, 3 di ≥ 1280 px); lencana hari tidak lagi terpotong dua baris.
+- **Detail siklus:** dua kolom; Ringkasan dan Jadwal kegiatan di kiri, Panen dan Transaksi siklus di kanan; Hapus siklus di bawah.
+- **Transaksi:** filter di kolom kiri (menempel saat menggulir), hasil dan daftar di kanan.
+- **Laporan:** Ringkasan | Bulan ini vs rata-rata 3 bulan, Tren | Komposisi modal, Rincian | Simulasi berdampingan; tinggi grafik dibatasi 340 px (sebelumnya ±900 px di lebar penuh).
+- **Setelan dan Lainnya:** dua kolom. Formulir (Catat, Siklus baru, Catat panen, Unit/Komoditas) dibatasi lebar 720 px.
+
+### Diubah
+- `js/siklus.js` (pembungkus `.sc-grid`, `.dt-kiri`, `.dt-kanan`), `js/analisa.js` (penanda `data-bx` pada bagian Laporan), `js/app.js` (versi), `css/style.css` (blok Tahap 0-D, `@media screen and (min-width:1100px)` agar tidak ikut tercetak), `sw.js` (`tani-keuangan-v0_1_082`), `index.html` dan `tani-keuangan.html` (hasil build), `docs/DESKTOP.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Diuji di Chromium headless: lebar 1100, 1280, 1440, 1920 untuk sembilan halaman (tanpa overflow, bagian meluber, atau tumpang tindih; kolom tiap halaman sesuai rancangan), delapan kombinasi skema × mode × kaca di 1440, dan teks semua halaman identik dengan v0.1.081 di 390, 800, dan 1099 px; tanpa galat JavaScript. Belum diuji di Firefox/Safari, layar dan skala Windows sungguhan, atau cetak dari kerangka baru (Tahap 0-G).
+- Belum dikerjakan: Rencana keuangan tetap satu kolom; Transaksi sebagai tabel dan master–detail (Tahap 2); rail lengkap (0-E); variasi tema menyeluruh (0-F).
+
+## v0.1.081 — 2026-11-05
+Layout desktop, Tahap 0-C (lanjutan v0.1.080): bagian bawah dan hero Beranda mengikuti gambar referensi. Hanya tampil di layar ≥1100 px; HP dan tablet tidak berubah (teks bagian Siklus berjalan di HP identik dengan v0.1.080).
+
+### Ditambahkan
+- **Kartu Siklus berjalan**: ikon, nama, modal, **Umur siklus N%** dengan bilah progres, **Hari N / umur panen**, dan pil **N hari lagi** / **panen hari ini** / **lewat N hari**. Komoditas tanpa umur panen tidak menampilkan bilah dan pil. Tiga kartu per baris pada lebar 1100–1920 px (`.sk-grid`, otomatis menyesuaikan jumlah kolom).
+- **Tren hero lebih besar** (90–210 px) mengisi ruang kosong di kartu hero, dengan tiga label bulan di bawahnya (`#heroSparkLbl`).
+- Penempatan grid ≥1360 px: Perlu perhatian (4 kolom) di samping Siklus berjalan (8 kolom); bila tidak ada peringatan, Siklus berjalan selebar penuh.
+
+### Diubah
+- `js/app.js` (markup kartu di `vBeranda`, label tren di `ringkas`, versi), `index.dev.html` (`#heroSparkLbl`), `css/style.css` (blok Tahap 0-C), `sw.js` (`tani-keuangan-v0_1_081`), `index.html` dan `tani-keuangan.html` (hasil build), `docs/DESKTOP.md`, `roadmap.md` (Tahap 0-C dicentang, baris changelog), `README.md`, `VERSION`.
+
+### Catatan
+- Diuji di Chromium headless: lebar 1440, 1360, 1280, 1100 (tiga kartu sebaris, tanpa overflow dan teks meluber), HP 390 (teks identik), siklus melewati umur panen dan komoditas tanpa umur panen, tanpa galat. Belum diuji di Firefox/Safari dan layar sungguhan.
+- Angka di tengah kartu hero seperti pada gambar tidak dibuat; angka untung sudah ditampilkan besar di hero.
+
+## v0.1.080 — 2026-11-05
+Layout desktop mengikuti gambar referensi dashboard (Fase 6D, Tahap 0 A–B). Hanya tata letak; warna, font, gaya kartu, tema, skema, dan efek kaca tidak diubah. Di bawah 1100 px tampilan sama seperti sebelumnya.
+
+### Ditambahkan
+- **Rail ikon di kiri** (≥1100 px): `#bnav` yang sama ditata vertikal, logo tunas di atas (`.rail-logo`), item aktif berupa kotak terang, nama item di `title` (tooltip) dan tetap terbaca pembaca layar. Mode kaca memakai latar kaca yang ada.
+- **Header baru**: breadcrumb kecil di atas judul besar, tombol tema/setelan/mata dalam pill di kanan; tab atas disembunyikan di layar ini.
+- **Grid dashboard Beranda 12 kolom**: hero lebar di kiri, Posisi kas dan Dibanding bulan lalu bertumpuk di tengah, Transaksi terakhir sebagai panel tinggi di kanan, Perlu perhatian dan Siklus berjalan di baris bawah, Grafik dua kolom (tinggi SVG dibatasi 250 px). Tata letak khusus 1100–1359 px dan saat data kosong.
+- `docs/DESKTOP.md`: titik batas, kerangka, peta grid, dan cara kerja.
+- Roadmap: Fase 6D diperbarui dengan **Tahap 0 (A–G)** untuk layout referensi; A dan B selesai, C sampai G dijadwalkan; dua butir Tahap 1 ikut dicentang/dicatat.
+
+### Diubah
+- `index.dev.html`: elemen `.rail-logo`; `<main>` diberi `role="main"`. `js/app.js`: `body[data-hal]` diisi halaman aktif, `title` pada tombol navigasi, `data-bx` pada bagian Beranda, pembungkus `.dash-grid`. `js/beranda.js`: `data-bx`. `css/style.css`: blok layout desktop di akhir. `index.html` dan `tani-keuangan.html` (hasil build), `README.md`, `roadmap.md`, `docs/STYLE.md`, `docs/FAB.md`, `VERSION`.
+
+### Diperbaiki
+- `sw.js`: nama cache masih `tani-keuangan-v0_1_078` padahal versi aplikasi 0.1.079. Sekarang `tani-keuangan-v0_1_080`.
+
+### Catatan
+- Diuji di Chromium headless: lebar 1100, 1280, 1360, 1920 (tanpa overflow horizontal, tanpa teks meluber, penempatan grid sesuai), lebar 1099, 1024, dan 390 (tidak berubah), semua halaman di 1440 px (konten tidak menimpa rail), mode gelap + kaca, data kosong, navigasi rail dengan Enter, FAB dan dial, tanpa galat. Belum diuji di Firefox/Safari dan layar sungguhan.
+- Halaman selain Beranda memakai kerangka baru tetapi isinya masih satu kolom (maks. 1180 px); grid dua kolom per halaman ada di roadmap Tahap 0-D.
+
 ## Dokumen — 2026-11-05 (tanpa rilis kode)
 - `roadmap.md`: ditambahkan **Fase 6D — Tampilan Desktop** (usulan, belum dikerjakan; tiga tahap, 16 butir) beserta temuan terbuka tentang Cetak yang memanggil `window.print` dua kali. Tanggal pembaruan dokumen diperbarui. Versi aplikasi tetap v0.1.079.
 

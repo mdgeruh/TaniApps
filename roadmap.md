@@ -1,6 +1,6 @@
 # Roadmap — Web App Keuangan Pertanian Rumahan
 
-> Status dokumen: draf v0.1 · Terakhir diperbarui: 5 November 2026 · Fase 5 selesai; Fase 6 berjalan: cadangan otomatis + dasar PWA; FAB kontekstual; chart di Beranda; data contoh otomatis; sinkron Supabase (v0.1.023); penyempurnaan UX (v0.1.024); kartu hero Beranda (v0.1.025); judul halaman (v0.1.026); foto nota lokal (v0.1.037); optimasi performa/aksesibilitas bagian 1 (v0.1.038); pembayaran utang/piutang tahap 1 (v0.1.048) dan tahap 2: tombol Bayar + cicilan (v0.1.049); Catat panen vs Catat hasil (v0.1.050); jadwal kegiatan per siklus (v0.1.051); katalog harga pasar (v0.1.052); kalkulator kelayakan usaha (v0.1.053); ekspor Excel (v0.1.054); isian Rencana keuangan lewat modal FAB (v0.1.055); ringkasan, sub-tab geser, ubah aset/utang (v0.1.056); daftar anggaran dengan detail (v0.1.057); daftar aset dan utang dengan detail (v0.1.058); grafik arus kas, saringan utang, simpan & tambah lagi, tren harga (v0.1.059); Jadwal dan Panen lewat modal detail (v0.1.060); modal bersama, tombol kembali, hapus seragam (v0.1.061); detail siklus dipadatkan (v0.1.066); duplikat FAB dibersihkan (v0.1.067)
+> Status dokumen: draf v0.1 · Terakhir diperbarui: 5 November 2026 · Fase 5 selesai; Fase 6 berjalan: cadangan otomatis + dasar PWA; FAB kontekstual; chart di Beranda; data contoh otomatis; sinkron Supabase (v0.1.023); penyempurnaan UX (v0.1.024); kartu hero Beranda (v0.1.025); judul halaman (v0.1.026); foto nota lokal (v0.1.037); optimasi performa/aksesibilitas bagian 1 (v0.1.038); pembayaran utang/piutang tahap 1 (v0.1.048) dan tahap 2: tombol Bayar + cicilan (v0.1.049); Catat panen vs Catat hasil (v0.1.050); jadwal kegiatan per siklus (v0.1.051); katalog harga pasar (v0.1.052); kalkulator kelayakan usaha (v0.1.053); ekspor Excel (v0.1.054); isian Rencana keuangan lewat modal FAB (v0.1.055); ringkasan, sub-tab geser, ubah aset/utang (v0.1.056); daftar anggaran dengan detail (v0.1.057); daftar aset dan utang dengan detail (v0.1.058); grafik arus kas, saringan utang, simpan & tambah lagi, tren harga (v0.1.059); Jadwal dan Panen lewat modal detail (v0.1.060); modal bersama, tombol kembali, hapus seragam (v0.1.061); detail siklus dipadatkan (v0.1.066); duplikat FAB dibersihkan (v0.1.067); layout desktop dashboard tahap A–C (v0.1.081); Fase 6E Jurnal Siklus direncanakan, 8 tahap (v0.1.086); Tahap 0 selesai: docs/JURNAL.md dan wireframe, menunggu konfirmasi keputusan (v0.1.087)
 
 ## 1. Visi & Tujuan
 
@@ -44,6 +44,7 @@ Aplikasi web sederhana untuk mencatat dan menganalisa keuangan pertanian skala r
 - **Kategori** — benih, pupuk, pestisida, tenaga kerja, alat, air/listrik, pakan, penjualan, lainnya
 - **Aset** — nama, harga beli, umur ekonomis (untuk penyusutan)
 - **Panen & Penjualan** — kuantitas, harga per satuan, pembeli, susut/reject
+- **Jurnal siklus** (rencana, Fase 6E) — tanggal, jenis (catatan, tahap, kejadian, ukuran, kegiatan), isi, foto, siklus terkait
 
 ## 6. Tahapan Pengembangan
 
@@ -119,12 +120,22 @@ Aplikasi web sederhana untuk mencatat dan menganalisa keuangan pertanian skala r
 - [x] Foto nota/bukti transaksi (lokal dulu) — satu foto per transaksi, dikecilkan, disimpan di IndexedDB; tidak ikut ekspor/sinkron (v0.1.037, docs/NOTA.md); belum diuji di kamera HP sungguhan
 - **Hasil:** pengguna baru membuat siklus dalam satu ketukan dan bisa menguji skenario harga
 
-### Fase 6D — Tampilan Desktop (usulan, belum dikerjakan)
+### Fase 6D — Tampilan Desktop (dikerjakan bertahap sejak v0.1.080)
 Dasar: pemeriksaan v0.1.079 di Chromium headless lebar 1440 (belum di Firefox/Safari/komputer sungguhan). Temuan: isi satu kolom 920 px di tengah (±260 px kosong di tiap sisi); tab navigasi di Beranda muncul di bawah kartu hero, di halaman lain di atas isi (tidak konsisten); teks pada grafik ikut membesar karena SVG diskalakan penuh.
 
-**Tahap 1 — murah dan berdampak**
-- [ ] Wadah lebih lebar (±1200 px di layar ≥1024 px) dengan grid dua kolom: Beranda (hero + perhatian | grafik), Laporan (ringkasan | tren); lebar baca teks tetap terbatas
-- [ ] Navigasi desktop konsisten di semua halaman (sidebar kiri tetap berisi ikon dan label; bilah bawah tetap untuk HP) — menggantikan tab atas yang letaknya berbeda di Beranda
+**Tahap 0 — Layout dashboard sesuai gambar referensi (permintaan pengguna, v0.1.080)**
+Aturan: hanya tata letak untuk layar ≥1100 px; token warna, font, dan gaya kartu yang ada tidak diubah; di bawah 1100 px tampilan sama seperti sebelumnya. Rincian: `docs/DESKTOP.md`.
+- [x] **A. Kerangka:** rail ikon di kiri (lonjong, logo di atas, item aktif berupa kotak terang, tooltip nama), header dengan breadcrumb kecil + judul besar + pill tombol tema/setelan di kanan, tab atas disembunyikan, wadah lebar hingga 1560 px, FAB bergeser ke sudut kanan (v0.1.080)
+- [x] **B. Grid dashboard Beranda 12 kolom:** hero lebar di kiri, Posisi kas dan Dibanding bulan lalu bertumpuk di tengah, Transaksi terakhir sebagai panel tinggi di kanan, Perlu perhatian dan Siklus berjalan di baris bawah, Grafik dua kolom dengan tinggi dibatasi; tata letak khusus 1100–1359 px dan saat data kosong (v0.1.080)
+- [x] **C. Penyempurnaan Beranda:** Siklus berjalan menjadi kartu terpisah (ikon, nama, modal, bilah progres umur siklus, hari ke-N/umur panen, pil sisa hari atau "lewat N hari"; tanpa bilah bila komoditas belum punya umur panen) dan kartu hero menampilkan grafik tren lebih besar dengan label bulan (v0.1.081). Angka di tengah kartu seperti pada gambar tidak dibuat karena angka untung sudah besar di hero
+- [x] **D. Halaman lain mengikuti kerangka baru** (v0.1.082): Siklus (grid kartu 2–3 kolom), Detail siklus (Ringkasan + Jadwal di kiri, Panen + Transaksi di kanan), Transaksi (filter di samping, menempel saat menggulir), Laporan (ringkasan | banding, tren | komposisi, rincian | simulasi), Setelan dan Lainnya (dua kolom); formulir dibatasi 720 px. Unit/Komoditas hanya dibatasi lebar (satu daftar tampil sekaligus) dan Rencana keuangan tetap satu kolom; Transaksi sebagai tabel masih Tahap 2. Diuji di Chromium headless lebar 1100, 1280, 1440, 1920 dan 8 kombinasi skema/mode/kaca; HP, tablet, dan 1099 px identik dengan v0.1.081
+- [x] **E. Rail lengkap** (v0.1.083): item Setelan di dasar rail, lencana jumlah Perlu perhatian pada Beranda, label saat disorot atau difokus keyboard, rail diperluas (ikon + label) di layar ≥1600 px, rapat di layar pendek. Diuji di Chromium headless lebar 1100–1920 dan tinggi 560; HP/tablet/1099 px identik dengan v0.1.082
+- [x] **F. Variasi tema** (v0.1.084): 8 kombinasi (Hijau Padi/Emas Klasik × terang/gelap × kaca) × 6 halaman × lebar 1280/1600 dan skala 90–120% × lebar 1100–1920 diperiksa di Chromium headless; tanpa overflow atau rail bertumpuk. Diperbaiki: lencana rail gelap, item aktif rail Emas terang, token teks sekunder/status empat palet (teks di bawah 4,5:1 turun dari 17–113 menjadi 0–6 per kombinasi). Sisa: angka hero dan merek Emas terang ±3,2:1 (token emas sengaja tetap), tombol utama kaca gelap 4,1–4,4:1
+- [ ] **G. Pengujian lanjutan** — sebagian (v0.1.085): cetak dari kerangka baru diuji dan diperbaiki (4 tema × 6 halaman, PDF A4; Emas gelap tercetak tak terbaca, tepi hitam tema gelap), dan audit statis kompatibilitas selesai (docs/DESKTOP.md). Belum: Firefox dan Safari (tidak tersedia di lingkungan pengembangan), monitor dan skala Windows sungguhan, dialog cetak sungguhan. Sudah diuji di Chromium headless pada lebar 1100, 1280, 1360, 1920 (v0.1.080)
+
+**Tahap 1 — murah dan berdampingan dengan Tahap 0**
+- [ ] Wadah lebih lebar dengan grid dua kolom: Beranda selesai lewat Tahap 0 (v0.1.080, mulai 1100 px); Laporan (ringkasan | tren) dan layar 1024–1099 px belum
+- [x] Navigasi desktop konsisten di semua halaman: rail kiri tetap (ikon dengan tooltip nama; label penuh menunggu Tahap 0-E), bilah bawah tetap untuk HP, tab atas dipertahankan di 721–1099 px (v0.1.080)
 - [ ] Grafik: ukuran font tetap dan tinggi dibatasi (ukur lebar dengan ResizeObserver, gambar ulang); 12 bulan sebagai bawaan di desktop
 - [ ] Angka: `font-variant-numeric: tabular-nums` dan rata kanan di semua daftar dan tabel jumlah
 - [ ] Keamanan data multi-tab: deteksi perubahan dari tab lain (`storage` event / `BroadcastChannel`) dan muat ulang atau beri peringatan sebelum menimpa (sekarang tab terakhir yang menyimpan menimpa tanpa peringatan)
@@ -135,7 +146,7 @@ Dasar: pemeriksaan v0.1.079 di Chromium headless lebar 1440 (belum di Firefox/Sa
 - [ ] Pola master–detail: daftar di kiri, detail/ubah di panel kanan (bukan pindah halaman penuh)
 - [ ] Modal menjadi dialog atau drawer selebar 480–560 px di desktop; formulir dua kolom untuk isian pendek; urutan Tab dan fokus otomatis
 - [ ] Interaksi mouse: `@media (hover:hover) and (pointer:fine)` — efek hover, target klik lebih rapat, ikon hapus di baris (geser tidak berguna dengan mouse), pilih banyak dengan kotak centang untuk hapus massal
-- [ ] 3–4 kartu KPI dalam satu baris
+- [ ] 3–4 kartu KPI dalam satu baris (lihat Tahap 0-C)
 
 **Tahap 3 — pelengkap**
 - [ ] Cadangan ke folder pilihan (File System Access API, Chromium) dan seret-dan-lepas berkas untuk impor
@@ -145,7 +156,110 @@ Dasar: pemeriksaan v0.1.079 di Chromium headless lebar 1440 (belum di Firefox/Sa
 - [ ] Uji otomatis di lebar 1024/1280/1440/1920 pada Chromium, Firefox, WebKit, dengan tangkapan layar pembanding
 
 **Temuan terbuka**
-- [ ] Satu ketukan Cetak memanggil `window.print` dua kali pada uji headless (sama di v0.1.078 dan v0.1.079); penyebab belum ditemukan, belum dipastikan terjadi di browser sungguhan
+- [x] Satu ketukan Cetak memanggil `window.print` dua kali pada uji headless — **bukan galat aplikasi** (v0.1.085): ekspresi yang mengganti `window.print` ikut dipanggil oleh alat uji sehingga hitungan awal sudah 1; satu ketukan (klik asli maupun `Analisa.cetak()`) memanggil tepat satu kali
+
+### Fase 6E — Jurnal Siklus (perjalanan tanaman dari awal sampai panen) — Tahap 0–3 selesai (v0.1.087–091); diusulkan v0.1.086
+**Latar.** Aplikasi sudah mencatat uang (transaksi), hasil (panen), dan rencana (jadwal kegiatan, perkiraan panen), tetapi belum *ceritanya*: kapan benih disemai, kapan dipindah tanam, hama apa yang datang, apa yang dilakukan, seperti apa kondisi tanamannya. Tanpa itu angka untung/rugi tidak bisa dijelaskan ("kenapa siklus ini rugi?") dan pengalaman tidak terbawa ke siklus berikutnya.
+
+**Tujuan.** Setiap siklus punya **jurnal**: catatan perjalanan dari persiapan sampai panen (dan evaluasi) dalam satu linimasa yang menggabungkan catatan, foto, tahap pertumbuhan, kejadian, serta data uang, panen, dan kegiatan yang sudah ada. Pembeda: *Jadwal* = rencana ke depan; *Transaksi* dan *Panen* = angka; *Jurnal* = apa yang terjadi dan terlihat di lapangan.
+
+**Prinsip khusus fitur ini**
+1. **Catat cepat:** satu catatan boleh hanya satu kalimat atau satu foto; tanggal bawaan hari ini; kegiatan umum cukup satu ketukan (chip).
+2. **Tidak menggandakan data:** transaksi, panen, dan jadwal tampil di linimasa dari sumbernya (baca-saja, ketuk membuka aslinya). Jurnal tidak memengaruhi kas, anggaran, maupun laporan keuangan.
+3. **Offline-first:** teks ikut data utama; foto lokal dulu (IndexedDB) dan fitur belum dianggap selesai sebelum ada jalan keluar untuk foto (cadangan, Tahap 6).
+4. **Menyatu dengan pola yang ada:** tombol + (FAB), modal detail dengan Ubah dan Hapus + Urungkan (docs/MODAL.md), penamaan (docs/STYLE.md), mode Tersembunyi, cetak polos, tema terang/gelap/kaca, dan layout desktop (Fase 6D).
+5. **Bahasa petani:** "Catatan", "Tahap", "Kejadian", "Ukuran"; bukan "log" atau "event".
+
+**Rancangan data (usulan; dikunci di Tahap 0)**
+- Koleksi akar baru `jurnal` (satu entri satu catatan, supaya sinkron per entri tidak bentrok seperti bila ditanam di dalam `siklus`). Awalan id `jr_` (`j_` sudah dipakai jadwal).
+- Field: `id`, `siklusId` (wajib), `tanggal` (tidak sebelum `siklus.mulai`, tidak di masa depan), `jenis` (`catatan` | `tahap` | `kejadian` | `ukuran` | `kegiatan`; `kegiatan` dibuat otomatis saat jadwal ditandai selesai), `judul?`, `isi?`, `tahap?` (kode tahap), `kejadian?` (`hama` | `penyakit` | `cuaca` | `perawatan` | `lainnya`), `ukuran?` (`{nama, nilai, satuan}`), `foto?` (daftar id foto, maks. 4), `jadwalId?`, `dibuat`, `diubah`, `terhapus`. Catatan wajib punya minimal judul, isi, atau foto.
+- **Linimasa** = entri `jurnal` + peristiwa turunan yang tidak disimpan ulang: mulai dan selesai siklus, transaksi (modal/hasil) dan panen siklus itu. Riwayat kegiatan jadwal baru ada setelah Tahap 2 (sekarang `jadwal` hanya menyimpan `terakhir`).
+- **Titik pendaftaran koleksi baru** (daftar periksa teknis, ada di empat tempat): `App.KOLEKSI` + `App.sah` + `kosong()`, `KOLEKSI` di `js/sinkron.js`, `kunci` impor di `js/setelan.js`, `js/contoh.js` (data contoh ikut terhapus bersama contoh); ditambah lembar `Jurnal` di `js/xlsx.js`, `docs/DATA-SCHEMA.md`, dan uji bahwa data lama tanpa koleksi `jurnal` tetap valid.
+
+Perkiraan ukuran: S kecil · M sedang · L besar. Urutan: 0 → 1 → 2 → (3 dan 4 boleh paralel) → 5 → 6 → 7; tiap tahap dirilis sendiri sebagai versi `0.1.xxx` dan berguna tanpa tahap sesudahnya.
+
+**Tahap 0 — Rancangan dan keputusan (S, tanpa kode)**
+- [x] Jawab **Keputusan terbuka** di bawah dan kunci skema data — *usulan diadopsi sementara di docs/JURNAL.md bagian 3 dan skema dikunci di bagian 4 (v0.1.087); dipakai membangun Tahap 1 (v0.1.088) atas permintaan "lanjut roadmap 6e"; tetap bisa diubah di Tahap 2 dan seterusnya*
+- [x] `docs/JURNAL.md` (istilah, aturan, skema, linimasa, antarmuka, daftar periksa teknis) dan wireframe HP dan desktop di `docs/WIREFRAME.md` bagian 7–11 (v0.1.087)
+- [x] Daftar **tahap pertumbuhan bawaan** per template komoditas (Sayur daun, Cabai, Tomat, Lele, Ayam petelur) dan satu daftar Umum untuk komoditas lain; persen umur panen dan saran hari ke-N (docs/JURNAL.md bagian 6, v0.1.087)
+- [x] Keputusan rancangan tambahan (v0.1.087): FAB di detail siklus berjalan menambah **Catat jurnal** (siklus selesai: tombol **Tulis evaluasi** di halaman); catatan penutup memakai field `evaluasi` (maks. satu per siklus); hapus siklus diblok juga bila ada jurnal; ubah tanggal mulai tidak boleh setelah entri tertua; alamat linimasa `#jurnal-<id siklus>`
+- **Hasil:** spesifikasi disetujui sebelum ada kode — **menunggu konfirmasi pengguna atas delapan keputusan**
+
+**Tahap 1 — Catatan jurnal teks (M) — fondasi**
+- [x] Koleksi `jurnal` terdaftar di empat titik di atas, validasi `sah`, ikut ekspor/impor JSON, cadangan otomatis, dan sinkron per entri; data contoh menyertakan beberapa catatan pada siklus cabai
+- [x] Detail siklus: bagian **Jurnal** (3 terbaru + Lihat semua, seperti Panen), tombol + → **Catat jurnal** (modal: tanggal, judul opsional, isi); modal detail dengan **Ubah** dan **Hapus** (Urungkan) sesuai docs/MODAL.md
+- [x] Aturan: tanggal tidak sebelum mulai siklus dan tidak di masa depan; siklus selesai baca-saja (mengikuti keputusan no. 1)
+- [x] Uji: impor data lama, sinkron gabung, cadangan dan pulihkan, hapus siklus bila ada jurnal (pesan menyebut jumlahnya), tema dan lebar HP/desktop
+- [x] Tambahan sesuai keputusan no. 1: siklus selesai menerima **satu catatan Evaluasi** (tombol Tulis evaluasi; Ubah/Hapus hanya untuk evaluasi); lembar **Jurnal** di ekspor Excel; hapus siklus dan ubah tanggal mulai ikut memeriksa jurnal
+- **Hasil:** pengguna sudah bisa menulis catatan harian per siklus — **selesai di v0.1.088** (modul `js/jurnal.js`; diuji end-to-end di Chromium 320–360 px: 34 pemeriksaan; belum di HP sungguhan)
+
+**Tahap 2 — Linimasa siklus (M)**
+- [x] Tampilan kronologis (halaman **Jurnal siklus** dari detail siklus; di desktop kolom lebar): entri jurnal + peristiwa turunan (Mulai siklus, transaksi modal/hasil, panen, Selesai) dengan penanda **hari ke-N** dan **minggu ke-N** sejak mulai
+- [x] Peristiwa turunan baca-saja dan diberi gaya berbeda; ketuk membuka modal atau halaman aslinya
+- [x] Saringan jenis (Semua · Catatan · Uang · Panen · Kegiatan) dan urutan terlama atau terbaru; daftar bertahap (100 baris + Tampilkan lebih banyak, seperti Transaksi)
+- [x] **Riwayat kegiatan:** saat jadwal ditandai "Sudah dikerjakan" (di detail siklus maupun Agenda) otomatis dibuat entri jurnal `kegiatan` dengan Urungkan yang ikut menghapusnya
+- [x] Mode Tersembunyi menyamarkan nominal di linimasa; cetak polos halaman ini
+- **Hasil:** satu layar menceritakan siklus dari mulai sampai panen — **selesai di v0.1.089** (modul `js/linimasa.js`, rute `#jurnal-<id>`, tombol Buka linimasa di bagian Jurnal; diuji di Chromium 390 px dan 1440 px; belum di HP sungguhan)
+
+**Tahap 3 — Tahap pertumbuhan (M)**
+- [x] *(v0.1.090 daftar bawaan dan pencatatan; v0.1.091 ganti nama tahap di Ubah komoditas)* Jenis `tahap`: pilih tahap (mis. Persiapan lahan, Semai, Pindah tanam, Vegetatif, Berbunga, Berbuah, Panen) dari daftar bawaan per komoditas; nama tahap bisa diubah
+- [x] *(v0.1.090 kartu siklus, Beranda, bilah di detail; v0.1.091 Agenda)* **Tahap sekarang** dan lama di tahap itu tampil di kartu siklus (tab Siklus dan "Siklus berjalan" di Beranda) dan di Agenda; bilah tahap bersegmen dibandingkan dengan umur panen
+- [x] Saran "tahap berikutnya" berdasarkan hari ke-N (hanya saran, tidak otomatis)
+- [x] (v0.1.091) Pengingat opsional "belum ada catatan N hari" di Beranda → Perlu perhatian (mati secara bawaan, diatur di Setelan; hanya tampil saat aplikasi dibuka)
+- **Hasil:** terlihat tanaman sedang di tahap apa dan apakah sesuai perkiraan — **selesai di v0.1.091** (modul `js/tahap.js`; diuji di Chromium 390 px; belum di HP sungguhan)
+
+**Tahap 4 — Foto jurnal, lokal (L)**
+- [ ] **Syarat sebelum rilis:** `Nota.rapikan()` (js/nota.js) kini hanya mengenali `transaksi.notaId`, sehingga foto jurnal akan dihapus setelah 30 hari sebagai "yatim"; ubah agar membaca rujukan jurnal juga, dan uji
+- [ ] 1–4 foto per catatan (kamera atau galeri) memakai modul `Nota` (dikecilkan 1280 px, JPEG) di IndexedDB; id foto `f_xxxxxx` disimpan di `jurnal.foto`
+- [ ] Galeri kecil di linimasa; layar penuh dengan geser antarfoto, Esc, jebakan Tab (seperti foto nota)
+- [ ] Penanda "foto tidak ada di perangkat ini" (data diimpor atau disinkron dari perangkat lain); hapus foto saat catatan dihapus dan tidak ada Urungkan yang bisa memulihkannya
+- [ ] Setelan: jumlah dan ukuran foto (nota + jurnal), pemakaian penyimpanan (`navigator.storage.estimate()`), dan permintaan penyimpanan tetap (`navigator.storage.persist()`) agar browser tidak membuang foto
+- [ ] Uji di kamera HP sungguhan, foto besar, dan kuota hampir penuh
+- **Hasil:** perkembangan tanaman terdokumentasi dengan foto
+
+**Tahap 5 — Kejadian dan ukuran (M)**
+- [ ] Jenis `kejadian` dengan chip (hama, penyakit, cuaca, perawatan, lainnya) dan jenis `ukuran` (nama, nilai, satuan; mis. tinggi 35 cm, bobot ikan 120 g)
+- [ ] Grafik mini pertumbuhan: nilai ukuran terhadap hari ke-N (memakai `Analisa.kurva`), per nama ukuran
+- [ ] Ringkasan kejadian di detail siklus (jumlah per jenis, kejadian terakhir); menutup butir backlog "cuaca/hasil per kondisi untuk korelasi" secara sederhana
+- [ ] Hubungan ke uang: ketuk kejadian untuk melihat transaksi pada tanggal yang sama (mis. beli pestisida)
+- **Hasil:** pengguna bisa menjawab "hama apa yang menyerang dan apa dampaknya"
+
+**Tahap 6 — Laporan, ekspor, dan cadangan foto (L)**
+- [ ] **Laporan perjalanan siklus** yang bisa dicetak (cetak polos): kop, ringkasan uang, tahap dan tanggalnya, catatan, kejadian, foto kecil (opsional); dipicu dari detail siklus
+- [ ] Ekspor Excel: lembar **Jurnal** (js/xlsx.js); CSV jurnal
+- [ ] **Cadangan foto:** ekspor semua foto ke satu berkas ZIP (penulis ZIP di js/xlsx.js dipakai ulang) beserta indeks nama berkas dan siklusnya, dan impor kembali; peringatan bila ada foto yang belum dicadangkan
+- [ ] Analisa lintas siklus: lama tiap tahap dan **panen pertama rata-rata hari ke-N** dari siklus selesai dibandingkan dengan umur panen komoditas, dengan tawaran memperbarui `umurPanenHari`
+- **Hasil:** pengalaman satu siklus bisa diarsipkan, dicetak, dan dipakai merencanakan siklus berikutnya
+
+**Tahap 7 — Penyempurnaan (M, sebagian opsional)**
+- [ ] Chip **Jurnal** di tab Siklus: umpan lintas siklus (seperti Agenda) dengan pencarian kata kunci dan saringan siklus/jenis
+- [ ] **Catatan cepat:** chip satu ketukan (Siram, Pupuk, Semprot, Penyiangan, Pindah tanam) yang langsung membuat entri hari ini; tawaran "Tambah catatan?" setelah menandai jadwal selesai
+- [ ] Desktop: pola master–detail untuk linimasa (Fase 6D Tahap 2); pintasan keyboard catat jurnal
+- [ ] Performa 1.000+ entri, aksesibilitas (urutan Tab, label, pengumuman perubahan), dan uji dengan data nyata 1–2 siklus (menyambung ke Fase 7)
+- **Hasil:** jurnal terasa cepat dan tidak memberatkan, layak dipakai tiap hari
+
+**Definisi selesai tiap tahap:** dokumentasi (docs/JURNAL.md, DATA-SCHEMA.md, CHANGELOG.md, baris roadmap); uji otomatis di Chromium (HP 390 px dan desktop 1440 px, tema terang/gelap/kaca) tanpa galat JavaScript; impor data lama tanpa regresi; cetak dan ekspor yang ada tetap berfungsi; zip full + update dan pratinjau web; butir yang belum diuji di HP sungguhan dicatat apa adanya.
+
+**Keputusan terbuka (perlu jawaban pengguna sebelum Tahap 1; usulan di kurung).** *Status v0.1.087: semua usulan diadopsi sementara di docs/JURNAL.md bagian 3; ubah jawaban bila ada yang tidak cocok.*
+1. Setelah siklus selesai, bolehkah jurnal ditambah? (Siklus selesai baca-saja, kecuali satu catatan **Evaluasi** penutup; selebihnya lewat Buka kembali)
+2. Foto: lokal saja atau juga disinkron ke cloud? (Lokal + cadangan ZIP dulu; sinkron foto lewat Supabase Storage butuh bucket, kuota, dan biaya, jadi ditunda)
+3. Jurnal per siklus saja, atau juga per unit (mis. pH air hidroponik, kondisi kolam secara umum)? (Per siklus dulu; catatan unit dipertimbangkan di Tahap 7)
+4. Tahap pertumbuhan: tetap atau bisa dikustom? (Bawaan per komoditas, nama bisa diubah, urutan tetap)
+5. Satu siklus dengan banyak bedeng atau kolam: satu jurnal atau terpisah? (Satu jurnal per siklus; pisahkan lewat siklus terpisah)
+6. Pengingat "belum mencatat": perlu? (Opsional, mati secara bawaan, hanya saat aplikasi dibuka)
+7. Mode Tersembunyi: apa yang disamarkan? (Hanya nominal uang di linimasa; teks catatan dan foto tidak)
+8. Letak menu: bagian di Detail siklus dulu, chip **Jurnal** di tab Siklus di Tahap 7? (Ya)
+
+**Risiko khusus fitur ini**
+| Risiko | Mitigasi |
+|---|---|
+| Foto hilang (data browser dibersihkan, ganti HP) padahal foto adalah isi paling berharga | Minta penyimpanan tetap (`persist`), penghitung ukuran di Setelan, cadangan ZIP (Tahap 6), peringatan jelas |
+| Pembersih foto otomatis menghapus foto jurnal | Syarat Tahap 4: `rapikan()` membaca rujukan jurnal, diuji |
+| Pengguna malas menulis | Catatan cukup satu kalimat atau satu foto, chip catatan cepat, entri otomatis dari jadwal |
+| `localStorage` penuh (±5 MB) | Jurnal hanya teks (±300 B per catatan); ukuran data dipantau di Setelan; foto tidak masuk localStorage |
+| Bentrok edit antarperangkat | Satu entri satu catatan, digabung per entri berdasarkan `diubah` (mekanisme sinkron yang ada) |
+| Linimasa membingungkan karena campur uang dan catatan | Peristiwa turunan berbeda gaya dan baca-saja, saringan jenis, mode Tersembunyi |
+| Lingkup membengkak | Tiap tahap dirilis sendiri; Tahap 5–7 opsional dan bisa dipindah ke backlog |
 
 ### Fase 7 — Rilis v1.0 (Minggu 17–18)
 - [ ] Pengujian dengan data nyata (minimal 1–2 siklus)
@@ -159,7 +273,7 @@ Dasar: pemeriksaan v0.1.079 di Chromium headless lebar 1440 (belum di Firefox/Sa
 - Template komoditas (sayur daun, cabai, tomat, lele, ayam petelur) dengan estimasi biaya standar (selesai di v0.1.030)
 - Analisa sensitivitas: "bagaimana jika harga jual turun 10%?" (selesai di v0.1.029)
 - Kalender tanam + pengingat jadwal pupuk/panen — **jadwal kegiatan per siklus selesai di v0.1.051** (docs/JADWAL.md); pengingat panen sudah ada sejak v0.1.028; **tampilan agenda gabungan lintas siklus selesai di v0.1.068** (tab Siklus → Agenda, docs/JADWAL.md; diuji di Chromium, belum di HP sungguhan); belum ada notifikasi di luar aplikasi
-- Pencatatan cuaca/hasil per kondisi untuk korelasi
+- Pencatatan cuaca/hasil per kondisi untuk korelasi — sebagian dicakup Tahap 5 Jurnal Siklus (Fase 6E, rencana)
 - Katalog harga pasar (input manual) dan pembanding harga (selesai di v0.1.052, docs/HARGA.md; belum diuji di browser/HP sungguhan)
 - Kalkulator kelayakan usaha (NPV, IRR sederhana) (selesai di v0.1.053, docs/KELAYAKAN.md; belum diuji di browser/HP sungguhan)
 - Integrasi Google Sheets / ekspor ke template Excel — **ekspor Excel (.xlsx) multi-lembar selesai di v0.1.054** (docs/EKSPOR.md); integrasi Google Sheets langsung dan template Excel yang bisa diimpor balik belum
@@ -243,6 +357,7 @@ Dasar: pemeriksaan v0.1.079 di Chromium headless lebar 1440 (belum di Firefox/Sa
 3. Apakah perlu multi-pengguna dan login sejak awal, atau cukup lokal dulu?
 4. Mata uang dan satuan: Rupiah saja? Satuan khusus (ikat, karung, butir)?
 5. Apakah perlu laporan format tertentu (misalnya untuk pengajuan KUR atau dana desa)?
+6. Jurnal Siklus (Fase 6E): delapan keputusan terbuka tercantum di bagian Fase 6E sebelum Tahap 1 dimulai.
 
 ## 11. Changelog Dokumen
 
@@ -283,6 +398,18 @@ Dasar: pemeriksaan v0.1.079 di Chromium headless lebar 1440 (belum di Firefox/Sa
 | 0.1.073 | 2026-11-05 | Kurva tren Laporan dan Beranda lebih halus: kubik monoton (tanpa tekukan dan lonjakan), sparkline Beranda tidak lagi garis patah |
 | 0.1.078 | 2026-11-05 | Pengaman navbar bawah: overflow-x clip di html/body, navbar dan label tidak bisa melebihi layar, teks panjang membungkus |
 | 0.1.079 | 2026-11-05 | Laporan satu halaman tanpa tab; rincian lipat; filter satu set |
+| 0.1.080 | 2026-11-05 | Layout desktop sesuai referensi (Fase 6D Tahap 0 A–B): rail ikon kiri, header breadcrumb + pill, grid dashboard Beranda; roadmap diperbarui |
+| 0.1.081 | 2026-11-05 | Layout desktop Tahap 0-C: kartu Siklus berjalan dengan bilah progres dan pil sisa hari; tren hero lebih besar dengan label bulan |
+| 0.1.082 | 2026-11-05 | Layout desktop Tahap 0-D: Siklus, Detail siklus, Transaksi, Laporan, Setelan, Lainnya (docs/DESKTOP.md) |
+| 0.1.083 | 2026-11-05 | Layout desktop Tahap 0-E: rail lengkap (Setelan, lencana, label hover/fokus, rail diperluas ≥1600 px) |
+| 0.1.084 | 2026-11-05 | Layout desktop Tahap 0-F: variasi tema dan kontras (lencana rail gelap, item aktif rail Emas terang, token teks sekunder/status empat palet); skala 90–120% diuji (docs/DESKTOP.md) |
+| 0.1.085 | 2026-11-05 | Layout desktop Tahap 0-G (sebagian): cetak dari kerangka baru diuji dan diperbaiki (Emas gelap, tepi hitam tema gelap), cetak ganda ternyata artefak uji, audit kompatibilitas Safari/Firefox (docs/DESKTOP.md) |
+| 0.1.086 | 2026-11-05 | Roadmap: Fase 6E Jurnal Siklus (perjalanan tanaman dari awal sampai panen): latar, prinsip, rancangan data, 8 tahap, definisi selesai, 8 keputusan terbuka, risiko; tanpa perubahan kode |
+| 0.1.087 | 2026-11-05 | Fase 6E Tahap 0: rancangan Jurnal Siklus (docs/JURNAL.md: istilah, aturan, skema `jurnal`, tahap pertumbuhan bawaan per komoditas, linimasa), wireframe HP dan desktop; tanpa perubahan kode |
+| 0.1.089 | 2026-11-06 | Fase 6E Tahap 2: Linimasa siklus (halaman Jurnal siklus `#jurnal-<id>`, jurnal + peristiwa turunan mulai/selesai/transaksi/panen, hari ke-N dan minggu ke-N, saringan, urutan, 100 baris bertahap, panel ringkasan di desktop, cetak polos) dan riwayat kegiatan otomatis saat jadwal ditandai selesai (Urungkan ikut menghapus) |
+| 0.1.090 | 2026-11-06 | Fase 6E Tahap 3 (sebagian): tahap pertumbuhan bawaan, bilah tahap, saran, Catat tahap |
+| 0.1.091 | 2026-11-06 | Fase 6E Tahap 3 selesai: ganti nama tahap, tahap di Agenda, pengingat jurnal di Setelan |
+| 0.1.088 | 2026-11-05 | Fase 6E Tahap 1: catatan jurnal teks per siklus (modul `js/jurnal.js`, koleksi `jurnal`, Catat jurnal lewat FAB, detail Ubah/Hapus + Urungkan, Evaluasi di siklus selesai, lembar Excel Jurnal, data contoh) (docs/JURNAL.md, docs/SIKLUS.md) |
 | 0.1.077 | 2026-11-05 | Rute web: alamat #nama per halaman, buka langsung dan muat ulang, pintasan PWA Catat modal/hasil (docs/RUTE.md) |
 | 0.1.076 | 2026-11-05 | Konsistensi modal: Panduan dan foto nota memakai mesin Modal, fokus awal modal, teks pesan diseragamkan (docs/MODAL.md, docs/STYLE.md) |
 | 0.1.075 | 2026-11-05 | Cetak laporan: satu dokumen untuk ketiga tab sekaligus (Ringkasan, Grafik, Rincian) |

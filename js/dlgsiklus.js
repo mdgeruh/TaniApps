@@ -53,7 +53,8 @@ Object.assign(Rencana.FORM, {
       const D = Siklus.d(), p = Dsk.pn(id), t = p && p.transaksiId && D.transaksi.find((x) => x.id === p.transaksiId), tIkut = !!(t && !t.terhapus);
       if (!p || (tIkut && Utang.tahan(t))) return;
       p.terhapus = true; p.diubah = nowIso(); if (tIkut) { t.terhapus = true; t.diubah = nowIso(); Utang.ikut(t, true); }
-      Rencana.dlgTutup(true); App.simpan(); App.go('siklus-detail', true); Modal.pulihFokus();
-      App.toast('Panen dihapus', { label: 'Urungkan', fn: () => { p.terhapus = false; p.diubah = nowIso(); if (tIkut) { t.terhapus = false; t.diubah = nowIso(); Utang.ikut(t, false); } App.simpan(); if (App.tab === 'siklus-detail') App.go('siklus-detail', true); } });
+      const hal = App.tab === 'jurnal' ? 'jurnal' : 'siklus-detail';
+      Rencana.dlgTutup(true); App.simpan(); App.go(hal, true); Modal.pulihFokus();
+      App.toast('Panen dihapus', { label: 'Urungkan', fn: () => { p.terhapus = false; p.diubah = nowIso(); if (tIkut) { t.terhapus = false; t.diubah = nowIso(); Utang.ikut(t, false); } App.simpan(); if (App.tab === hal) App.go(hal, true); } });
     } }
 });

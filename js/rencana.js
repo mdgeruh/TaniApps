@@ -245,7 +245,7 @@ const Rencana = {
     const v = (i) => (document.getElementById(i) || {}).value || '', f = this.FORM[this.dlg.j], r = f.ok(v, this.dlg.arg);
     if (typeof r === 'string') { Modal.galat(r); return; }
     const j = this.dlg.j, arg = j === 'harga' ? Harga.pilih : this.dlg.arg;
-    Modal.tutup(true); App.simpan(); App.go(f.tab || 'rencana', true);
+    Modal.tutup(true); App.simpan(); App.go(f.tab === 'siklus-detail' && App.tab === 'jurnal' ? 'jurnal' : (f.tab || 'rencana'), true);
     if (lagi) this.dlgBuka(j, arg); else Modal.pulihFokus();
     App.toast(r.toast);
   },

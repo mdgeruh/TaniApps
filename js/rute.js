@@ -19,6 +19,7 @@ const Rute = {
       if (!id || !this.aman(id)) return 'siklus';
       return (t === 'panen' && Siklus.pd && !Siklus.pd.id ? 'panen-' : 'siklus-') + this.nid(id);
     }
+    if (t === 'jurnal') { const id = Siklus.sid; return id && this.aman(id) ? 'jurnal-' + this.nid(id) : 'siklus'; }
     if (t === 'catat') {
       const d = App.draft; if (!d) return 'transaksi';
       return d.id && this.aman(d.id) ? 'transaksi-' + this.nid(d.id) : 'catat-' + (d.jenis === 'masuk' ? 'hasil' : 'modal');
@@ -40,6 +41,7 @@ const Rute = {
     if (h === 'siklus-selesai' || h === 'siklus-agenda') { Siklus.sub = h.slice(7); App.go('siklus'); return true; }
     if (h === 'siklus-baru') { Siklus.sf = Siklus.sfBaru(); App.go('siklus-form'); return true; }
     if (h === 'catat-modal' || h === 'catat-hasil') { App.draft = { jenis: h === 'catat-hasil' ? 'masuk' : 'keluar' }; App.baru(); return true; }
+    if ((m = /^jurnal-(.+)$/.exec(h))) { const s = this.cari(D.siklus, m[1]); if (s) { Siklus.sid = s.id; App.go('jurnal'); return true; } }
     if ((m = /^siklus-(.+)$/.exec(h))) { const s = this.cari(D.siklus, m[1]); if (s) { Siklus.sid = s.id; App.go('siklus-detail'); return true; } }
     if ((m = /^panen-(.+)$/.exec(h))) {
       const s = this.cari(D.siklus, m[1]);

@@ -21,7 +21,7 @@ document.addEventListener('toggle', function (e) { var d = e.target; if (d && d.
 /* Tani Keuangan — halaman setelan (dipakai aplikasi dan pratinjau) */
 var Setelan = (function () {
   var KUNCI = 'tani.setelan';
-  var BAWAAN = { mode: 'light', skema: 'hijau', ukuran: 100, kaca: false, tanggal: 'dmy', sembunyi: false, margin: 30 };
+  var BAWAAN = { mode: 'light', skema: 'hijau', ukuran: 100, kaca: false, tanggal: 'dmy', sembunyi: false, margin: 30, ingatJurnal: 0 };
   var s = Object.assign({}, BAWAAN);
   var h = { versi: '', ambil: function () { return {}; }, pasang: function () {}, hapus: function () {}, ubah: function () {} };
   var konfirmasi = null, konfirmasi2 = null;
@@ -72,7 +72,8 @@ var Setelan = (function () {
     var pref = head('Preferensi', 'Berlaku di seluruh aplikasi.') +
       row('Format tanggal', 'Tabel transaksi dan daftar siklus.', seg('tanggal', [['dmy', '03/11/2026'], ['iso', '2026-11-03']])) +
       row('Angka untung saat dibuka', 'Pilih Tersembunyi agar semua nominal rupiah di aplikasi disamarkan. Tombol mata menampilkannya sementara; saat mencetak, angka tetap tampil.', seg('sembunyi', [[false, 'Tampil'], [true, 'Tersembunyi']])) +
-      row('Target margin', 'Dipakai menghitung harga jual minimum per siklus (1 sampai 90 persen).', '<input type="number" id="margin" class="settings-input" min="1" max="90" step="1" inputmode="numeric" value="' + s.margin + '" aria-label="Target margin persen">');
+      row('Target margin', 'Dipakai menghitung harga jual minimum per siklus (1 sampai 90 persen).', '<input type="number" id="margin" class="settings-input" min="1" max="90" step="1" inputmode="numeric" value="' + s.margin + '" aria-label="Target margin persen">') +
+      row('Ingatkan catatan jurnal', 'Beranda mengingatkan bila siklus berjalan belum dicatat selama sekian hari. Hanya tampil saat aplikasi dibuka; bawaan mati.', seg('ingatJurnal', [[0, 'Mati'], [3, '3 hari'], [7, '7 hari'], [14, '14 hari']]));
     var data = head('Data', 'Cadangan dan pemulihan. Data tersimpan di browser ini.') +
       '<div class="settings-row"><div class="settings-desc"><strong>Ekspor dan impor</strong><span>Ekspor mengisi kotak di bawah dengan JSON. Untuk impor, tempel JSON ke kotak atau pilih berkas.</span></div>' +
       '<div class="seg sm"><button type="button" class="btn" data-act="ekspor">Ekspor</button><button type="button" class="btn" data-act="impor">Impor</button><button type="button" class="btn" data-act="berkas">Pilih berkas</button></div></div>' +
@@ -111,7 +112,7 @@ var Setelan = (function () {
   function impor() {
     var box = document.getElementById('dataBox'), o;
     try { o = JSON.parse(box.value); } catch (e) { pesan('JSON tidak valid.'); return; }
-    var kunci = ['transaksi', 'siklus', 'unit', 'komoditas', 'panen', 'aset', 'utang', 'kategori'];
+    var kunci = ['transaksi', 'siklus', 'unit', 'komoditas', 'panen', 'aset', 'utang', 'kategori', 'jurnal'];
     if (!o || typeof o !== 'object' || Array.isArray(o) || !kunci.some(function (k) { return k in o; })) { pesan('Format tidak dikenali: ini bukan berkas ekspor Tani Keuangan. Data tidak diubah.'); return; }
     var r = h.pasang(o);
     pesan('Data berhasil diimpor.' + (r && r.dibuang ? ' ' + r.dibuang + ' bagian tidak valid dilewati.' : '') + ' Salinan data sebelumnya ada di Cadangan otomatis.');
