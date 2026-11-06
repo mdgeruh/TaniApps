@@ -63,11 +63,11 @@ const Analisa = {
     const ke = (n) => { const x = new Date(); x.setDate(1); x.setMonth(x.getMonth() + n); return isoHari(x).slice(0, 7); };
     const per = (k) => { const tx = App.aktif().filter((t) => t.tanggal.slice(0, 7) === k), m = App.jumlah(tx, 'keluar'), h = App.jumlah(tx, 'masuk'); return { m, h, u: h - m, n: tx.length }; };
     const lalu = [-3, -2, -1].map((n) => per(ke(n))).filter((r) => r.n), ini = per(ke(0));
-    if (!lalu.length) return '<section><h2>Bulan ini vs rata-rata 3 bulan</h2><p class="note">Belum ada transaksi di 3 bulan sebelumnya sebagai pembanding.</p></section>';
+    if (!lalu.length) return '<section data-bx="banding"><h2>Bulan ini vs rata-rata 3 bulan</h2><p class="note">Belum ada transaksi di 3 bulan sebelumnya sebagai pembanding.</p></section>';
     const avg = (f) => lalu.reduce((s, r) => s + r[f], 0) / lalu.length;
     const baris = (nama, f, baikNaik) => { const a = avg(f), c = ini[f], d = c - a, pct = a ? Math.round(d / Math.abs(a) * 100) : null, baik = (d >= 0) === baikNaik;
       return '<div class="row"><span class="mu">' + nama + '</span><span>' + rp(c) + ' <span class="mu">vs ' + rp(Math.round(a)) + '</span> <span class="' + (d === 0 ? 'mu' : baik ? 'up' : 'down') + '">' + (d === 0 ? 'sama' : (d > 0 ? '▲' : '▼') + (pct === null ? '' : ' ' + Math.abs(pct) + '%')) + '</span></span></div>'; };
-    return '<section><h2>Bulan ini vs rata-rata 3 bulan</h2>' + baris('Untung', 'u', true) + baris('Modal', 'm', false) + baris('Hasil', 'h', true) +
+    return '<section data-bx="banding"><h2>Bulan ini vs rata-rata 3 bulan</h2>' + baris('Untung', 'u', true) + baris('Modal', 'm', false) + baris('Hasil', 'h', true) +
       '<p class="note">Rata-rata dari ' + lalu.length + ' bulan sebelumnya yang ada transaksinya. Hijau = membaik (modal turun dianggap baik).</p></section>';
   },
   simH: -10, simB: 0,
@@ -101,11 +101,11 @@ const Analisa = {
     const aksi = '<div class="lap-aksi no-print"><button type="button" class="ikon-btn" data-an="cetak" aria-label="Cetak semua bagian laporan atau simpan PDF">' + this.IKON.cetak + '<span>Cetak</span></button>' +
       '<button type="button" class="ikon-btn" data-an="xls" aria-label="Ekspor ke Excel">' + this.IKON.xls + '<span>Excel</span></button></div>';
     const filter = '<section class="lap-filter no-print"><div class="lap-fl">Periode</div>' + this.chip(this.PER, this.per, 'lp') + '<div class="lap-fl">Kelompokkan per</div>' + this.chip(this.DIM, this.dim, 'ld') + '</section>';
-    const kpi = '<section><div class="lap-untung"><span class="mu">Untung / rugi · ' + (this.per === 'semua' ? 'semua waktu' : lab(this.PER, this.per).toLowerCase()) + '</span><strong class="' + (un >= 0 ? 'up' : 'down') + '">' + rp(un) + '</strong></div>' +
+    const kpi = '<section data-bx="kpi"><div class="lap-untung"><span class="mu">Untung / rugi · ' + (this.per === 'semua' ? 'semua waktu' : lab(this.PER, this.per).toLowerCase()) + '</span><strong class="' + (un >= 0 ? 'up' : 'down') + '">' + rp(un) + '</strong></div>' +
       '<div class="lap-kpi"><div><span class="mu">Modal</span><b>' + rp(T.m) + '</b></div><div><span class="mu">Hasil</span><b>' + rp(T.h) + '</b></div><div><span class="mu">R/C ratio</span><b>' + (T.m ? fmtRC(T.h / T.m) : '—') + '</b></div></div></section>';
     const rinci = '<section class="lap-rinci"><h2>Rincian per ' + lab(this.DIM, this.dim).toLowerCase() + '</h2><p class="note">Urut dari untung terbesar; ketuk satu baris untuk detail. HPP = modal (di luar pembelian alat) ÷ panen bersih; harga rata-rata tidak menghitung penjualan bibit dan bantuan; BEP dihitung dari biaya tetap, harga rata-rata, dan biaya variabel per satuan.</p>' +
       (L.length ? L.map((r, i) => this.kartu(r, i)).join('') : '<p class="note">Belum ada transaksi pada periode ini. Catat modal/hasil atau isi data contoh di Beranda.</p>') + '</section>';
-    return aksi + filter + kpi + this.vGrafik() + this.vBanding() + '<section class="dash"><h2>Komposisi modal</h2>' + this.komposisi() + '</section>' + rinci + this.vSimulasi();
+    return aksi + filter + kpi + this.vGrafik() + this.vBanding() + '<section class="dash" data-bx="komp"><h2>Komposisi modal</h2>' + this.komposisi() + '</section>' + rinci + this.vSimulasi();
   },
   /* ---------- Fase 4: dashboard, cetak, Excel ---------- */
   tren() {
@@ -138,7 +138,7 @@ const Analisa = {
   },
   vDashboard() {
     return this.vGrafik() + '<section class="dash"><h2>Tren 6 bulan (batang)</h2>' + this.svgTren() + '</section>' +
-      '<section class="dash"><h2>Komposisi modal</h2>' + this.komposisi() + '</section>' +
+      '<section class="dash" data-bx="komp"><h2>Komposisi modal</h2>' + this.komposisi() + '</section>' +
       '<section class="dash"><h2>Komoditas teratas</h2>' + this.topKom() + '</section>';
   },
   /* ---------- Cetak polos (v0.1.074): dokumen khusus cetak, terlepas dari tema, efek kaca, dan tampilan layar ---------- */
@@ -228,8 +228,8 @@ const Analisa = {
       bab(1, 'Ringkasan', this.cetakRingkasan(false)) + bab(2, 'Grafik', this.cetakGrafik(false)) + bab(3, 'Rincian per ' + dim, this.cetakRincian(false), 'ct-rincian-bag');
   },
   cetakPasang() { // dipanggil sebelum mencetak: hanya halaman Laporan yang punya dokumen cetak sendiri
-    this.cetakLepas(); if (App.tab !== 'laporan') return;
-    const d = document.createElement('div'); d.id = 'cetak-lap'; d.className = 'ct-semua'; d.innerHTML = this.cetakSemua();
+    this.cetakLepas(); if (App.tab !== 'laporan' && App.tab !== 'jurnal') return;
+    const d = document.createElement('div'); d.id = 'cetak-lap'; d.className = 'ct-semua'; d.innerHTML = App.tab === 'jurnal' ? Linimasa.cetakDoc() : this.cetakSemua();
     document.body.appendChild(d); document.documentElement.classList.add('cetak-lap');
   },
   cetakLepas() { const d = document.getElementById('cetak-lap'); if (d) d.remove(); document.documentElement.classList.remove('cetak-lap'); },
@@ -292,7 +292,7 @@ const Analisa = {
     const kH = this.kurva(H), area = kH + ' L' + X1 + ' ' + Y1 + ' L' + X0 + ' ' + Y1 + ' Z';
     const tot = T.reduce((a, r) => ({ h: a.h + r.h, m: a.m + r.m }), { h: 0, m: 0 }), un = tot.h - tot.m;
     const tabel = '<div class="gulir"><table class="lg-tab"><tr><th>Bulan</th><th>Hasil</th><th>Modal</th><th>Untung</th></tr>' + T.map((r) => '<tr><td>' + r.n + ' ' + r.thn + '</td><td>' + rp(r.h) + '</td><td>' + rp(r.m) + '</td><td class="' + (r.h >= r.m ? 'up' : 'down') + '">' + rp(r.h - r.m) + '</td></tr>').join('') + '</table></div>';
-    return '<section class="dash"><h2>Tren hasil / modal</h2>' + this.chip([[6, '6 bulan'], [12, '12 bulan']], this.rentang, 'lr') +
+    return '<section class="dash" data-bx="tren"><h2>Tren hasil / modal</h2>' + this.chip([[6, '6 bulan'], [12, '12 bulan']], this.rentang, 'lr') +
       '<div class="lg-stat"><div><div class="note">UNTUNG BERSIH</div><strong class="' + (un >= 0 ? 'up' : 'down') + '">' + rp(un) + '</strong></div><div><div class="note">TOTAL HASIL</div><strong>' + rp(tot.h) + '</strong></div><div><div class="note">TOTAL MODAL</div><strong>' + rp(tot.m) + '</strong></div></div>' +
       '<div class="lg-wrap"><svg class="lg-svg" viewBox="0 0 ' + W + ' 176" width="100%" role="img" aria-label="Tren hasil dan modal"><defs><linearGradient id="lgA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--fill)" stop-opacity=".45"/><stop offset="1" stop-color="var(--fill)" stop-opacity="0"/></linearGradient></defs>' +
       grid + '<path d="' + area + '" fill="url(#lgA)"/><path d="' + kH + '" fill="none" stroke="var(--fill)" stroke-width="2.2" stroke-linecap="round"/><path d="' + this.kurva(M) + '" fill="none" stroke="var(--loss)" stroke-width="2.2" stroke-linecap="round"/>' + sumbu +

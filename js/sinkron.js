@@ -1,7 +1,7 @@
 /* Tani Keuangan — sinkron cloud Supabase, opsional (v0.1.023) */
 var Sinkron = (function () {
   var KUNCI = 'tani.sinkron', TABEL = 'tani_data', JEDA = 20000, WAKTU = 15000;
-  var KOLEKSI = ['unit', 'komoditas', 'siklus', 'transaksi', 'panen', 'aset', 'utang', 'kategori'];
+  var KOLEKSI = ['unit', 'komoditas', 'siklus', 'transaksi', 'panen', 'aset', 'utang', 'kategori', 'jurnal'];
   var h = { ambil: function () { return {}; }, terapkan: function () {}, segar: function () {} };
   var c = { url: '', key: '', sesi: null, auto: true, terakhir: 0 };
   var f = { email: '', pw: '' };

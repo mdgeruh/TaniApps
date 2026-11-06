@@ -26,7 +26,7 @@ const Jadwal = {
         return '<h2 class="ag-grup' + (g[0] === 'Terlambat' ? ' down' : '') + '">' + g[0] + ' (' + isi.length + ')</h2>' + isi.map((x) => {
           const status = '<span class="' + (x.n < 0 ? 'down' : '') + '">' + this.teksN(x.n) + '</span>';
           const judul = x.tipe === 'panen' ? 'Perkiraan panen' : esc(x.j.nama);
-          const ket = esc(Siklus.nama(x.s.id)) + ' · ' + Setelan.tgl(x.tgl) + ' · ' + status + (x.tipe === 'kegiatan' && x.j.ulang > 0 ? ' · tiap ' + x.j.ulang + ' hari' : '');
+          const ket = esc(Siklus.nama(x.s.id)) + (Tahap.ringkas(x.s) ? ' · ' + esc(Tahap.ringkas(x.s)) : '') + ' · ' + Setelan.tgl(x.tgl) + ' · ' + status + (x.tipe === 'kegiatan' && x.j.ulang > 0 ? ' · tiap ' + x.j.ulang + ' hari' : '');
           return '<div class="ag-row"><button type="button" class="ag-main" data-do="buka-siklus" data-id="' + x.s.id + '" aria-label="' + (x.tipe === 'panen' ? 'Perkiraan panen ' : 'Kegiatan ' + esc(x.j.nama) + ', ') + esc(Siklus.nama(x.s.id)) + ', ' + this.teksN(x.n) + '. Buka siklus"><strong>' + (x.tipe === 'panen' ? '🌾 ' : '') + judul + '</strong><span class="note">' + ket + '</span></button>' +
             (x.tipe === 'kegiatan' ? '<button type="button" class="btn ag-ok" data-do="agenda-selesai" data-sid="' + x.s.id + '" data-id="' + x.j.id + '" aria-label="Tandai sudah dikerjakan: ' + esc(x.j.nama) + ', ' + esc(Siklus.nama(x.s.id)) + '">✓</button>' : '') + '</div>';
         }).join('');
@@ -63,8 +63,11 @@ const Jadwal = {
       const lama = JSON.stringify(j), hari = isoHari();
       j.terakhir = hari;
       if (j.ulang > 0) j.tanggal = this.tambahHari(hari, j.ulang); else j.selesai = true;
+      /* riwayat kegiatan (v0.1.089): satu entri jurnal jenis 'kegiatan' per penandaan; Urungkan ikut menghapusnya */
+      const n = nowIso(), rk = { id: uid('jr'), siklusId: s.id, tanggal: hari < s.mulai ? s.mulai : hari, jenis: 'kegiatan', judul: j.nama, isi: '', dibuat: n, diubah: n, terhapus: false };
+      Jurnal.semua().push(rk);
       simpan();
-      App.toast(j.selesai ? 'Kegiatan selesai' : 'Dijadwalkan lagi ' + Setelan.tgl(j.tanggal), { label: 'Urungkan', fn: () => { Object.assign(j, JSON.parse(lama)); s.diubah = nowIso(); App.simpan(); App.go(rute, true); } });
+      App.toast(j.selesai ? 'Kegiatan selesai' : 'Dijadwalkan lagi ' + Setelan.tgl(j.tanggal), { label: 'Urungkan', fn: () => { Object.assign(j, JSON.parse(lama)); const i = Jurnal.semua().indexOf(rk); if (i >= 0) Jurnal.semua().splice(i, 1); s.diubah = nowIso(); App.simpan(); App.go(rute, true); } });
     } else if (a === 'jadwal-hapus') {
       const i = s.jadwal.indexOf(j); s.jadwal.splice(i, 1); simpan();
       App.toast('Kegiatan dihapus', { label: 'Urungkan', fn: () => { s.jadwal.splice(i, 0, j); s.diubah = nowIso(); App.simpan(); App.go(rute, true); } });

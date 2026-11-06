@@ -72,14 +72,15 @@ const Siklus = {
         '<div><label for="sf_k">Komoditas</label><select id="sf_k" data-sfl="kom"><option value="">Semua komoditas</option>' + this.opsi(this.koms(true).filter((k) => ada.some((s) => s.komoditasId === k.id)), fk, (k) => k.nama) + '</select></div></div>' : '') +
       (tampil.length > 1 ? (() => { const m = tampil.reduce((a, s) => { const r = this.ringkas(s.id); a.m += r.modal; a.h += r.hasil; return a; }, { m: 0, h: 0 }), u = m.h - m.m;
         return '<div class="sum" style="margin-top:14px"><div><span class="note">Modal</span><strong class="down">' + rp(m.m) + '</strong></div><div><span class="note">Hasil</span><strong class="up">' + rp(m.h) + '</strong></div><div><span class="note">' + (u < 0 ? 'Rugi' : 'Untung') + '</span><strong class="' + (u < 0 ? 'down' : 'up') + '">' + rp(u) + '</strong></div></div><p class="note" style="margin:6px 0 4px">Total ' + tampil.length + ' siklus ' + this.sub + (fu || fk ? ' (disaring)' : '') + '</p>'; })() : '') +
-      (this.sub === 'agenda' ? Jadwal.agenda(base) : tampil.length ? tampil.map((s) => {
+      (this.sub === 'agenda' ? Jadwal.agenda(base) : tampil.length ? '<div class="sc-grid">' + tampil.map((s) => {
         const r = this.ringkas(s.id), k = this.kom(s.komoditasId), pp = this.panenPerkiraan(s);
         return '<div class="sc-card" data-do="buka-siklus" data-id="' + s.id + '" role="button" tabindex="0"><div class="sc-head"><span class="sc-name">' + esc(this.nama(s.id)) + '</span>' +
           '<span class="badge' + (s.status === 'berjalan' ? ' live' : '') + '">' + (s.status === 'berjalan' ? 'hari ' + this.hari(s) + (k && k.umurPanenHari ? '/' + k.umurPanenHari : '') : 'selesai') + '</span></div>' +
           '<div class="note">Mulai ' + Setelan.tgl(s.mulai) + ' · Modal ' + rp(r.modal) + ' · Hasil ' + rp(r.hasil) + (s.status === 'berjalan' && r.hasil ? ' · ' + (r.hasil - r.modal < 0 ? 'Rugi ' : 'Untung ') + rp(Math.abs(r.hasil - r.modal)) : '') + '</div>' +
+          (Tahap.ringkas(s) ? '<div class="note">' + esc(Tahap.ringkas(s)) + '</div>' : '') +
           (pp ? '<div class="note">' + (pp.sisa >= 0 ? 'Perkiraan panen ' + Setelan.tgl(pp.tgl) + ' · ' + (pp.sisa === 0 ? 'hari ini' : pp.sisa + ' hari lagi') : '<span class="down">Lewat perkiraan panen ' + Setelan.tgl(pp.tgl) + ' · terlambat ' + (-pp.sisa) + ' hari</span>') + '</div>' : '') +
           (s.anggaran ? (() => { const p = Math.round(r.modal / s.anggaran * 100); return '<div class="bar-ang' + (p > 100 ? ' x' : p >= 90 ? ' w' : '') + '" role="img" aria-label="Modal ' + p + ' persen dari anggaran"><i style="width:' + Math.min(100, p) + '%"></i></div><div class="note">Anggaran ' + rp(s.anggaran) + ' · terpakai ' + p + '%</div>'; })() : '') + '</div>';
-      }).join('') : '<p class="note" style="margin-top:14px">' + (ada.length ? 'Tidak ada siklus ' + this.sub + (fu || fk ? ' untuk saringan ini' : '') + '.' : 'Belum ada siklus. Siapkan unit dan komoditas, lalu ketuk tombol + untuk memulai siklus pertama.') + '</p>') +
+      }).join('') + '</div>' : '<p class="note" style="margin-top:14px">' + (ada.length ? 'Tidak ada siklus ' + this.sub + (fu || fk ? ' untuk saringan ini' : '') + '.' : 'Belum ada siklus. Siapkan unit dan komoditas, lalu ketuk tombol + untuk memulai siklus pertama.') + '</p>') +
       (this.units().length && this.koms().length ? '' : '<button class="btn" data-go="master" style="width:100%;margin-top:10px">Siapkan unit &amp; komoditas</button>') + '</section>';
   },
   vForm() {
@@ -109,7 +110,7 @@ const Siklus = {
     const panen = (this.lg.pn ? pAll : pAll.slice(0, BP)).map((p) => '<div class="tx"' + ' data-do="panen-detail" data-id="' + p.id + '" role="button" tabindex="0" aria-haspopup="dialog"' + '><div class="tx-l"><div class="tx-n">' +
       fmtN(p.kuantitasKotor - p.susut) + ' ' + esc(sat) + ' bersih</div><div class="note">' + Setelan.tgl(p.tanggal) + ' · susut ' + fmtN(p.susut) + (p.pembeli ? ' · ' + esc(p.pembeli) : '') + '</div></div>' +
       '<div class="tx-a">' + (p.hargaPerSatuan ? rp(p.hargaPerSatuan) + '/' + esc(sat) : '—') + '</div></div>').join('');
-    return '<section><div class="sc-head"><h2 style="margin:0">Ringkasan</h2><span class="badge' + (jalan ? ' live' : '') + '">' + (jalan ? 'berjalan' : 'selesai') + '</span></div>' +
+    return '<div class="dt-kiri"><section><div class="sc-head"><h2 style="margin:0">Ringkasan</h2><span class="badge' + (jalan ? ' live' : '') + '">' + (jalan ? 'berjalan' : 'selesai') + '</span></div>' +
       '<p class="note" style="margin:8px 0 0">Mulai ' + Setelan.tgl(s.mulai) + (jalan ? ' · hari ' + this.hari(s) + (k && k.umurPanenHari ? ' dari ±' + k.umurPanenHari : '') : ' · selesai ' + Setelan.tgl(s.selesai) + ' (' + this.hari(s) + ' hari)') + (s.catatan ? ' · ' + esc(s.catatan) : '') + '</p>' +
       '<div class="sum" style="margin-top:14px"><div><span class="note">Modal</span><strong class="down">' + rp(r.modal) + '</strong></div><div><span class="note">Hasil</span><strong class="up">' + rp(r.hasil) + '</strong></div>' +
       '<div><span class="note">' + (u < 0 ? 'Rugi' : 'Untung') + '</span><strong class="' + (u < 0 ? 'down' : 'up') + '">' + rp(u) + '</strong></div></div>' +
@@ -119,9 +120,11 @@ const Siklus = {
         : '<p class="note" style="margin-top:12px">Siklus selesai tidak menerima transaksi atau panen baru. Buka kembali untuk mengubahnya.</p>' +
           '<div class="seg" style="margin-top:6px"><button class="btn" data-do="ubah-siklus">Ubah siklus</button><button class="btn" data-do="buka-lagi">Buka kembali</button></div>' +
           '<button class="btn" data-do="ulangi-siklus" style="width:100%;margin-top:10px">Ulangi siklus ini</button>') + '</section>' +
-      Jadwal.v(s) +
+      Jadwal.v(s) + '</div><div class="dt-kanan">' +
       '<section><h2>Panen</h2>' + (panen ? panen + lagi('pn', pAll.length, BP) + '<p class="note">Ketuk panen untuk detail' + (jalan ? ', mengubah, atau menghapus' : '') + '.</p>' : '<p class="note">Belum ada panen.' + (jalan ? ' Ketuk tombol + lalu pilih Catat panen saat hasil siap.' : '') + '</p>') + '</section>' +
+      Tahap.v(s) + Jurnal.v(s, (n, b) => lagi('jr', n, b), !!this.lg.jr) +
       '<section><h2>Transaksi siklus</h2>' + (r.tx.length ? (this.lg.tx ? tAll : tAll.slice(0, BT)).map((t) => App.barisTx(t)).join('') + lagi('tx', tAll.length, BT) : '<p class="note">Belum ada transaksi terhubung.' + (jalan ? ' Ketuk tombol + untuk mencatat modal atau hasil siklus ini.' : '') + '</p>') + '</section>' +
+      '</div>' +
       '<button class="btn danger" data-do="hapus-siklus" style="width:100%;margin-top:4px">Hapus siklus</button>';
   },
   tautan(j, id) { const x = j === 'unit' ? this.unit(id) : this.kom(id); return x ? '<button type="button" class="btn" data-do="dm-buka" data-j="' + j + '" data-id="' + id + '" aria-haspopup="dialog" style="flex:0 0 auto;padding:4px 10px;font-size:12px;min-height:36px">' + esc(x.nama) + ' ›</button>' : '<span>?</span>'; },
@@ -175,7 +178,7 @@ const Siklus = {
   /* ---------- aksi (true bila ditangani) ---------- */
   aksi(a, el) {
     const D = this.d(), v = (id) => ($(id) ? $(id).value.trim() : '');
-    if (Dsk.aksi(a, el) || Jadwal.aksi(a, el)) return true;
+    if (Dsk.aksi(a, el) || Jadwal.aksi(a, el) || Jurnal.aksi(a, el) || Tahap.aksi(a) || Linimasa.aksi(a, el)) return true;
     if (a === 'siklus-tab') { this.sub = el.dataset.val; App.go('siklus', true); }
     else if (a === 'lg-toggle') { const k = el.dataset.k; this.lg[k] = !this.lg[k]; const y = window.scrollY; App.go('siklus-detail', true); window.scrollTo(0, y); const b = document.querySelector('[data-do="lg-toggle"][data-k="' + k + '"]'); if (b) b.focus({ preventScroll: true }); }
     else if (a === 'buka-siklus') { this.dmTutup(false, true); this.sid = el.dataset.id; this.minta = null; App.go('siklus-detail'); }
@@ -197,6 +200,7 @@ const Siklus = {
       if (ubah) {
         const pn = this.panenOf(s.id).map((p) => p.tanggal).sort(), sel = s.status === 'selesai' ? v('s_selesai') : null;
         if (pn.length && mulai > pn[0]) { App.toast('Ada panen bertanggal ' + Setelan.tgl(pn[0]) + ', sebelum tanggal mulai'); return true; }
+        const jr = Jurnal.of(s.id).map((j) => j.tanggal).sort(); if (jr.length && mulai > jr[0]) { App.toast('Ada catatan jurnal bertanggal ' + Setelan.tgl(jr[0]) + ', sebelum tanggal mulai'); return true; }
         if (sel !== null) {
           if (!iso.test(sel)) { App.toast('Isi tanggal selesai'); return true; }
           if (sel < mulai) { App.toast('Tanggal selesai tidak boleh sebelum tanggal mulai'); return true; }
@@ -213,8 +217,9 @@ const Siklus = {
       const s = this.cari(this.sid); s.status = 'berjalan'; s.selesai = null; s.diubah = nowIso(); App.simpan(); App.go('siklus-detail', true);
     }
     else if (a === 'hapus-siklus') {
-      const s = this.cari(this.sid), nTx = App.aktif().filter((t) => t.siklusId === s.id).length, nP = this.panenOf(s.id).length;
-      if (nTx || nP) { App.toast('Tidak bisa dihapus: ' + (nTx ? nTx + ' transaksi' : '') + (nTx && nP ? ' dan ' : '') + (nP ? nP + ' panen' : '') + ' masih terhubung'); return true; }
+      const s = this.cari(this.sid), nTx = App.aktif().filter((t) => t.siklusId === s.id).length, nP = this.panenOf(s.id).length, nJ = Jurnal.of(s.id).length;
+      const bag = [nTx ? nTx + ' transaksi' : '', nP ? nP + ' panen' : '', nJ ? nJ + ' catatan jurnal' : ''].filter(Boolean);
+      if (bag.length) { App.toast('Tidak bisa dihapus: ' + (bag.length > 1 ? bag.slice(0, -1).join(', ') + ' dan ' + bag[bag.length - 1] : bag[0]) + ' masih terhubung'); return true; }
       s.terhapus = true; s.diubah = nowIso(); this.minta = null; App.simpan(); App.go('siklus');
       App.toast('Siklus dihapus', { label: 'Urungkan', fn: () => { s.terhapus = false; s.diubah = nowIso(); App.simpan(); if (App.tab === 'siklus') App.go('siklus', true); } });
     }
@@ -274,6 +279,7 @@ const Siklus = {
       if (K.id && !rec) { this.mf.kom = this.mfBaru().kom; App.toast('Komoditas tidak ditemukan'); this.selesaiForm(); return true; }
       const ubahSat = !!(rec && rec.satuan !== sat && D.panen.some((p) => !p.terhapus && this.daftar().some((s) => s.id === p.siklusId && s.komoditasId === rec.id)));
       const isi = { nama: nama, satuan: sat, umurPanenHari: umur ? parseInt(umur, 10) : null, diubah: nowIso() };
+      const nm = rec ? Tahap.bacaNama() : null; if (nm) { if (Object.keys(nm).length) isi.tahap = nm; else delete rec.tahap; }
       if (rec) Object.assign(rec, isi); else D.komoditas.push(Object.assign({ id: uid('k'), dibuat: nowIso(), terhapus: false }, isi));
       this.mf.kom = this.mfBaru().kom; App.simpan(); App.toast(rec ? (ubahSat ? 'Komoditas diperbarui — satuan baru berlaku di semua panennya' : 'Komoditas diperbarui') : 'Komoditas ditambahkan'); this.selesaiForm();
     }
@@ -351,7 +357,7 @@ const Siklus = {
       '<div class="two"><div><label for="m_uukur">Luas / kapasitas</label><input id="m_uukur" inputmode="decimal" value="' + esc(U.ukur) + '"></div><div><label for="m_usat">Satuan</label><input id="m_usat" maxlength="12" value="' + esc(U.sat) + '" placeholder="m², lubang, ekor"></div></div>'
       : (ed ? '<p class="note" style="margin-top:0">Satuan baru berlaku di semua panennya.</p>' : '<p class="note" style="margin-top:0">Isi cepat dari template (nama, satuan, umur panen; bisa diubah):</p><div class="seg sm" style="justify-content:flex-start;margin:6px 0">' + TEMPLATE_KOM.map((t, i) => '<button type="button" class="btn" data-do="tpl-kom" data-val="' + i + '">' + t.label + '</button>').join('') + '</div>') +
       '<label for="m_knama">Nama</label><input id="m_knama" maxlength="40" value="' + esc(K.nama) + '" placeholder="mis. Cabai rawit">' +
-      '<div class="two"><div><label for="m_ksat">Satuan hasil</label><input id="m_ksat" maxlength="12" value="' + esc(K.sat) + '" placeholder="kg, ikat, butir"></div><div><label for="m_kumur">Umur panen (hari)</label><input id="m_kumur" inputmode="numeric" value="' + esc(K.umur) + '"></div></div>';
+      '<div class="two"><div><label for="m_ksat">Satuan hasil</label><input id="m_ksat" maxlength="12" value="' + esc(K.sat) + '" placeholder="kg, ikat, butir"></div><div><label for="m_kumur">Umur panen (hari)</label><input id="m_kumur" inputmode="numeric" value="' + esc(K.umur) + '"></div></div>' + (ed ? Tahap.formNama(K.id) : '');
     this.dmEl.firstChild.innerHTML = '<div class="dm-kepala"><div><div class="dm-jenis">' + (un ? 'Unit / lahan' : 'Komoditas') + '</div><h2 class="dm-judul" id="dmJudul">' + tit + '</h2></div>' +
       '<button type="button" class="dm-x" data-do="dm-tutup" aria-label="Tutup"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' +
       '<div class="dm-isi">' + isi + '</div><div class="dm-aksi"><button type="button" class="btn gold" data-do="tambah-' + m.j + '">' + (ed ? 'Simpan perubahan' : tit) + '</button><button type="button" class="btn" data-do="batal-' + m.j + '" style="width:100%">Batal</button></div>';
