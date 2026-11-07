@@ -1,5 +1,102 @@
 # Changelog
 
+## v0.1.096 — 2026-11-07
+Perbaikan: dropdown di modal **Tambah unit** (dan **Ubah unit**) masih dropdown bawaan browser.
+
+### Penyebab
+- Modal unit/komoditas dibuka dengan isi kosong lalu formulirnya digambar sesudahnya (`dmForm`), sehingga pengubah dropdown dan tanggal kustom (`Form.upgrade`), yang hanya dijalankan saat modal dibuat, tidak mengenai kolom **Jenis**.
+
+### Diubah
+- `js/siklus.js`: `dmForm` kini memanggil `Form.upgrade` setelah menggambar, sehingga kolom Jenis memakai dropdown kustom seperti modal lain. Modal komoditas tidak memiliki dropdown, jadi tidak terpengaruh.
+- `js/app.js` (versi), `sw.js` (`tani-keuangan-v0_1_096`), `index.html`, `tani-keuangan.html`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Diuji di Chromium 390 px: pada Tambah unit dan Ubah unit, dropdown asli tersembunyi dan tombol kustom muncul serta bisa dibuka; Tambah komoditas tanpa dropdown. Sekaligus diperiksa 15 modal Rencana (aset, utang, harga, anggaran, saldo awal, jadwal, jurnal, evaluasi, tahap, kejadian, ukuran): tidak ada dropdown atau pemilih tanggal bawaan yang tampil. Modal detail (tanpa isian) dan modal Selesaikan siklus tidak memiliki dropdown. Belum diuji di HP sungguhan.
+
+## v0.1.095 — 2026-11-07
+Fase 6E, Tahap 6 (sebagian): **lembar Jurnal di Excel diperbarui dan CSV jurnal**. Dokumen: `docs/EKSPOR.md`.
+
+### Diubah
+- **Lembar Jurnal di Excel**: lembar ini sudah ada sejak v0.1.088, tetapi kolom Jenis hanya membedakan Catatan dan Evaluasi sehingga tahap, kejadian, dan ukuran tampil sebagai "Catatan" dan nilai ukuran tidak terbawa. Kini kolomnya: Siklus, Tanggal, Hari ke, **Jenis** (Catatan, Kegiatan, Tahap, Kejadian, Ukuran, Evaluasi), **Rincian** (nama tahap atau jenis kejadian), Judul, Isi, **Nilai ukuran** (angka, bisa dijumlah atau dibuat grafik di Excel), **Satuan**, dan Foto (jumlah).
+- Urutan lembar: per siklus (A–Z), tanggal naik di dalam siklus.
+
+### Ditambahkan
+- **Ekspor CSV jurnal** (Lainnya → Ekspor Excel → tombol di bawahnya): `tani-jurnal-<tanggal>.csv` dengan kolom `siklus, tanggal (ISO), hari_ke, jenis, rincian, judul, isi, nilai, satuan, foto`; BOM UTF-8 agar Excel membaca huruf dengan benar; tanda kutip, koma, dan baris baru di dalam isi diamankan. Pesan hasil: "N catatan jurnal diekspor ke CSV" atau "Belum ada catatan jurnal untuk diekspor".
+- Satu sumber baris (`Kejadian.barisJurnal`) dipakai Excel dan CSV agar isinya selalu sama.
+
+### Perubahan lain
+- `js/kejadian.js`, `js/xlsx.js`, `js/app.js` (tombol, teks penjelasan, versi), `sw.js` (`tani-keuangan-v0_1_095`), `index.html`, `tani-keuangan.html`, `docs/EKSPOR.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Belum dikerjakan di Tahap 6: laporan perjalanan siklus yang bisa dicetak dan analisa lintas siklus.
+- Foto tidak ikut CSV maupun Excel (hanya jumlahnya); gunakan Cadangkan foto (ZIP).
+- Diuji di Chromium: 8 entri (termasuk tahap, kejadian dengan baris baru dan koma, ukuran 24,5 cm) menghasilkan CSV yang terbaca pembaca CSV standar dengan 8 baris, dan lembar Jurnal berisi 8 baris dengan nilai 24.5 di sel angka; berkas xlsx lolos uji CRC; tanpa galat JavaScript. Dibuka langsung di aplikasi Excel atau Google Sheets belum diuji.
+
+## v0.1.094 — 2026-11-07
+Fase 6E, **Tahap 6 (sebagian): cadangan foto ke ZIP** — jalan keluar untuk foto yang hanya ada di browser ini. Dokumen: `docs/CADANGAN.md`, `docs/JURNAL.md`.
+
+### Ditambahkan
+- **`js/cadanganfoto.js`** (objek `CadFoto`). Setelan → **Foto nota dan jurnal** kini punya tombol **Cadangkan foto (ZIP)** dan **Pulihkan dari ZIP**.
+- **ZIP** berisi `indeks.json` (id, nama berkas, tipe, ukuran, dan asal tiap foto: jurnal atau nota beserta tanggal dan siklusnya) dan `foto/<id>.jpg|png|webp`. Dibuat dengan penulis ZIP di `js/xlsx.js` (tanpa kompresi, karena JPEG sudah terkompresi); diperiksa dapat dibuka oleh pembaca ZIP standar (Python `zipfile`, CRC valid).
+- **Pulihkan**: foto yang id-nya sudah ada dilewati (aman diulang), yang belum ada ditambahkan; hasilnya dilaporkan ("3 foto dipulihkan, 2 sudah ada, 1 dilewati"). Berkas ditolak dengan pesan jelas bila bukan ZIP, ZIP terkompresi (bukan hasil aplikasi ini), tidak ada `indeks.json`, versi tidak dikenal, atau terpotong. Nama berkas dan id divalidasi (hanya pola `foto/<id>.<jpg|png|webp>`), foto lebih dari 30 MB dilewati.
+- **Peringatan cadangan**: info foto di Setelan menyebut cadangan terakhir dan berapa foto yang lebih baru ("Foto belum pernah dicadangkan." atau "…; 2 foto belum dicadangkan."). Waktu cadangan disimpan di penyimpanan perangkat, bukan di data.
+- Batas ukuran 250 MB per ZIP (pesan jelas bila lebih); foto lama tetap bisa dihapus lewat "Hapus semua foto".
+
+### Diubah
+- `js/foto.js` (info status), `js/setelan.js` (tombol dan teks penjelasan: foto tidak ikut ekspor data dan harus dicadangkan sendiri), `index.dev.html`, `js/app.js` (versi), `sw.js` (`tani-keuangan-v0_1_094`), `index.html`, `tani-keuangan.html`, `docs/CADANGAN.md`, `docs/JURNAL.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Belum dikerjakan di Tahap 6: laporan perjalanan siklus yang bisa dicetak, lembar Jurnal di Excel dan CSV jurnal, dan analisa lintas siklus.
+- ZIP tidak terenkripsi dan memuat foto asli yang sudah dikecilkan; simpan di tempat yang aman. Pulihkan hanya menambah foto; keterkaitan foto ke catatan tetap lewat data utama (ekspor/cadangan data), jadi pulihkan data utama dan foto bersamaan bila berganti perangkat.
+- Diuji di Chromium: tiga foto (dua jurnal, satu nota) dicadangkan, ZIP valid, dikosongkan lalu dipulihkan (3 baru), diulang (3 sudah ada, 0 baru), dan tiga jenis berkas salah ditolak dengan pesan yang benar, tanpa galat JavaScript. Pemilih berkas dan unduhan di HP sungguhan belum diuji.
+
+## v0.1.093 — 2026-11-06
+Fase 6E, **Tahap 5 — kejadian dan ukuran**. Dokumen: `docs/JURNAL.md`, `docs/DATA-SCHEMA.md`.
+
+### Ditambahkan
+- **`js/kejadian.js`** (objek `Kejadian`): dua jenis entri jurnal baru pada koleksi `jurnal` yang sudah ada (tanpa perubahan skema; field sudah dikunci di Tahap 0).
+  - **Kejadian**: jenis Hama, Penyakit, Cuaca, Perawatan, atau Lainnya + catatan opsional; judul tampil "Hama: Kutu daun…".
+  - **Ukuran**: nama (mis. Tinggi, dengan saran nama yang sudah dipakai), nilai (boleh koma desimal, 0 atau lebih), satuan opsional (cm, g, kg…); judul tampil "Tinggi 35 cm".
+- Bagian **Kejadian dan ukuran** di detail siklus: tombol Catat kejadian dan Catat ukuran (siklus berjalan), ringkasan jumlah per jenis kejadian beserta kejadian terakhir, dan **grafik mini pertumbuhan** per nama ukuran (nilai terhadap hari ke-N, memakai `Analisa.kurva`; maksimal tiga nama; satu titik menampilkan nilai terakhir dan ajakan mencatat lagi).
+- **Hubungan ke uang**: detail catatan kejadian menampilkan transaksi siklus itu pada tanggal yang sama (mis. beli pestisida di hari kejadian hama), atau keterangan bila tidak ada.
+- Ubah dan Hapus (dengan Urungkan) lewat modal detail seperti jenis lain; kejadian dan ukuran tampil di Jurnal dan linimasa dengan ikon dan label sendiri (⚠ Kejadian, ↕ Ukuran).
+
+### Diubah
+- `js/jurnal.js` (judul, rute Ubah, detail), `js/linimasa.js`, `js/siklus.js`, `js/app.js` (versi), `sw.js` (`tani-keuangan-v0_1_093`), `index.dev.html`, `css` tidak berubah, `index.html`, `tani-keuangan.html`, `docs/JURNAL.md`, `docs/DATA-SCHEMA.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Validasi: nama ukuran wajib (maks. 30 karakter), nilai harus angka 0 atau lebih (pesan galat tampil di dalam modal), satuan maks. 10 karakter, catatan kejadian maks. 2.000 karakter. Siklus selesai tetap baca-saja kecuali evaluasi.
+- Belum ada: foto langsung pada kejadian (foto jurnal dipakai di catatan), ekspor kejadian/ukuran ke Excel (Tahap 6), dan perbandingan ukuran antar siklus.
+- Diuji di Chromium 390 px: simpan, ubah, validasi, grafik dengan tiga titik, detail dengan transaksi pada tanggal yang sama, linimasa, tanpa galat JavaScript. Belum diuji di HP sungguhan, tema gelap/kaca, atau desktop.
+
+## v0.1.092 — 2026-11-06
+Fase 6E, Tahap 4 — foto jurnal (lokal).
+
+### Ditambahkan
+- **`js/foto.js`** (objek `Foto`): 1–4 foto per catatan jurnal, memakai penyimpanan IndexedDB modul Nota. Foto dikecilkan ke 1280 px (JPEG, mutu 0,72); berkas asli maks. 30 MB; berkas bukan gambar dan galat kuota memberi pesan jelas. Id foto berawalan `f_`, disimpan di `jurnal.foto`.
+- Formulir **Catat/Ubah catatan**: bagian **Foto (opsional, maksimal 4)** dengan gambar kecil, tombol × untuk melepas, dan pilih beberapa foto sekaligus. Catatan boleh hanya berisi foto (judul tampil **Foto catatan**; pesan galat kosong kini "Isi judul, catatan, atau foto"). Batal/Esc membuang foto baru; foto lama yang dilepas dihapus saat Simpan.
+- **Galeri kecil** di linimasa (di bawah baris catatan) dan di modal detail catatan; jumlah foto di baris bagian Jurnal pada detail siklus.
+- **Penampil layar penuh**: panah kiri/kanan, tombol ‹ ›, geser jari, penghitung "2 / 3", Esc atau Tutup, jebakan Tab, latar gelap (juga di mode kaca).
+- **Penanda foto tidak ada di perangkat ini** (data diimpor atau disinkron dari perangkat lain) pada gambar kecil dan di penampil.
+- **Hapus catatan berfoto**: foto dihapus setelah jendela Urungkan lewat; Urungkan membatalkan penghapusan foto.
+- **Setelan**: baris **Foto nota dan jurnal** (jumlah dan ukuran per jenis, pemakaian dan kuota browser) dan baris **Penyimpanan tetap** (`navigator.storage.persist()`).
+- Ekspor Excel: kolom **Foto** (jumlah) di lembar Jurnal.
+- Dokumen: `docs/JURNAL.md` (Status Tahap 4), `docs/DATA-SCHEMA.md` (Foto jurnal), `docs/NOTA.md` (dipakai bersama).
+
+### Diubah
+- **`Nota.rapikan()`** (syarat Tahap 4): kini membaca rujukan `jurnal.foto` dari catatan yang belum dihapus, sehingga foto jurnal tidak dibersihkan sebagai yatim setelah 30 hari. `Nota` mengekspor `kecilkan`, `simpan`, `ambil`, `semua`, `galat`, `mb`; `Nota.isiInfo` diteruskan ke `Foto.isiInfo`.
+- `Rencana.dlgBuka`: formulir boleh punya kait `tutup()` yang dipanggil saat modal ditutup.
+- **Hapus semua foto** di Setelan kini menghapus foto nota dan foto jurnal.
+- `Jurnal.judul`: catatan hanya berfoto berjudul "Foto catatan".
+
+### Diperbaiki
+- `sw.js`: nama cache masih `tani-keuangan-v0_1_089` padahal aplikasi 0.1.091. Sekarang `tani-keuangan-v0_1_092`.
+- Penampil foto (nota dan jurnal) di **mode kaca**: latar gelapnya tertimpa gaya kaca sehingga halaman terlihat di belakang foto. Latar kini tetap gelap.
+
+### Catatan
+- Diuji di Chromium (Playwright; HP 390 px dan desktop 1440 px, terang, gelap, kaca): 31 pemeriksaan otomatis lulus (pilih dan lepas foto, batas 4, berkas bukan gambar, berkas 31 MB, foto 6000×4000 → 1280 px, simpan, galeri, penampil dan geser, ubah/Batal/Simpan, hapus dengan dan tanpa Urungkan, `rapikan`, penanda hilang, Setelan, galat kuota yang disimulasikan, Evaluasi tanpa foto, ekspor) ditambah 7 pemeriksaan regresi (catatan tanpa foto, foto nota transaksi, form Tahap dan Evaluasi, Hapus semua foto, semua halaman tanpa overflow/NaN/galat). Ekspor Excel diperiksa memuat kolom Foto.
+- **Belum diuji**: kamera HP sungguhan (Android/iOS), format HEIC, dan kuota perangkat nyata. Foto belum ikut cadangan ZIP (Tahap 6).
+
 ## v0.1.091 — 2026-11-06
 Roadmap Fase 6E, **Tahap 3 selesai**: tiga sisa Tahap pertumbuhan. Dokumen: `docs/JURNAL.md`, `docs/DATA-SCHEMA.md`, `docs/SETELAN.md` (bila ada).
 

@@ -9,7 +9,7 @@ const Jurnal = {
   /* hari ke-N sejak mulai (tanggal mulai = hari ke-1, sama dengan Siklus.hari) */
   hariKe(s, tgl) { const p = (x) => { const a = x.split('-').map(Number); return new Date(a[0], a[1] - 1, a[2]); }; return Math.round((p(tgl) - p(s.mulai)) / 864e5) + 1; },
   boleh(s, j) { return s.status === 'berjalan' || !!(j && j.evaluasi); },
-  judul(j) { if (j.jenis === 'tahap') return 'Tahap: ' + Tahap.nama(j); return j.judul || (j.evaluasi ? 'Evaluasi siklus' : String(j.isi || '').split('\n')[0].slice(0, 60)); },
+  judul(j) { if (j.jenis === 'tahap') return 'Tahap: ' + Tahap.nama(j); if (j.jenis === 'kejadian' || j.jenis === 'ukuran') return Kejadian.judul(j); return j.judul || (j.evaluasi ? 'Evaluasi siklus' : String(j.isi || '').split('\n')[0].slice(0, 60)) || ((j.foto || []).length ? 'Foto catatan' : ''); },
   cek(s, tgl) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(tgl)) return 'Isi tanggal.';
     if (tgl < s.mulai) return 'Tanggal tidak boleh sebelum mulai siklus (' + Setelan.tgl(s.mulai) + ').';
@@ -22,7 +22,7 @@ const Jurnal = {
     const baris = (j) => {
       const ket = j.judul && j.isi ? String(j.isi).replace(/\s+/g, ' ').slice(0, 80) + (String(j.isi).length > 80 ? '…' : '') : '';
       return '<div class="tx" data-do="jurnal-detail" data-id="' + j.id + '" role="button" tabindex="0" aria-haspopup="dialog"><div class="tx-l"><div class="note">' + Setelan.tgl(j.tanggal) + ' · hari ' + this.hariKe(s, j.tanggal) +
-        (j.evaluasi ? ' · <span class="badge">evaluasi</span>' : '') + '</div><div class="tx-n">' + esc(this.judul(j)) + '</div>' + (ket ? '<div class="note">' + esc(ket) + '</div>' : '') + '</div></div>';
+        (j.evaluasi ? ' · <span class="badge">evaluasi</span>' : '') + (j.foto && j.foto.length ? ' · ' + j.foto.length + ' foto' : '') + '</div><div class="tx-n">' + esc(this.judul(j)) + '</div>' + (ket ? '<div class="note">' + esc(ket) + '</div>' : '') + '</div></div>';
     };
     return '<section><div class="sc-head"><h2 style="margin:0">Jurnal</h2><button type="button" class="btn" data-do="jurnal-linimasa" style="padding:7px 12px;font-size:12px;min-height:40px">Buka linimasa</button></div>' + (L.length ? (semuaOn ? L : L.slice(0, BJ)).map(baris).join('') + lagi(L.length, BJ) +
         '<p class="note">Ketuk catatan untuk detail' + (jalan ? ', mengubah, atau menghapus' : '') + '.</p>'
@@ -33,6 +33,7 @@ const Jurnal = {
   aksi(a, el) {
     if (a === 'jurnal-detail') { Rencana.dlgBuka('jurnalDetail', el.dataset.id); return true; }
     if (a === 'jurnal-eval') { Rencana.dlgBuka('jurnalEval'); return true; }
+    if (a === 'foto-lihat') { const j = this.cari(el.dataset.id); if (j) Foto.lihat(j.foto, +el.dataset.i); return true; }
     return false;
   },
   /* simpan catatan baru atau perubahan; mengembalikan teks galat (string) atau { toast } */
@@ -42,21 +43,24 @@ const Jurnal = {
     if (!this.boleh(s, j || { evaluasi: eval_ })) return 'Siklus sudah selesai. Buka kembali untuk mengubah catatan.';
     if (eval_ && !j && this.evaluasiOf(s.id)) return 'Evaluasi sudah ada. Ubah evaluasi yang ada.';
     const g = this.cek(s, v('rm_jt')); if (g) return g;
-    const judul = eval_ ? '' : v('rm_jj').trim(), isi = v('rm_ji').trim();
-    if (eval_ ? !isi : (!judul && !isi)) return eval_ ? 'Isi evaluasi.' : 'Isi judul atau catatan.';
+    const judul = eval_ ? '' : v('rm_jj').trim(), isi = v('rm_ji').trim(), foto = eval_ ? [] : Foto.ids();
+    if (eval_ ? !isi : (!judul && !isi && !foto.length)) return eval_ ? 'Isi evaluasi.' : 'Isi judul, catatan, atau foto.';
     if (isi.length > 2000) return 'Isi paling banyak 2.000 karakter.';
     const t = v('rm_jt'), n = nowIso();
-    if (j) Object.assign(j, { tanggal: t, judul: judul, isi: isi, diubah: n });
-    else this.semua().push({ id: uid('jr'), siklusId: s.id, tanggal: t, jenis: 'catatan', judul: judul, isi: isi, evaluasi: eval_ ? true : undefined, dibuat: n, diubah: n, terhapus: false });
-    s.diubah = n;
+    if (j) { Object.assign(j, { tanggal: t, judul: judul, isi: isi, diubah: n }); if (!eval_) j.foto = foto.length ? foto : undefined; }
+    else this.semua().push({ id: uid('jr'), siklusId: s.id, tanggal: t, jenis: 'catatan', judul: judul, isi: isi, foto: foto.length ? foto : undefined, evaluasi: eval_ ? true : undefined, dibuat: n, diubah: n, terhapus: false });
+    s.diubah = n; if (!eval_) Foto.disimpan();
     return { toast: eval_ ? (j ? 'Evaluasi diperbarui' : 'Evaluasi disimpan') : (j ? 'Catatan diperbarui' : 'Catatan ditambahkan') };
   }
 };
 Object.assign(Rencana.FORM, {
   jurnal: { jenis: 'Jurnal siklus', judul: 'Catat jurnal', judulUbah: 'Ubah catatan', simpan: 'Simpan catatan', tab: 'siklus-detail', fokus: 'rm_jj',
-    isi() { return Rencana.lab('rm_jt', 'Tanggal', '<input type="date" id="rm_jt" value="' + isoHari() + '">') +
+    tutup() { Foto.buang(); },
+    ubah(e) { if (e.target.id === 'f_jfoto') Foto.pilih(e.target); },
+    aksi(m, id, x) { if (m === 'foto-pilih') { const i = document.getElementById('f_jfoto'); if (i) i.click(); } else if (m === 'foto-lepas') Foto.lepas(x.dataset.id); },
+    isi(id) { const aw = id && Jurnal.cari(id); Foto.mulai(aw ? aw.foto : []); setTimeout(() => Foto.isiBox(), 0); return Rencana.lab('rm_jt', 'Tanggal', '<input type="date" id="rm_jt" value="' + isoHari() + '">') +
       Rencana.lab('rm_jj', 'Judul (opsional)', '<input id="rm_jj" maxlength="80" autocomplete="off" placeholder="mis. Daun menguning">') +
-      Rencana.lab('rm_ji', 'Isi', '<textarea id="rm_ji" rows="5" maxlength="2000" placeholder="Apa yang terlihat atau dikerjakan hari ini"></textarea>'); },
+      Rencana.lab('rm_ji', 'Isi', '<textarea id="rm_ji" rows="5" maxlength="2000" placeholder="Apa yang terlihat atau dikerjakan hari ini"></textarea>') + Foto.kotak(); },
     isiEd(id, el) { const j = Jurnal.cari(id); if (!j) return; el.querySelector('#rm_jt').value = j.tanggal; el.querySelector('#rm_jj').value = j.judul || ''; el.querySelector('#rm_ji').value = j.isi || ''; },
     ok(v, id) { return Jurnal.simpan(v, id, false); } },
   jurnalEval: { jenis: 'Jurnal siklus', judul: 'Tulis evaluasi', judulUbah: 'Ubah evaluasi', simpan: 'Simpan evaluasi', tab: 'siklus-detail', fokus: 'rm_ji',
@@ -70,16 +74,18 @@ Object.assign(Rencana.FORM, {
     isi(id) {
       const j = Jurnal.cari(id), s = Siklus.cari(Siklus.sid), h = Jurnal.hariKe(s, j.tanggal);
       return '<p class="note" style="margin:0 0 12px">' + Setelan.tgl(j.tanggal) + ' · hari ' + h + ' · minggu ' + Math.ceil(h / 7) + (j.evaluasi ? ' · evaluasi' : '') + '</p>' +
-        (j.isi ? '<div style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.65">' + esc(j.isi) + '</div>' : '<p class="note">Tidak ada isi.</p>');
+        Kejadian.detail(j) + (j.isi ? '<div style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.65">' + esc(j.isi) + '</div>' : (j.foto && j.foto.length ? '' : '<p class="note">Tidak ada isi.</p>')) +
+        Foto.galeri(j, 'data-rm="foto-lihat"', 'dm-foto') + (j.foto && j.foto.length ? (setTimeout(() => Foto.muat(Modal.m && Modal.m.el), 0), '') : '');
     },
     tombol(id) { const s = Siklus.cari(Siklus.sid), j = Jurnal.cari(id); return (s && Jurnal.boleh(s, j) ? Rencana.bt('ubah', 'Ubah', 'gold') + Rencana.bt('hapus', 'Hapus', 'danger') : '') + Rencana.bt('tutup', 'Tutup', ''); },
-    aksi(a, id) {
+    aksi(a, id, x) {
       const j = Jurnal.cari(id), s = Siklus.cari(Siklus.sid); if (!j || !s) return;
-      if (a === 'ubah') { Rencana.dlgTutup(true); Rencana.dlgBuka(j.evaluasi ? 'jurnalEval' : j.jenis === 'tahap' ? 'tahap' : 'jurnal', id); return; }
+      if (a === 'foto-lihat') { Rencana.dlgTutup(true); Foto.lihat(j.foto, +x.dataset.i); return; }
+      if (a === 'ubah') { Rencana.dlgTutup(true); Rencana.dlgBuka(j.evaluasi ? 'jurnalEval' : j.jenis === 'tahap' || j.jenis === 'kejadian' || j.jenis === 'ukuran' ? j.jenis : 'jurnal', id); return; }
       if (a !== 'hapus' || !Jurnal.boleh(s, j)) return;
-      j.terhapus = true; j.diubah = nowIso(); s.diubah = nowIso();
+      j.terhapus = true; j.diubah = nowIso(); s.diubah = nowIso(); const batalFoto = Foto.hapusNanti(j);
       const hal = App.tab === 'jurnal' ? 'jurnal' : 'siklus-detail';
       Rencana.dlgTutup(true); App.simpan(); App.go(hal, true); Modal.pulihFokus();
-      App.toast(j.evaluasi ? 'Evaluasi dihapus' : 'Catatan dihapus', { label: 'Urungkan', fn: () => { j.terhapus = false; j.diubah = nowIso(); s.diubah = nowIso(); App.simpan(); if (App.tab === hal) App.go(hal, true); } });
+      App.toast(j.evaluasi ? 'Evaluasi dihapus' : 'Catatan dihapus', { label: 'Urungkan', fn: () => { batalFoto(); j.terhapus = false; j.diubah = nowIso(); s.diubah = nowIso(); App.simpan(); if (App.tab === hal) App.go(hal, true); } });
     } }
 });

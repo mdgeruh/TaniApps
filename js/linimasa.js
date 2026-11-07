@@ -42,7 +42,7 @@ const Linimasa = {
     }
     const j = e.j;
     const ket = j.judul && j.isi ? String(j.isi).replace(/\s+/g, ' ').slice(0, 90) + (String(j.isi).length > 90 ? '…' : '') : '';
-    return { ikon: j.jenis === 'kegiatan' ? '✓' : j.jenis === 'tahap' ? '❖' : j.evaluasi ? '★' : '✎', judul: Jurnal.judul(j), ket: ket, jurnal: j.id, label: j.jenis === 'kegiatan' ? 'Kegiatan' : j.jenis === 'tahap' ? 'Tahap' : j.evaluasi ? 'Evaluasi' : 'Catatan' };
+    return { ikon: j.jenis === 'kegiatan' ? '✓' : j.jenis === 'tahap' ? '❖' : j.jenis === 'kejadian' ? '⚠' : j.jenis === 'ukuran' ? '↕' : j.evaluasi ? '★' : '✎', judul: Jurnal.judul(j), ket: ket, jurnal: j.id, label: j.jenis === 'kegiatan' ? 'Kegiatan' : j.jenis === 'tahap' ? 'Tahap' : j.jenis === 'kejadian' ? 'Kejadian' : j.jenis === 'ukuran' ? 'Ukuran' : j.evaluasi ? 'Evaluasi' : 'Catatan' };
   },
   baris(s, e) {
     const x = this.isi(s, e), h = Jurnal.hariKe(s, e.tgl);
@@ -51,8 +51,9 @@ const Linimasa = {
     const meta = Setelan.tgl(e.tgl) + (h >= 1 ? ' · hari ' + h : ' · sebelum mulai');
     const inner = '<span class="lm-ik" aria-hidden="true">' + x.ikon + '</span><div class="tx-l"><div class="note">' + meta + (tag ? ' · ' : '') + tag + '</div><div class="tx-n">' + esc(x.judul) + '</div>' + (x.ket ? '<div class="note">' + esc(x.ket) + '</div>' : '') + '</div>' +
       (x.nilai ? '<div class="tx-a ' + x.kelas + '">' + x.nilai + '</div>' : '');
-    return att ? '<div class="tx lm-baris' + (x.turunan ? ' lm-turun' : '') + '"' + att + ' role="button" tabindex="0">' + inner + '</div>'
-      : '<div class="tx lm-baris lm-turun lm-diam">' + inner + '</div>';
+    const gal = x.jurnal ? Foto.galeri(e.j, 'data-do="foto-lihat"', 'lm-galeri no-print') : '';
+    return (att ? '<div class="tx lm-baris' + (x.turunan ? ' lm-turun' : '') + '"' + att + ' role="button" tabindex="0">' + inner + '</div>'
+      : '<div class="tx lm-baris lm-turun lm-diam">' + inner + '</div>') + gal;
   },
   daftar(s, L) {
     let h = '', last = null;

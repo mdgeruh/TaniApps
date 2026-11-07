@@ -153,6 +153,7 @@ var Nota = (function () {
     return semua().then(function (L) { return { n: L.length, ukuran: L.reduce(function (a, r) { return a + (r.ukuran || (r.blob && r.blob.size) || 0); }, 0) }; });
   }
   function isiInfo() {
+    if (typeof Foto !== 'undefined') return Foto.isiInfo();
     var e = document.getElementById('notaInfo'); if (!e) return;
     ringkas().then(function (r) { var x = document.getElementById('notaInfo'); if (x) x.textContent = r.n ? r.n + ' foto · ' + mb(r.ukuran) + '.' : 'Belum ada foto.'; })
       .catch(function () { var x = document.getElementById('notaInfo'); if (x) x.textContent = 'Tidak bisa dibaca.'; });
@@ -166,9 +167,11 @@ var Nota = (function () {
       if (t.terhapus && kini - Date.parse(t.diubah || 0) > HARI30) return;
       pakai[t.notaId] = 1;
     });
+    (App.data.jurnal || []).forEach(function (j) { if (j.terhapus || !j.foto) return; j.foto.forEach(function (id) { pakai[id] = 1; }); }); // foto jurnal (v0.1.092)
     semua().then(function (L) { L.forEach(function (r) { if (!pakai[r.id] && kini - (r.ms || 0) > HARI30) hapus(r.id); }); }).catch(function () {});
   }
 
   return { ikon: ikon, tersedia: function () { return ada; }, kotak: kotak, isiBox: isiBox, isiInfo: isiInfo, pilih: pilih, aksi: aksi, buang: buang,
-           lihat: lihat, kosongkan: kosongkan, rapikan: rapikan, hapus: hapus, ringkas: ringkas };
+           lihat: lihat, kosongkan: kosongkan, rapikan: rapikan, hapus: hapus, ringkas: ringkas,
+           kecilkan: kecilkan, simpan: simpan, ambil: ambil, semua: semua, galat: galat, mb: mb };
 })();
