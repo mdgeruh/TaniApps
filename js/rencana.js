@@ -234,7 +234,7 @@ const Rencana = {
       klik: (e) => { const x = e.target.closest('[data-rm]'); if (!x) return; const m = x.dataset.rm; if (m === 'tutup') Modal.tutup(); else if (m === 'simpan') this.dlgSimpan(); else if (m === 'lagi') this.dlgSimpan(true); else if (f.aksi) f.aksi(m, arg, x); },
       ubah: (e) => { if (f.ubah) f.ubah(e, Modal.m.el); },
       simpan: f.tombol ? null : () => this.dlgSimpan(),
-      onTutup: () => { this.dlg = null; }
+      onTutup: () => { this.dlg = null; if (f.tutup) f.tutup(); }
     });
     if (!el) { this.dlg = null; return false; }
     return true;

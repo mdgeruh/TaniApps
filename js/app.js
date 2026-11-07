@@ -1,5 +1,5 @@
 /* Tani Keuangan — Fase 1: pencatatan transaksi + efek kaca (v0.1.039) */
-const VERSI = '0.1.091';
+const VERSI = '0.1.096';
 const KUNCI = 'tani.v1';
 const IKON = {
   master: '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><path d="M16.5 13v7M13 16.5h7"/>',
@@ -371,6 +371,7 @@ const App = {
     $('app').innerHTML = h;
     Form.upgrade($('app'));
     if (t === 'catat') Nota.isiBox(); else if (t === 'setelan') Nota.isiInfo();
+    if (typeof Foto !== 'undefined') Foto.muat($('app'));
     const induk = { 'siklus-form': 'siklus', 'siklus-detail': 'siklus', jurnal: 'siklus', panen: 'siklus', rencana: 'lainnya' }[t] || t;
     document.querySelectorAll('.main-tab-btn,.bnav-btn').forEach((b) => { const on = b.dataset.go === induk; b.classList.toggle('active', on); if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
     $('gear').classList.toggle('active', t === 'setelan');
@@ -552,8 +553,8 @@ const App = {
       '<label for="k_nama">Nama kategori</label><input id="k_nama" maxlength="40" placeholder="mis. Bambu penyangga">' +
       '<label for="k_jenis">Jenis</label><select id="k_jenis"><option value="keluar">Modal (keluar)</option><option value="masuk">Hasil (masuk)</option></select>' +
       '<button class="btn gold" data-do="tambah-kat">Tambah kategori</button></section>' +
-      '<section><h2>Ekspor Excel</h2><p class="note">Satu berkas .xlsx berisi lembar Siklus, Transaksi, Panen, Utang dan piutang, Aset, Harga pasar, dan Jadwal. Untung dan R/C memakai rumus Excel. Cadangan yang bisa dipulihkan tetap JSON di Setelan.</p>' +
-      '<button class="btn" data-do="ekspor-xlsx" style="width:100%;margin-top:12px">Ekspor Excel (.xlsx)</button><div class="note" id="xlsMsg" role="status" aria-live="polite" style="margin-top:8px"></div></section>' +
+      '<section><h2>Ekspor Excel</h2><p class="note">Satu berkas .xlsx berisi lembar Siklus, Transaksi, Panen, Utang dan piutang, Aset, Harga pasar, Jadwal, dan Jurnal (catatan, tahap, kejadian, ukuran). Untung dan R/C memakai rumus Excel. Cadangan yang bisa dipulihkan tetap JSON di Setelan.</p>' +
+      '<button class="btn" data-do="ekspor-xlsx" style="width:100%;margin-top:12px">Ekspor Excel (.xlsx)</button><button class="btn" data-do="ekspor-csv-jurnal" style="width:100%;margin-top:8px">Ekspor CSV jurnal</button><div class="note" id="xlsMsg" role="status" aria-live="polite" style="margin-top:8px"></div></section>' +
       '<section><h2>Ekspor &amp; impor CSV</h2><p class="note">Kolom: tanggal, jenis (keluar/masuk), kategori, siklus, jumlah, catatan. Cadangan penuh (JSON) ada di Setelan.</p>' +
       '<div class="seg tiga" style="margin-top:12px"><button class="btn" data-do="ekspor-csv">Ekspor CSV</button><button class="btn" data-do="impor-csv">Impor teks</button>' +
       '<button class="btn" data-do="berkas-csv">Pilih berkas</button></div>' +
@@ -597,6 +598,7 @@ const App = {
     }
     else if (a === 'ekspor-xlsx') { try { const n = Xlsx.unduh(); $('xlsMsg').textContent = 'Berkas Excel dibuat: ' + n + ' lembar berisi data.'; } catch (err) { $('xlsMsg').textContent = 'Ekspor Excel gagal. Coba ekspor CSV atau cadangan JSON.'; } }
     else if (a === 'ekspor-csv') this.eksporCsv();
+    else if (a === 'ekspor-csv-jurnal') { const n = Kejadian.eksporCsvJurnal(); $('xlsMsg').textContent = n ? n + ' catatan jurnal diekspor ke CSV.' : 'Belum ada catatan jurnal untuk diekspor.'; }
     else if (a === 'impor-csv') this.imporCsv();
     else if (a === 'berkas-csv') $('csvFile').click();
     else if (a === 'contoh') this.contoh();

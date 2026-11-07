@@ -122,7 +122,7 @@ const Siklus = {
           '<button class="btn" data-do="ulangi-siklus" style="width:100%;margin-top:10px">Ulangi siklus ini</button>') + '</section>' +
       Jadwal.v(s) + '</div><div class="dt-kanan">' +
       '<section><h2>Panen</h2>' + (panen ? panen + lagi('pn', pAll.length, BP) + '<p class="note">Ketuk panen untuk detail' + (jalan ? ', mengubah, atau menghapus' : '') + '.</p>' : '<p class="note">Belum ada panen.' + (jalan ? ' Ketuk tombol + lalu pilih Catat panen saat hasil siap.' : '') + '</p>') + '</section>' +
-      Tahap.v(s) + Jurnal.v(s, (n, b) => lagi('jr', n, b), !!this.lg.jr) +
+      Tahap.v(s) + Kejadian.v(s) + Jurnal.v(s, (n, b) => lagi('jr', n, b), !!this.lg.jr) +
       '<section><h2>Transaksi siklus</h2>' + (r.tx.length ? (this.lg.tx ? tAll : tAll.slice(0, BT)).map((t) => App.barisTx(t)).join('') + lagi('tx', tAll.length, BT) : '<p class="note">Belum ada transaksi terhubung.' + (jalan ? ' Ketuk tombol + untuk mencatat modal atau hasil siklus ini.' : '') + '</p>') + '</section>' +
       '</div>' +
       '<button class="btn danger" data-do="hapus-siklus" style="width:100%;margin-top:4px">Hapus siklus</button>';
@@ -178,7 +178,7 @@ const Siklus = {
   /* ---------- aksi (true bila ditangani) ---------- */
   aksi(a, el) {
     const D = this.d(), v = (id) => ($(id) ? $(id).value.trim() : '');
-    if (Dsk.aksi(a, el) || Jadwal.aksi(a, el) || Jurnal.aksi(a, el) || Tahap.aksi(a) || Linimasa.aksi(a, el)) return true;
+    if (Dsk.aksi(a, el) || Jadwal.aksi(a, el) || Jurnal.aksi(a, el) || Tahap.aksi(a) || Kejadian.aksi(a) || Linimasa.aksi(a, el)) return true;
     if (a === 'siklus-tab') { this.sub = el.dataset.val; App.go('siklus', true); }
     else if (a === 'lg-toggle') { const k = el.dataset.k; this.lg[k] = !this.lg[k]; const y = window.scrollY; App.go('siklus-detail', true); window.scrollTo(0, y); const b = document.querySelector('[data-do="lg-toggle"][data-k="' + k + '"]'); if (b) b.focus({ preventScroll: true }); }
     else if (a === 'buka-siklus') { this.dmTutup(false, true); this.sid = el.dataset.id; this.minta = null; App.go('siklus-detail'); }
@@ -361,6 +361,7 @@ const Siklus = {
     this.dmEl.firstChild.innerHTML = '<div class="dm-kepala"><div><div class="dm-jenis">' + (un ? 'Unit / lahan' : 'Komoditas') + '</div><h2 class="dm-judul" id="dmJudul">' + tit + '</h2></div>' +
       '<button type="button" class="dm-x" data-do="dm-tutup" aria-label="Tutup"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' +
       '<div class="dm-isi">' + isi + '</div><div class="dm-aksi"><button type="button" class="btn gold" data-do="tambah-' + m.j + '">' + (ed ? 'Simpan perubahan' : tit) + '</button><button type="button" class="btn" data-do="batal-' + m.j + '" style="width:100%">Batal</button></div>';
+    if (typeof Form !== 'undefined') Form.upgrade(this.dmEl); // dropdown dan tanggal kustom (select asli disembunyikan)
   },
   dmTutup(simpanMinta, tanpaFokus) { // simpanMinta: pertahankan keadaan minta; tanpaFokus: jangan kembalikan fokus ke baris
     if (!this.dmEl) return;

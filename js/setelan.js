@@ -81,7 +81,8 @@ var Setelan = (function () {
       '<textarea id="dataBox" class="settings-text" rows="5" aria-label="Data JSON" placeholder="Hasil ekspor muncul di sini"></textarea>' +
       '<div class="note" id="dataMsg" role="status" aria-live="polite" style="margin-top:8px"></div>' +
       row('Data contoh', 'Isi data tiruan (±7 bulan: tiga unit, empat komoditas, enam siklus) untuk mencoba aplikasi. Bisa dihapus tanpa mengganggu catatan Anda.', '<button type="button" class="btn" data-do="' + (typeof Contoh !== 'undefined' && Contoh.ada() ? 'hapus-contoh' : 'contoh') + '">' + (typeof Contoh !== 'undefined' && Contoh.ada() ? 'Hapus data contoh' : 'Isi data contoh') + '</button>') +
-      (typeof Nota !== 'undefined' && Nota.tersedia() ? row('Foto nota', 'Foto bukti transaksi hanya disimpan di browser ini; tidak ikut ekspor, cadangan otomatis, maupun sinkron cloud. Foto yang tidak lagi dipakai dibersihkan otomatis setelah 30 hari. <span id="notaInfo"></span>', '<button type="button" class="btn danger" data-act="nota-hapus">Hapus semua foto</button>') : '') +
+      (typeof Nota !== 'undefined' && Nota.tersedia() ? row('Foto nota dan jurnal', 'Foto bukti transaksi dan foto catatan jurnal hanya disimpan di browser ini; tidak ikut ekspor data, cadangan otomatis, maupun sinkron cloud, jadi cadangkan sendiri ke ZIP. Foto yang tidak lagi dipakai dibersihkan otomatis setelah 30 hari. <span id="notaInfo"></span>', '<div class="seg sm" style="flex-wrap:wrap"><button type="button" class="btn" data-act="foto-zip">Cadangkan foto (ZIP)</button><button type="button" class="btn" data-act="foto-pulih">Pulihkan dari ZIP</button><button type="button" class="btn danger" data-act="nota-hapus">Hapus semua foto</button></div>') +
+        (navigator.storage && navigator.storage.persist ? row('Penyimpanan tetap', 'Minta browser agar tidak membuang foto saat ruang penyimpanan menipis. Browser menentukan sendiri apakah permintaan dikabulkan.', '<button type="button" class="btn" data-act="foto-tetap">Minta penyimpanan tetap</button>') : '') : '') +
       row('Hapus semua data', 'Menghapus transaksi dan siklus di browser ini. Salinan cadangan otomatis dan data cloud tidak ikut terhapus. Bila sinkron cloud aktif, data akan kembali dari cloud: hapus juga data cloud di bagian Sinkron cloud.', '<button type="button" class="btn danger" data-act="hapus">Hapus semua data</button>');
     var tentang = head('Tentang', '') +
       row('Versi', 'Tani Keuangan, keuangan pertanian rumahan.', '<strong>v' + h.versi + '</strong>') +
@@ -132,8 +133,11 @@ var Setelan = (function () {
       else if (x === 'ekspor') ekspor();
       else if (x === 'impor') impor();
       else if (x === 'berkas') document.getElementById('fileImp').click();
+      else if (x === 'foto-zip') CadFoto.aksiEkspor();
+      else if (x === 'foto-pulih') CadFoto.pilih();
+      else if (x === 'foto-tetap') { Foto.minta().then(function (t) { App.toast(t); Foto.isiInfo(); }); }
       else if (x === 'nota-hapus') {
-        if (konfirmasi2) { clearTimeout(konfirmasi2); konfirmasi2 = null; Nota.kosongkan().then(function () { pesan('Semua foto nota dihapus.'); Nota.isiInfo(); a.textContent = 'Hapus semua foto'; }).catch(function () { pesan('Foto tidak bisa dihapus.'); }); }
+        if (konfirmasi2) { clearTimeout(konfirmasi2); konfirmasi2 = null; Nota.kosongkan().then(function () { pesan('Semua foto nota dan jurnal dihapus.'); Nota.isiInfo(); a.textContent = 'Hapus semua foto'; }).catch(function () { pesan('Foto tidak bisa dihapus.'); }); }
         else {
           a.textContent = 'Ketuk lagi untuk menghapus';
           konfirmasi2 = setTimeout(function () { konfirmasi2 = null; a.textContent = 'Hapus semua foto'; }, 4000);

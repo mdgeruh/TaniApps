@@ -86,7 +86,7 @@ const Xlsx = {
     const aset = D.aset.filter((a) => !a.terhapus).map((a) => { const per = Math.round(a.hargaBeli / a.umurBulan), m = Rencana.mulai(a); return [a.nama, a.hargaBeli, tgl(a.tanggalBeli), a.umurBulan, per, Math.max(0, a.hargaBeli - per * m)]; });
     const harga = []; Siklus.koms(true).forEach((k) => (k.hargaPasar || []).forEach((h) => harga.push([k.nama, tgl(h.tanggal), h.harga, k.satuan, h.sumber || ''])));
     harga.sort((a, b) => String(b[1].v).localeCompare(a[1].v) || String(a[0]).localeCompare(b[0]));
-    const jurnal = []; Siklus.daftar().forEach((s) => Jurnal.of(s.id).slice().reverse().forEach((j) => jurnal.push([Siklus.nama(s.id), tgl(j.tanggal), Jurnal.hariKe(s, j.tanggal), j.evaluasi ? 'Evaluasi' : 'Catatan', Jurnal.judul(j), j.isi || ''])));
+    const jurnal = Kejadian.barisJurnal().map((r) => [r[0], tgl(r[1]), r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9]]);
     const jadwal = []; Siklus.daftar().forEach((s) => (s.jadwal || []).forEach((j) => jadwal.push([Siklus.nama(s.id), j.nama, j.selesai ? 'Selesai' : 'Berjalan', j.selesai ? null : tgl(j.tanggal), j.ulang > 0 ? j.ulang : null, tgl(j.terakhir)])));
     return [
       { nama: 'Siklus', kolom: [{ h: 'Siklus', w: 28 }, { h: 'Status', w: 11 }, { h: 'Mulai', w: 12 }, { h: 'Selesai', w: 12 }, { h: 'Modal', w: 14, g: uang }, { h: 'Hasil', w: 14, g: uang }, { h: 'Untung', w: 14, g: uang }, { h: 'R/C', w: 8, g: desi }, { h: 'Panen bersih', w: 13, g: desi }, { h: 'Satuan', w: 9 }, { h: 'HPP per satuan', w: 15, g: uang }, { h: 'Harga rata-rata', w: 15, g: uang }], baris: siklus },
@@ -97,7 +97,7 @@ const Xlsx = {
       { nama: 'Aset', kolom: [{ h: 'Aset', w: 26 }, { h: 'Harga beli', w: 14, g: uang }, { h: 'Tanggal beli', w: 13 }, { h: 'Umur (bulan)', w: 13, g: uang }, { h: 'Penyusutan per bulan', w: 20, g: uang }, { h: 'Nilai buku', w: 14, g: uang }], baris: aset },
       { nama: 'Harga pasar', kolom: [{ h: 'Komoditas', w: 22 }, { h: 'Tanggal', w: 12 }, { h: 'Harga per satuan', w: 16, g: uang }, { h: 'Satuan', w: 9 }, { h: 'Sumber', w: 24 }], baris: harga },
       { nama: 'Jadwal', kolom: [{ h: 'Siklus', w: 28 }, { h: 'Kegiatan', w: 26 }, { h: 'Status', w: 11 }, { h: 'Jadwal berikutnya', w: 17 }, { h: 'Ulang tiap (hari)', w: 16, g: uang }, { h: 'Terakhir dikerjakan', w: 19 }], baris: jadwal },
-      { nama: 'Jurnal', kolom: [{ h: 'Siklus', w: 28 }, { h: 'Tanggal', w: 12 }, { h: 'Hari ke', w: 8 }, { h: 'Jenis', w: 10 }, { h: 'Judul', w: 28 }, { h: 'Isi', w: 60 }], baris: jurnal }
+      { nama: 'Jurnal', kolom: [{ h: 'Siklus', w: 28 }, { h: 'Tanggal', w: 12 }, { h: 'Hari ke', w: 8 }, { h: 'Jenis', w: 11 }, { h: 'Rincian', w: 14 }, { h: 'Judul', w: 28 }, { h: 'Isi', w: 60 }, { h: 'Nilai ukuran', w: 12, g: desi }, { h: 'Satuan', w: 9 }, { h: 'Foto', w: 7 }], baris: jurnal }
     ];
   },
   /* unduh berkas; kembalikan jumlah lembar yang berisi data */
