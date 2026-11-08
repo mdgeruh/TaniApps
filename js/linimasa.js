@@ -1,4 +1,4 @@
-/* Tani Keuangan — Linimasa siklus, Jurnal Tahap 2 (v0.1.089, docs/JURNAL.md §7)
+/* Buku Kebun — Linimasa siklus, Jurnal Tahap 2 (v0.1.089, docs/JURNAL.md §7)
    Satu halaman kronologis per siklus (tab `jurnal`, rute #jurnal-<id>): catatan jurnal + peristiwa turunan
    (mulai, selesai, transaksi, panen). Peristiwa turunan hanya dibaca dari data yang ada, tidak disalin; ketuk membuka aslinya. */
 const Linimasa = {
@@ -81,7 +81,7 @@ const Linimasa = {
       '<button type="button" class="btn" data-go="siklus-detail" style="width:100%;margin-top:12px;min-height:44px">Kembali ke detail siklus</button></section></div>';
     const kanan = '<div class="dt-kanan"><section><div class="sc-head"><h2 style="margin:0">Linimasa</h2>' +
       '<div class="lap-aksi no-print" style="margin:0"><button type="button" class="ikon-btn" data-an="cetak" aria-label="Cetak linimasa atau simpan PDF">' + Analisa.IKON.cetak + '<span>Cetak</span></button></div></div>' +
-      '<div class="seg sm lm-filter no-print" role="group" aria-label="Saring linimasa">' + chip + '</div>' +
+      Cepat.chips(s) + '<div class="seg sm lm-filter no-print" role="group" aria-label="Saring linimasa">' + chip + '</div>' +
       '<div class="seg sm lm-urut no-print" style="margin-top:8px"><button type="button" class="btn" data-do="lm-urut" aria-label="Urutan: ' + (this.urut === 'baru' ? 'terbaru dulu' : 'terlama dulu') + '. Ketuk untuk membalik">' + (this.urut === 'baru' ? '↓ Terbaru' : '↑ Terlama') + '</button></div>' +
       (L.length ? this.daftar(s, L) + (L.length > this.n ? '<button type="button" class="btn" data-do="lm-lagi" style="width:100%;margin-top:12px;min-height:44px">Tampilkan lebih banyak (sisa ' + (L.length - this.n) + ')</button>' : '')
         : '<p class="note">Belum ada ' + (this.f === 'semua' ? 'peristiwa' : this.FILTER.find((c) => c[0] === this.f)[1].toLowerCase()) + '.</p>') +
@@ -100,7 +100,7 @@ const Linimasa = {
       baris += '<tr><td>' + Setelan.tgl(e.tgl) + '</td><td>' + (h >= 1 ? h : '—') + '</td><td>' + (x.label || (e.k === 'mulai' ? 'Mulai' : 'Selesai')) + '</td><td>' + esc(x.judul) + (e.j && e.j.isi ? '<br>' + esc(e.j.isi).replace(/\n/g, '<br>') : x.ket ? '<br>' + esc(x.ket) : '') + '</td><td class="n">' + (x.nilai || '') + '</td></tr>';
     });
     return '<div class="ct-kop"><h1>Jurnal Siklus</h1><p class="ct-sub">' + esc(Siklus.nama(s.id)) + '</p><table class="ct-meta"><tr><th>Komoditas</th><td>' + esc(k.nama || '—') + '</td><th>Dicetak</th><td>' + Setelan.tgl(isoHari()) + '</td></tr>' +
-      '<tr><th>Mulai</th><td>' + Setelan.tgl(s.mulai) + '</td><th>Aplikasi</th><td>Tani Keuangan v' + VERSI + '</td></tr></table></div>' +
+      '<tr><th>Mulai</th><td>' + Setelan.tgl(s.mulai) + '</td><th>Aplikasi</th><td>Buku Kebun v' + VERSI + '</td></tr></table></div>' +
       '<div class="ct-bag"><table class="ct-tab"><tr><th>Tanggal</th><th>Hari</th><th>Jenis</th><th>Keterangan</th><th class="n">Nilai</th></tr>' + baris + '</table></div>';
   },
 

@@ -1,4 +1,4 @@
-/* Tani Keuangan — katalog harga pasar (input manual) dan pembanding harga (v0.1.052, docs/HARGA.md)
+/* Buku Kebun — katalog harga pasar (input manual) dan pembanding harga (v0.1.052, docs/HARGA.md)
    Disimpan di komoditas.hargaPasar = [{ id, tanggal, harga, sumber }]; harga per satuan komoditas. */
 const Harga = {
   pilih: '',

@@ -1,4 +1,4 @@
-/* Tani Keuangan — modal detail Jadwal kegiatan dan Panen di detail siklus (v0.1.060)
+/* Buku Kebun — modal detail Jadwal kegiatan dan Panen di detail siklus (v0.1.060)
    Memakai mesin modal Rencana (Rencana.dlgBuka); entri didaftarkan ke Rencana.FORM. Dokumen: docs/JADWAL.md, docs/SIKLUS.md */
 const Dsk = {
   aksi(a, el) {

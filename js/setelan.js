@@ -1,4 +1,4 @@
-/* Tani Keuangan — penyimpanan aman: localStorage; bila diblokir (mis. dibuka lewat content://), pakai memori + window.name */
+/* Buku Kebun — penyimpanan aman: localStorage; bila diblokir (mis. dibuka lewat content://), pakai memori + window.name */
 var Penyimpanan = (function () {
   var ls = null, mem = {}, PREFIX = 'TKDATA:';
   try { ls = window.localStorage; ls.setItem('__tk', '1'); ls.removeItem('__tk'); } catch (e) { ls = null; }
@@ -14,11 +14,11 @@ var Penyimpanan = (function () {
   };
 })();
 
-/* Tani Keuangan — status buka/tutup bagian yang bisa dilipat (v0.1.024) */
+/* Buku Kebun — status buka/tutup bagian yang bisa dilipat (v0.1.024) */
 var Lipat = { s: {}, buka: function (k, d) { return k in Lipat.s ? Lipat.s[k] : d; } };
 document.addEventListener('toggle', function (e) { var d = e.target; if (d && d.dataset && d.dataset.lipat) Lipat.s[d.dataset.lipat] = d.open; }, true);
 
-/* Tani Keuangan — halaman setelan (dipakai aplikasi dan pratinjau) */
+/* Buku Kebun — halaman setelan (dipakai aplikasi dan pratinjau) */
 var Setelan = (function () {
   var KUNCI = 'tani.setelan';
   var BAWAAN = { mode: 'light', skema: 'hijau', ukuran: 100, kaca: false, tanggal: 'dmy', sembunyi: false, margin: 30, ingatJurnal: 0 };
@@ -57,6 +57,10 @@ var Setelan = (function () {
       return '<button type="button" class="btn' + (String(s[k]) === String(o[0]) ? ' on' : '') + '" data-set="' + k + '" data-val="' + o[0] + '">' + (o[2] || '') + o[1] + '</button>';
     }).join('') + '</div>';
   }
+  /* saklar nyala/mati (v0.1.109): untuk pilihan hidup-mati; pilihan di antara beberapa opsi tetap memakai seg() */
+  function saklar(k, label, aktif, teks, lebar) {
+    return '<div class="sw-wrap"><span class="sw-t"' + (lebar ? ' style="min-width:' + lebar + 'px"' : '') + '>' + (aktif ? teks[1] : teks[0]) + '</span><button type="button" class="sw" role="switch" aria-checked="' + (aktif ? 'true' : 'false') + '" aria-label="' + label + '" data-saklar="' + k + '"><span class="sw-kenop"></span></button></div>';
+  }
   function row(a, b, c) {
     return '<div class="settings-row"><div class="settings-desc"><strong>' + a + '</strong><span>' + b + '</span></div>' + c + '</div>';
   }
@@ -64,18 +68,18 @@ var Setelan = (function () {
   function render() {
     var tampil = head('Tampilan', 'Mode, skema warna, dan ukuran. Tersimpan di browser ini, tidak ikut ekspor data.') +
       row('Mode', 'Otomatis mengikuti pengaturan perangkat.', seg('mode', [['light', 'Terang'], ['dark', 'Gelap'], ['auto', 'Otomatis']])) +
-      row('Skema warna', 'Hijau Padi adalah palet bawaan Tani Keuangan; Emas Klasik sama dengan Jurnal Trading.',
+      row('Skema warna', 'Hijau Padi adalah palet bawaan Buku Kebun; Emas Klasik sama dengan Jurnal Trading.',
         seg('skema', [['hijau', 'Hijau Padi', '<i class="dot" style="background:#81AE64"></i>'], ['emas', 'Emas Klasik', '<i class="dot" style="background:#C9A24B"></i>']])) +
-      row('Efek kaca', 'Liquid Glass bergaya iOS: kartu, kontrol kapsul, dan navigasi bawah melayang dari kaca bening di atas latar bentuk geometri. Bisa dipakai dengan skema dan mode apa saja; otomatis padat bila browser tidak mendukung blur atau perangkat memilih Kurangi Transparansi.', seg('kaca', [[false, 'Mati'], [true, 'Nyala']])) +
+      row('Efek kaca', 'Liquid Glass bergaya iOS: kartu, kontrol kapsul, dan navigasi bawah melayang dari kaca bening di atas latar bentuk geometri. Bisa dipakai dengan skema dan mode apa saja; otomatis padat bila browser tidak mendukung blur atau perangkat memilih Kurangi Transparansi.', saklar('kaca', 'Efek kaca', !!s.kaca, ['Mati', 'Nyala'])) +
       row('Ukuran tampilan', 'Perkecil atau perbesar seluruh aplikasi.', seg('ukuran', [[90, '90%'], [100, '100%'], [110, '110%'], [120, '120%']])) +
       row('Kembali ke bawaan', 'Terang, Hijau Padi, tanpa efek kaca, 100%, format tanggal dan target margin bawaan.', '<button type="button" class="btn" data-act="reset">Atur ulang</button>');
     var pref = head('Preferensi', 'Berlaku di seluruh aplikasi.') +
       row('Format tanggal', 'Tabel transaksi dan daftar siklus.', seg('tanggal', [['dmy', '03/11/2026'], ['iso', '2026-11-03']])) +
-      row('Angka untung saat dibuka', 'Pilih Tersembunyi agar semua nominal rupiah di aplikasi disamarkan. Tombol mata menampilkannya sementara; saat mencetak, angka tetap tampil.', seg('sembunyi', [[false, 'Tampil'], [true, 'Tersembunyi']])) +
+      row('Angka untung saat dibuka', 'Nyalakan agar semua nominal rupiah di aplikasi disamarkan. Tombol mata menampilkannya sementara; saat mencetak, angka tetap tampil.', saklar('sembunyi', 'Sembunyikan angka untung saat dibuka', !!s.sembunyi, ['Tampil', 'Tersembunyi'], 80)) +
       row('Target margin', 'Dipakai menghitung harga jual minimum per siklus (1 sampai 90 persen).', '<input type="number" id="margin" class="settings-input" min="1" max="90" step="1" inputmode="numeric" value="' + s.margin + '" aria-label="Target margin persen">') +
       row('Ingatkan catatan jurnal', 'Beranda mengingatkan bila siklus berjalan belum dicatat selama sekian hari. Hanya tampil saat aplikasi dibuka; bawaan mati.', seg('ingatJurnal', [[0, 'Mati'], [3, '3 hari'], [7, '7 hari'], [14, '14 hari']]));
     var data = head('Data', 'Cadangan dan pemulihan. Data tersimpan di browser ini.') +
-      '<div class="settings-row"><div class="settings-desc"><strong>Ekspor dan impor</strong><span>Ekspor mengisi kotak di bawah dengan JSON. Untuk impor, tempel JSON ke kotak atau pilih berkas.</span></div>' +
+      '<div class="settings-row"><div class="settings-desc"><strong>Ekspor dan impor</strong><span>Ekspor mengisi kotak di bawah dengan JSON. Untuk impor, tempel JSON ke kotak atau pilih berkas; pratinjau tampil dulu sebelum data diganti.</span></div>' +
       '<div class="seg sm"><button type="button" class="btn" data-act="ekspor">Ekspor</button><button type="button" class="btn" data-act="impor">Impor</button><button type="button" class="btn" data-act="berkas">Pilih berkas</button></div></div>' +
       '<input type="file" id="fileImp" accept=".json,application/json" hidden>' +
       '<textarea id="dataBox" class="settings-text" rows="5" aria-label="Data JSON" placeholder="Hasil ekspor muncul di sini"></textarea>' +
@@ -85,7 +89,7 @@ var Setelan = (function () {
         (navigator.storage && navigator.storage.persist ? row('Penyimpanan tetap', 'Minta browser agar tidak membuang foto saat ruang penyimpanan menipis. Browser menentukan sendiri apakah permintaan dikabulkan.', '<button type="button" class="btn" data-act="foto-tetap">Minta penyimpanan tetap</button>') : '') : '') +
       row('Hapus semua data', 'Menghapus transaksi dan siklus di browser ini. Salinan cadangan otomatis dan data cloud tidak ikut terhapus. Bila sinkron cloud aktif, data akan kembali dari cloud: hapus juga data cloud di bagian Sinkron cloud.', '<button type="button" class="btn danger" data-act="hapus">Hapus semua data</button>');
     var tentang = head('Tentang', '') +
-      row('Versi', 'Tani Keuangan, keuangan pertanian rumahan.', '<strong>v' + h.versi + '</strong>') +
+      row('Versi', 'Buku Kebun, manajemen pertanian.', '<strong>v' + h.versi + '</strong>') +
       (typeof Panduan !== 'undefined' ? Panduan.html() : '') +
       (typeof Pwa !== 'undefined' ? Pwa.html() : '');
     var cad = typeof Cadangan !== 'undefined' ? '<section>' + Cadangan.html() + '</section>' : '';
@@ -105,21 +109,16 @@ var Setelan = (function () {
     try {
       var a = document.createElement('a');
       a.href = URL.createObjectURL(new Blob([j], { type: 'application/json' }));
-      a.download = 'tani-keuangan-' + new Date().toISOString().slice(0, 10) + '.json';
+      a.download = 'buku-kebun-' + new Date().toISOString().slice(0, 10) + '.json';
       document.body.appendChild(a); a.click(); a.remove();
     } catch (e) {}
     pesan('Data ditampilkan di kotak. Jika unduhan tidak mulai, salin teksnya.');
   }
-  function impor() {
-    var box = document.getElementById('dataBox'), o;
-    try { o = JSON.parse(box.value); } catch (e) { pesan('JSON tidak valid.'); return; }
-    var kunci = ['transaksi', 'siklus', 'unit', 'komoditas', 'panen', 'aset', 'utang', 'kategori', 'jurnal'];
-    if (!o || typeof o !== 'object' || Array.isArray(o) || !kunci.some(function (k) { return k in o; })) { pesan('Format tidak dikenali: ini bukan berkas ekspor Tani Keuangan. Data tidak diubah.'); return; }
-    var r = h.pasang(o);
-    pesan('Data berhasil diimpor.' + (r && r.dibuang ? ' ' + r.dibuang + ' bagian tidak valid dilewati.' : '') + ' Salinan data sebelumnya ada di Cadangan otomatis.');
-  }
+  function impor(info) { var box = document.getElementById('dataBox'); Impor.json(box ? box.value : '', info, pesan); } // pratinjau dulu, baru impor (js/impor.js)
   function bind(root) {
     root.addEventListener('click', function (e) {
+      var w = e.target.closest('[data-saklar]');
+      if (w) { var kw = w.dataset.saklar; ubah(kw, !s[kw]); var nw = document.querySelector('[data-saklar="' + kw + '"]'); if (nw) nw.focus(); return; } /* fokus tetap di saklar setelah halaman digambar ulang */
       var b = e.target.closest('[data-set]');
       if (b) {
         var k = b.dataset.set, v = b.dataset.val;
@@ -156,9 +155,11 @@ var Setelan = (function () {
         var n = Math.round(+e.target.value);
         ubah('margin', n >= 1 && n <= 90 ? n : s.margin);
       } else if (e.target.id === 'fileImp' && e.target.files[0]) {
-        var r = new FileReader();
-        r.onload = function () { document.getElementById('dataBox').value = r.result; impor(); };
-        r.readAsText(e.target.files[0]);
+        var f = e.target.files[0], r = new FileReader();
+        if (f.size > Impor.MAKSJSON) { pesan('Berkas terlalu besar (maksimal 20 MB).'); App.toast('Berkas terlalu besar (maks. 20 MB)'); e.target.value = ''; return; }
+        r.onload = function () { document.getElementById('dataBox').value = r.result; impor({ nama: f.name, ukuran: f.size }); };
+        r.onerror = function () { App.toast('Berkas tidak bisa dibaca'); };
+        r.readAsText(f); e.target.value = '';
       }
     });
   }

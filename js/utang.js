@@ -1,4 +1,4 @@
-/* Tani Keuangan — pembayaran Tunai / Belum dibayar / Sebagian, tombol Bayar + cicilan, dan perhitungan kas (v0.1.049, docs/UTANG.md)
+/* Buku Kebun — pembayaran Tunai / Belum dibayar / Sebagian, tombol Bayar + cicilan, dan perhitungan kas (v0.1.049, docs/UTANG.md)
    Transaksi selalu menyimpan nilai penuh (untung, HPP, laporan memakai nilai ini).
    Bagian yang belum dibayar menjadi catatan utang/piutang tertaut (utang.transaksiId); pembayarannya di utang.bayar.
    Kas = bagian tunai transaksi + pembayaran utang/piutang, bukan jumlah semua transaksi. */

@@ -1,6 +1,6 @@
 # Roadmap — Web App Keuangan Pertanian Rumahan
 
-> Status dokumen: draf v0.1 · Terakhir diperbarui: 5 November 2026 · Fase 5 selesai; Fase 6 berjalan: cadangan otomatis + dasar PWA; FAB kontekstual; chart di Beranda; data contoh otomatis; sinkron Supabase (v0.1.023); penyempurnaan UX (v0.1.024); kartu hero Beranda (v0.1.025); judul halaman (v0.1.026); foto nota lokal (v0.1.037); optimasi performa/aksesibilitas bagian 1 (v0.1.038); pembayaran utang/piutang tahap 1 (v0.1.048) dan tahap 2: tombol Bayar + cicilan (v0.1.049); Catat panen vs Catat hasil (v0.1.050); jadwal kegiatan per siklus (v0.1.051); katalog harga pasar (v0.1.052); kalkulator kelayakan usaha (v0.1.053); ekspor Excel (v0.1.054); isian Rencana keuangan lewat modal FAB (v0.1.055); ringkasan, sub-tab geser, ubah aset/utang (v0.1.056); daftar anggaran dengan detail (v0.1.057); daftar aset dan utang dengan detail (v0.1.058); grafik arus kas, saringan utang, simpan & tambah lagi, tren harga (v0.1.059); Jadwal dan Panen lewat modal detail (v0.1.060); modal bersama, tombol kembali, hapus seragam (v0.1.061); detail siklus dipadatkan (v0.1.066); duplikat FAB dibersihkan (v0.1.067); layout desktop dashboard tahap A–C (v0.1.081); Fase 6E Jurnal Siklus direncanakan, 8 tahap (v0.1.086); Tahap 0 selesai: docs/JURNAL.md dan wireframe, menunggu konfirmasi keputusan (v0.1.087); Fase 6E Tahap 4 foto jurnal (v0.1.092)
+> Status dokumen: draf v0.1 · Terakhir diperbarui: 5 November 2026 · Fase 5 selesai; Fase 6 berjalan: cadangan otomatis + dasar PWA; FAB kontekstual; chart di Beranda; data contoh otomatis; sinkron Supabase (v0.1.023); penyempurnaan UX (v0.1.024); kartu hero Beranda (v0.1.025); judul halaman (v0.1.026); foto nota lokal (v0.1.037); optimasi performa/aksesibilitas bagian 1 (v0.1.038); pembayaran utang/piutang tahap 1 (v0.1.048) dan tahap 2: tombol Bayar + cicilan (v0.1.049); Catat panen vs Catat hasil (v0.1.050); jadwal kegiatan per siklus (v0.1.051); katalog harga pasar (v0.1.052); kalkulator kelayakan usaha (v0.1.053); ekspor Excel (v0.1.054); isian Rencana keuangan lewat modal FAB (v0.1.055); ringkasan, sub-tab geser, ubah aset/utang (v0.1.056); daftar anggaran dengan detail (v0.1.057); daftar aset dan utang dengan detail (v0.1.058); grafik arus kas, saringan utang, simpan & tambah lagi, tren harga (v0.1.059); Jadwal dan Panen lewat modal detail (v0.1.060); modal bersama, tombol kembali, hapus seragam (v0.1.061); detail siklus dipadatkan (v0.1.066); duplikat FAB dibersihkan (v0.1.067); layout desktop dashboard tahap A–C (v0.1.081); Fase 6E Jurnal Siklus direncanakan, 8 tahap (v0.1.086); Tahap 0 selesai: docs/JURNAL.md dan wireframe, menunggu konfirmasi keputusan (v0.1.087); Fase 6E Tahap 4 foto jurnal (v0.1.092); Jurnal Tahap 7: Catat cepat (v0.1.100); keamanan data multi-tab (v0.1.101); performa 1.000+ entri dan aksesibilitas Jurnal diaudit (v0.1.105)
 
 ## 1. Visi & Tujuan
 
@@ -93,8 +93,8 @@ Aplikasi web sederhana untuk mencatat dan menganalisa keuangan pertanian skala r
 - **Hasil:** perencanaan keuangan sebelum tanam, bukan hanya pencatatan
 
 ### Fase 6 — PWA & Sinkron Cloud (v0.6) (Minggu 14–16)
-- [ ] PWA: bisa dipasang di HP dan jalan offline — sebagian: manifest, service worker, ikon, tombol pasang sudah ada (v0.1.019); centang setelah diuji di hosting HTTPS dan di HP
-- [ ] Login & sinkron Supabase (opsional) — sebagian: login, gabung per entri, sinkron otomatis, timpa/ambil/hapus cloud sudah ada dan lolos uji server tiruan (v0.1.023, docs/SINKRON.md); centang setelah diuji di proyek Supabase sungguhan
+- [x] PWA: bisa dipasang di HP dan jalan offline — manifest, service worker, ikon, tombol pasang (v0.1.019); **diuji di hosting HTTPS (Vercel) dan terpasang serta jalan di HP** (dikonfirmasi pengguna, v0.1.110)
+- [ ] Login & sinkron Supabase (opsional) — sebagian: login, gabung per entri, sinkron otomatis, timpa/ambil/hapus cloud sudah ada dan lolos uji server tiruan (v0.1.023, docs/SINKRON.md); layar Masuk/Daftar dan label status (v0.1.107, Fase 6F, docs/AKUN.md); centang setelah diuji di proyek Supabase sungguhan
 - [x] Cadangan otomatis & pemulihan data (docs/CADANGAN.md; salinan di browser, belum ke cloud)
 - [ ] Mode multi-pengguna sederhana (pemilik & pencatat)
 - **Hasil:** data aman dan bisa diakses dari beberapa perangkat
@@ -137,8 +137,8 @@ Aturan: hanya tata letak untuk layar ≥1100 px; token warna, font, dan gaya kar
 - [ ] Wadah lebih lebar dengan grid dua kolom: Beranda selesai lewat Tahap 0 (v0.1.080, mulai 1100 px); Laporan (ringkasan | tren) dan layar 1024–1099 px belum
 - [x] Navigasi desktop konsisten di semua halaman: rail kiri tetap (ikon dengan tooltip nama; label penuh menunggu Tahap 0-E), bilah bawah tetap untuk HP, tab atas dipertahankan di 721–1099 px (v0.1.080)
 - [ ] Grafik: ukuran font tetap dan tinggi dibatasi (ukur lebar dengan ResizeObserver, gambar ulang); 12 bulan sebagai bawaan di desktop
-- [ ] Angka: `font-variant-numeric: tabular-nums` dan rata kanan di semua daftar dan tabel jumlah
-- [ ] Keamanan data multi-tab: deteksi perubahan dari tab lain (`storage` event / `BroadcastChannel`) dan muat ulang atau beri peringatan sebelum menimpa (sekarang tab terakhir yang menyimpan menimpa tanpa peringatan)
+- [ ] Angka (sebagian: tabular-nums global sudah ada, v0.1.110; rata kanan di semua daftar dan tabel belum diperiksa): `font-variant-numeric: tabular-nums` dan rata kanan di semua daftar dan tabel jumlah
+- [x] Keamanan data multi-tab: deteksi perubahan dari tab lain (`storage` event) dan gabung 3 arah per entri alih-alih menimpa — *selesai v0.1.101 (docs/MULTITAB.md); belum diuji pada PWA terpasang di HP bersama tab Chrome; dua simpan dalam beberapa milidetik yang sama masih bisa saling menimpa (batas `localStorage`)*
 - [ ] Pintasan keyboard: `N` catat baru, `/` cari, `G` lalu `B/T/S/L` pindah halaman, `?` daftar pintasan; tooltip pada tombol ikon
 
 **Tahap 2 — lebih besar**
@@ -225,17 +225,17 @@ Perkiraan ukuran: S kecil · M sedang · L besar. Urutan: 0 → 1 → 2 → (3 d
 - **Hasil:** pengguna bisa menjawab "hama apa yang menyerang dan apa dampaknya"
 
 **Tahap 6 — Laporan, ekspor, dan cadangan foto (L)**
-- [ ] **Laporan perjalanan siklus** yang bisa dicetak (cetak polos): kop, ringkasan uang, tahap dan tanggalnya, catatan, kejadian, foto kecil (opsional); dipicu dari detail siklus
+- [x] *(v0.1.103)* **Laporan perjalanan siklus** yang bisa dicetak (cetak polos): kop, ringkasan uang, tahap dan tanggalnya, catatan, kejadian, foto kecil (opsional); dipicu dari detail siklus
 - [x] *(v0.1.095)* Ekspor Excel: lembar **Jurnal** (js/xlsx.js); CSV jurnal
 - [x] *(v0.1.094)* **Cadangan foto:** ekspor semua foto ke satu berkas ZIP (penulis ZIP di js/xlsx.js dipakai ulang) beserta indeks nama berkas dan siklusnya, dan impor kembali; peringatan bila ada foto yang belum dicadangkan
-- [ ] Analisa lintas siklus: lama tiap tahap dan **panen pertama rata-rata hari ke-N** dari siklus selesai dibandingkan dengan umur panen komoditas, dengan tawaran memperbarui `umurPanenHari`
-- **Hasil:** pengalaman satu siklus bisa diarsipkan, dicetak, dan dipakai merencanakan siklus berikutnya
+- [x] *(v0.1.103)* Analisa lintas siklus: lama tiap tahap dan **panen pertama rata-rata hari ke-N** dari siklus selesai dibandingkan dengan umur panen komoditas, dengan tawaran memperbarui `umurPanenHari`
+- **Hasil:** pengalaman satu siklus bisa diarsipkan, dicetak, dan dipakai merencanakan siklus berikutnya — **Tahap 6 selesai di v0.1.103** (`js/perjalanan.js`, `js/pengalaman.js`; diuji di Chromium 390 px dan 1440 px dan lewat PDF Chromium; belum di printer atau HP sungguhan)
 
 **Tahap 7 — Penyempurnaan (M, sebagian opsional)**
-- [ ] Chip **Jurnal** di tab Siklus: umpan lintas siklus (seperti Agenda) dengan pencarian kata kunci dan saringan siklus/jenis
-- [ ] **Catatan cepat:** chip satu ketukan (Siram, Pupuk, Semprot, Penyiangan, Pindah tanam) yang langsung membuat entri hari ini; tawaran "Tambah catatan?" setelah menandai jadwal selesai
+- [x] *(v0.1.104)* Chip **Jurnal** di tab Siklus: umpan lintas siklus (seperti Agenda) dengan pencarian kata kunci dan saringan siklus/jenis
+- [x] **Catatan cepat:** chip satu ketukan yang langsung membuat entri hari ini; tawaran "Tambah catatan" setelah menandai jadwal selesai — *selesai v0.1.100 (modul `js/cepat.js`; chip per jenis komoditas, toast Urungkan + Tambah detail, linimasa dan detail siklus; belum diuji di HP sungguhan; chip yang bisa diubah pengguna belum)*
 - [ ] Desktop: pola master–detail untuk linimasa (Fase 6D Tahap 2); pintasan keyboard catat jurnal
-- [ ] Performa 1.000+ entri, aksesibilitas (urutan Tab, label, pengumuman perubahan), dan uji dengan data nyata 1–2 siklus (menyambung ke Fase 7)
+- [ ] Performa 1.000+ entri, aksesibilitas (urutan Tab, label, pengumuman perubahan), dan uji dengan data nyata 1–2 siklus (menyambung ke Fase 7) — *sebagian (v0.1.105): performa diukur sampai 5.000 jurnal + 20.000 transaksi (semua layar < 300 ms), audit aksesibilitas otomatis dan uji keyboard dikerjakan, `aria-pressed` pada tombol pilihan diperbaiki (docs/AUDIT.md); belum: data nyata 1–2 siklus, pembaca layar sungguhan, HP berspesifikasi rendah*
 - **Hasil:** jurnal terasa cepat dan tidak memberatkan, layak dipakai tiap hari
 
 **Definisi selesai tiap tahap:** dokumentasi (docs/JURNAL.md, DATA-SCHEMA.md, CHANGELOG.md, baris roadmap); uji otomatis di Chromium (HP 390 px dan desktop 1440 px, tema terang/gelap/kaca) tanpa galat JavaScript; impor data lama tanpa regresi; cetak dan ekspor yang ada tetap berfungsi; zip full + update dan pratinjau web; butir yang belum diuji di HP sungguhan dicatat apa adanya.
@@ -260,6 +260,24 @@ Perkiraan ukuran: S kecil · M sedang · L besar. Urutan: 0 → 1 → 2 → (3 d
 | Bentrok edit antarperangkat | Satu entri satu catatan, digabung per entri berdasarkan `diubah` (mekanisme sinkron yang ada) |
 | Linimasa membingungkan karena campur uang dan catatan | Peristiwa turunan berbeda gaya dan baca-saja, saringan jenis, mode Tersembunyi |
 | Lingkup membengkak | Tiap tahap dirilis sendiri; Tahap 5–7 opsional dan bisa dipindah ke backlog |
+
+### Fase 6F — Akun & Sinkron Supabase (layar Masuk dan Daftar; mode lokal tetap bawaan) — Tahap 1 selesai (v0.1.107)
+**Latar.** Sinkron Supabase sudah jalan (v0.1.023; konfigurasi bawaan v0.1.106) tetapi berupa formulir teknis di dalam Setelan: alamat proyek dan kunci tampil, tidak ada status yang terlihat, dan pesan galat masih bahasa Inggris dari server. Rancangan lengkap: docs/AKUN.md.
+
+**Prinsip**
+1. **Lokal dulu:** tidak ada layar login saat aplikasi dibuka; semua fitur jalan penuh tanpa akun. Akun hanya tambahan opsional untuk cadangan cloud dan banyak perangkat.
+2. **Status selalu terlihat, tidak mengganggu:** label kecil di header (Mode lokal, Menyinkronkan…, Tersinkron HH:MM, Gagal sinkron, Menunggu internet); ketuk untuk membuka akun.
+3. **Satu mesin modal** (Modal) untuk Layar Akun: jebakan Tab, Esc, tombol Kembali, fokus kembali.
+4. **Pesan ramah berbahasa Indonesia**, kata sandi tidak pernah disimpan, bagian teknis disembunyikan di Lanjutan.
+5. **Keluar tidak menghapus data di perangkat.** Foto dan data contoh tidak ikut sinkron, dan harus dikatakan jelas.
+
+**Tahapan**
+- [x] **Tahap 1 — Layar akun dan label status (v0.1.107):** Layar Akun (Masuk, Buat akun, Cek email) sebagai modal; label status di header; kartu "Akun dan sinkron" di Setelan; alamat proyek dan kunci pindah ke Lanjutan; pesan galat berbahasa Indonesia; tampil/sembunyi kata sandi, indikator kekuatan, persetujuan; uji dengan server Supabase tiruan.
+- [ ] **Tahap 2 — Masuk dengan kode 6 angka lewat email dan pemulihan kata sandi:** `signInWithOtp` lalu `verifyOtp` (tanpa tautan, cocok untuk PWA terpasang); lupa kata sandi; kirim ulang dengan hitung mundur. Butuh templat email Supabase yang memuat kode (`{{ .Token }}`).
+- [ ] **Tahap 3 — Pilihan gabung pada login pertama dan ajakan lembut:** bila perangkat dan cloud sama-sama berisi data, tampilkan jumlah masing-masing dan tiga pilihan (Gabungkan, Pakai data cloud, Pakai data perangkat ini); ajakan membuat akun sekali per 30 hari setelah ±30 transaksi, bisa ditutup.
+- [ ] **Tahap 4 — Ganti kata sandi, hapus akun dan data cloud:** konfirmasi dengan mengetik email; keluar dengan pilihan menyimpan atau menghapus data lokal.
+- [ ] **Tahap 5 — Uji pada proyek Supabase sungguhan:** konfirmasi email, kode OTP, batas kecepatan, sesi habis, dua perangkat, uji kamera/PWA terpasang.
+- [ ] **Tahap 6 — Multi-pengguna (pemilik dan pencatat):** tabel kebun, anggota, dan RLS berbasis peran; skema satu baris per pengguna (`tani_data`) perlu diganti. Dikerjakan setelah alur akun stabil.
 
 ### Fase 7 — Rilis v1.0 (Minggu 17–18)
 - [ ] Pengujian dengan data nyata (minimal 1–2 siklus)
@@ -332,6 +350,16 @@ Perkiraan ukuran: S kecil · M sedang · L besar. Urutan: 0 → 1 → 2 → (3 d
   - [x] 3. **Keseragaman teks (v0.1.076; aturan di docs/STYLE.md).** (a) Penolakan hapus punya dua gaya: "Masih dipakai n siklus — gunakan Arsipkan" dan "Tidak bisa dihapus: …". (b) Tanda baca toast dan keadaan kosong campur (titik atau tanpa titik, "—" atau ":"). (c) "di tab Unit" dan "di tab Siklus" padahal keduanya menu bawah. (d) dicek ulang saat mengerjakan: "Belum ada jadwal." dan "Belum ada panen." sudah menyebut tombol + untuk siklus berjalan dan sengaja tanpa + untuk siklus selesai (FAB disembunyikan), jadi bukan pelanggaran.
   - [x] 4. **Kebersihan CSS (v0.1.076).** `.toast` punya dua deklarasi `z-index` (60 dan 120), sisakan satu. `.dm-lapis` dan `.pd-lapis` sama-sama 90 (hilang sendiri bila butir 1 selesai) dan `.nota-lihat` 80 berada di bawah modal: aman selama penampil tidak dibuka dari dalam modal, catat di `docs/MODAL.md` atau samakan.
   - [ ] 5. **Belum teruji:** penampil foto nota secara langsung, pembaca layar (VoiceOver/TalkBack), printer dan HP sungguhan. Sertakan di uji rilis berikutnya.
+
+### Saran optimasi kartu hero (diusulkan di v0.1.099; sebagian dikerjakan di v0.1.110)
+- [x] **Bandingkan periode setara** (v0.1.110): selisih terhadap "sampai tanggal yang sama bulan lalu" (atau proyeksi akhir bulan) agar tidak membandingkan bulan berjalan dengan bulan penuh. Kecil; dampak: angka lebih adil.
+- [ ] **Sparkline interaktif:** ketuk atau geser untuk melihat bulan dan nilainya (tersamar bila Tersembunyi), titik penanda bulan ini (lapisan HTML agar tidak lonjong akibat `preserveAspectRatio="none"`), dan label awal/akhir bulan juga di HP. Sedang.
+- [x] **Notasi ringkas untuk miliaran** (v0.1.110) ("Rp 12,3 M") dengan nilai penuh di `title`/ketuk, sebagai ganti sekadar mengecilkan huruf. Kecil.
+- [x] ~~**Pilihan periode hero**~~ — **dibatalkan** atas permintaan pengguna (hero cukup angka utama): chip kecil Bulan ini / 3 bulan / Tahun ini / Siklus berjalan. Sedang.
+- [x] ~~**Anggaran terpakai di hero**~~ — **dibatalkan** atas permintaan pengguna; anggaran tetap di kartu Siklus berjalan: batang kemajuan "sisa anggaran bulan ini" bila anggaran diisi. Sedang.
+- [ ] **Cache agregat bulanan:** memo `Analisa.bulanN` dan `Beranda.per` yang dibatalkan saat `App._ak` direset, dipakai bersama Beranda, Laporan, dan hero; relevan di atas ±5.000 transaksi. Sedang.
+- [x] **Penjelasan R/C untuk pemula** (v0.1.110): ketuk "R/C ratio" membuka penjelasan satu kalimat dan status (mis. ≥ 1,3 sehat). Kecil.
+- [x] **Uji tangkapan layar otomatis** (v0.1.110, `tools/uji-hero.py`): kartu hero di 320/360/390/1440 px agar regresi terlihat sebelum rilis. Kecil.
 
 ## 8. Metrik Keberhasilan
 
@@ -459,3 +487,17 @@ Perkiraan ukuran: S kecil · M sedang · L besar. Urutan: 0 → 1 → 2 → (3 d
 | 0.1.054 | 2026-11-04 | Ekspor Excel (.xlsx) multi-lembar tanpa pustaka luar: Siklus (rumus), Transaksi, Panen, Utang, Aset, Harga pasar, Jadwal (docs/EKSPOR.md) |
 | 0.1.055 | 2026-11-04 | Semua isian Rencana keuangan (anggaran, saldo awal, aset, utang/piutang, harga pasar) lewat modal dari tombol +; isian di halaman dihapus (docs/FAB.md, docs/RENCANA.md) |
 | 0.1.056 | 2026-11-04 | Rencana keuangan: kartu ringkasan, sub-tab satu baris bisa digeser, Ubah dan Urungkan untuk aset dan utang manual (docs/RENCANA.md) |
+| 0.1.097 | 2026-11-07 | Ganti nama menjadi Buku Kebun (tagline Manajemen pertanian); data dan kunci penyimpanan tidak berubah |
+| 0.1.098 | 2026-11-07 | Label versi hanya di Setelan → Tentang (header hanya tagline) |
+| 0.1.099 | 2026-11-07 | Perbaikan kartu hero Beranda: angka tidak putus di layar sempit, margin ekstrem, selisih bulan lalu, label sparkline, aksesibilitas, hitung hanya saat terlihat (docs/HERO.md) |
+| 0.1.100 | 2026-11-07 | Jurnal Tahap 7 (sebagian): Catat cepat — chip satu ketukan per jenis komoditas di detail siklus dan linimasa, toast dengan Urungkan dan Tambah detail, tawaran Tambah catatan setelah jadwal selesai; toast bisa memuat dua tombol dan tidak lagi menyempit |
+| 0.1.101 | 2026-11-07 | Keamanan data multi-tab: gabung 3 arah per entri bila tab/PWA lain menyimpan, pembaruan langsung lewat storage event, penggantian sengaja (impor, pulihkan, hapus semua, ambil dari cloud) tidak digabung; toast bertumpuk |
+| 0.1.102 | 2026-11-07 | Impor data dengan pratinjau dan toast: JSON (ganti data), CSV (tambah transaksi, deteksi baris kembar), ZIP foto; Urungkan untuk JSON dan CSV (docs/IMPOR.md) |
+| 0.1.103 | 2026-11-08 | Fase 6E Tahap 6 selesai: laporan perjalanan siklus (cetak polos, foto opsional) dari detail siklus; pengalaman lintas siklus di detail komoditas (panen pertama rata-rata hari ke-N, lama tiap tahap, tombol memakai sebagai umur panen) |
+| 0.1.104 | 2026-11-08 | Fase 6E Tahap 7 (sebagian): chip Jurnal di tab Siklus, umpan lintas siklus dengan pencarian dan saringan jenis; rute `#siklus-jurnal` |
+| 0.1.105 | 2026-11-08 | Fase 7 / Jurnal Tahap 7 (sebagian): performa 1.000+ entri diukur, audit aksesibilitas dan uji keyboard, `aria-pressed` untuk tombol pilihan (js/aksesibel.js, docs/AUDIT.md) |
+| 0.1.106 | 2026-11-08 | Konfigurasi Supabase bawaan: alamat proyek dan kunci publishable terisi di Setelan → Sinkron cloud (docs/SINKRON.md) |
+| 0.1.107 | 2026-11-08 | Fase 6F Tahap 1: Layar Akun (Masuk, Buat akun), label status di header, kartu Akun dan sinkron, pesan galat Indonesia (docs/AKUN.md) |
+| 0.1.108 | 2026-11-08 | Sinkron otomatis memakai saklar (toggle) yang terlihat jelas di efek kaca |
+| 0.1.109 | 2026-11-08 | Efek kaca dan Angka untung saat dibuka diganti saklar; pilihan dua tombol non-nyala/mati tetap |
+| 0.1.110 | 2026-11-08 | Butir kecil: hero (selisih periode setara, notasi miliar/triliun, penjelasan R/C, uji tangkapan layar), angka sejajar, PWA di HTTPS dan HP dicentang (docs/HERO.md, tools/uji-hero.py) |

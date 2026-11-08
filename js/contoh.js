@@ -1,4 +1,4 @@
-/* Tani Keuangan — data contoh realistis (v0.1.022). Semua entri bertanda contoh:true agar bisa dihapus tanpa menyentuh data pengguna. */
+/* Buku Kebun — data contoh realistis (v0.1.022). Semua entri bertanda contoh:true agar bisa dihapus tanpa menyentuh data pengguna. */
 const Contoh = {
   FLAG: 'tani.contoh', minta: null,
   tgl(n) { const d = new Date(); return isoHari(new Date(d.getFullYear(), d.getMonth(), d.getDate() - n)); },

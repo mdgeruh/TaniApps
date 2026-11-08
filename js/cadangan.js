@@ -1,4 +1,4 @@
-/* Tani Keuangan — cadangan otomatis di browser (v0.1.019) */
+/* Buku Kebun — cadangan otomatis di browser (v0.1.019) */
 var Cadangan = (function () {
   var KUNCI = 'tani.cadangan', MAKS = 7, JEDA = 5 * 60 * 1000;
   var h = { ambil: function () { return {}; }, pulih: function () {}, segar: function () {} };

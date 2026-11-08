@@ -1,4 +1,4 @@
-/* Tani Keuangan — struktur gaya Jurnal Trading, palet Hijau Padi (#FFF4C9 #C7E78B #81AE64 #709053) */
+/* Buku Kebun — struktur gaya Jurnal Trading, palet Hijau Padi (#FFF4C9 #C7E78B #81AE64 #709053) */
 :root{--ink:#FFF4C9;--ink-raised:#FFFAE2;--paper:#243019;--paper-dim:#485C33;--paper-faint:#4C6436;--gold:#4E6F35;--gold-dim:#709053;--fill:#81AE64;--fill-hi:#C7E78B;--on-fill:#1F2A16;--act-bg:#C7E78B;--act-tx:#1F2A16;--gain:#25703A;--loss:#9E3826;--line:#D3C88C;--line-soft:#E8DDA8;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
 html[data-theme="dark"]{--ink:#161D12;--ink-raised:#1F2918;--paper:#FFF4C9;--paper-dim:#C4C09A;--paper-faint:#B2AE8C;--gold:#C7E78B;--gold-dim:#81AE64;--fill:#81AE64;--fill-hi:#C7E78B;--on-fill:#14200E;--act-bg:#1F2918;--act-tx:#C7E78B;--gain:#8FD08A;--loss:#E88A72;--line:#34422A;--line-soft:#27331F;color-scheme:dark}
 *{box-sizing:border-box}
@@ -15,14 +15,14 @@ header.masthead{padding:30px 0 20px;border-bottom:1px solid var(--line)}
 .theme-toggle:hover{color:var(--gold);border-color:var(--gold)}
 .hero{padding:26px 4px 6px}
 .hero-label{font-size:12px;color:var(--paper-dim);text-transform:uppercase;letter-spacing:.08em;margin:0 0 6px}
-.hero-number{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:clamp(36px,9vw,64px);line-height:1;color:var(--gold);letter-spacing:-.01em}
+.hero-number{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:clamp(36px,9vw,64px);line-height:1;color:var(--gold);letter-spacing:-.01em;white-space:nowrap;font-variant-numeric:lining-nums tabular-nums}
 .hero-sub{font-size:13px;color:var(--paper-dim);margin-top:8px}
 .up{color:var(--gain)}.down{color:var(--loss)}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);margin-top:16px;border-top:1px solid var(--line-soft)}
 .stat{padding:14px 10px;border-left:1px solid var(--line-soft);min-width:0}
 .stat:first-child{border-left:0;padding-left:0}
-.stat-lbl{font-size:10.5px;color:var(--paper-faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;line-height:1.25}
-.stat-val{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:17px;word-break:break-word;line-height:1.2}
+.stat-lbl{font-size:10.5px;color:var(--paper-faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;line-height:1.25;white-space:nowrap}
+.stat-val{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:var(--sv,17px);line-height:1.2;white-space:nowrap;font-variant-numeric:lining-nums tabular-nums}
 .main-tabs{display:flex;gap:2px;margin:22px 0 0;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
 .main-tabs::-webkit-scrollbar{display:none}
 .main-tab-btn{background:none;border:0;color:var(--paper-dim);font:inherit;font-size:12.5px;letter-spacing:.02em;padding:12px 18px;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
@@ -509,7 +509,7 @@ html[data-glass="1"] .row-tuju>.mu{color:var(--paper-dim)}
 
 /* Cetak polos laporan (v0.1.074): dokumen #cetak-lap dibuat saat mencetak; warna literal agar tidak ikut tema/kaca */
 #cetak-lap{display:none}
-@page{size:A4;margin:14mm 12mm 16mm;@bottom-left{content:"Tani Keuangan";font:8pt Arial,sans-serif;color:#444}@bottom-right{content:"Halaman " counter(page) " dari " counter(pages);font:8pt Arial,sans-serif;color:#444}}
+@page{size:A4;margin:14mm 12mm 16mm;@bottom-left{content:"Buku Kebun";font:8pt Arial,sans-serif;color:#444}@bottom-right{content:"Halaman " counter(page) " dari " counter(pages);font:8pt Arial,sans-serif;color:#444}}
 @page rincian{size:A4 landscape}
 @media print{
   html.cetak-lap body>*:not(#cetak-lap){display:none!important}
@@ -791,3 +791,78 @@ textarea{resize:vertical;min-height:96px;line-height:1.5;display:block}
 /* Penampil foto (nota dan jurnal): latar gelap tetap di mode kaca; tombol bilah tidak melebar */
 html[data-glass="1"] .dm-lapis.nota-lihat{background:rgba(0,0,0,.9)}
 .foto-lihat .fl-bar .btn{flex:0 0 auto;width:52px;min-width:52px;padding:10px 0}
+
+/* ---------- Kartu hero Beranda, perbaikan (v0.1.099) ---------- */
+/* ringkasan Modal/Hasil/R/C disusun ke bawah bila tidak muat dalam tiga kolom (layar sempit atau angka besar) */
+.stats.tumpuk{grid-template-columns:1fr}
+.stats.tumpuk .stat{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-left:0;border-top:1px solid var(--line-soft);padding:10px 4px}
+.stats.tumpuk .stat:first-child{border-top:0}
+.stats.tumpuk .stat-lbl{margin:0}
+/* label bulan sejajar dengan titik datanya */
+@media screen and (min-width:1100px){body[data-hal="beranda"] .hero-spark-lbl:not([hidden]){display:block;position:relative;height:14px}}
+.hero-spark-lbl .a,.hero-spark-lbl .m,.hero-spark-lbl .z{position:absolute;top:0;white-space:nowrap}
+.hero-spark-lbl .a{left:0}.hero-spark-lbl .z{right:0}.hero-spark-lbl .m{transform:translateX(-50%)}
+
+
+/* v0.1.100 — Catatan cepat Jurnal (docs/JURNAL.md bagian 6) */
+.jr-cepat .seg{flex-wrap:wrap;gap:6px;justify-content:flex-start}
+.jr-cepat .seg.sm .btn{flex:0 0 auto;min-height:40px;padding:6px 10px;font-size:12px;white-space:nowrap}
+.toast{width:max-content;max-width:calc(100vw - 24px);text-align:center;box-sizing:border-box}
+.toast .toast-btn{margin-left:10px}
+
+/* v0.1.103 — foto kecil di laporan perjalanan siklus */
+@media print{
+  #cetak-lap .ct-foto{display:flex;flex-wrap:wrap;gap:4pt;margin-top:3pt}
+  #cetak-lap .ct-foto img{display:block;height:62pt;width:auto;max-width:120pt;object-fit:cover;border:.5pt solid #666}
+  #cetak-lap .ct-tab td h2{display:none}
+}
+
+/* v0.1.104 — empat chip di tab Siklus: 2 × 2 di HP, satu baris di layar lebar */
+.seg.empat{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (min-width:600px){.seg.empat{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+/* ===== Layar Akun dan label status sinkron (v0.1.107, Fase 6F Tahap 1) ===== */
+.sk-chip{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:11.5px;line-height:1;padding:5px 11px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--paper-dim);white-space:nowrap;vertical-align:middle}
+.sk-chip::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;flex:0 0 auto}
+button.sk-chip{position:relative;cursor:pointer;margin-left:8px}
+button.sk-chip::after{content:"";position:absolute;inset:-8px -4px}
+button.sk-chip:hover,button.sk-chip:focus-visible{border-color:var(--gold);color:var(--paper)}
+.sk-ok{color:var(--gain);border-color:var(--gain)}
+.sk-sibuk{color:var(--gold);border-color:var(--gold)}
+.sk-offline{color:var(--paper-dim);border-style:dashed}
+.sk-gagal{color:var(--loss);border-color:var(--loss)}
+.sk-sandi{display:flex;gap:8px;align-items:flex-end}
+.sk-sandi .sk-f{flex:1;min-width:0}
+.sk-mata{width:44px;height:42px;padding:0;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.sk-mata svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sk-mata[aria-pressed="true"]{color:var(--gold);border-color:var(--gold)}
+.sk-kuat{height:4px;border-radius:2px;background:var(--line-soft);margin-top:8px;overflow:hidden}
+.sk-kuat i{display:block;height:100%;width:0;transition:width .15s}
+.sk-k1{background:var(--loss)}.sk-k2{background:var(--gold)}.sk-k3{background:var(--fill)}
+.sk-setuju{display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-size:12.5px;line-height:1.55;color:var(--paper-dim);text-transform:none;letter-spacing:0;cursor:pointer}
+.sk-setuju input{-webkit-appearance:none;appearance:none;width:22px;height:22px;flex:0 0 auto;margin:1px 0 0;padding:0;border:1px solid var(--line);border-radius:6px;background:var(--ink);position:relative;cursor:pointer}
+.sk-setuju input:checked{background:var(--fill);border-color:var(--gold)}
+.sk-setuju input:checked::after{content:"";position:absolute;left:6px;top:2px;width:6px;height:11px;border:solid var(--on-fill);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+.sk-setuju input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.settings-desc .sk-chip{display:inline-flex;width:fit-content;margin:0 6px 2px 0}
+.sk-lanjut{margin-top:12px;border-top:1px solid var(--line-soft);padding-top:4px}
+.sk-lanjut summary{cursor:pointer;min-height:40px;display:flex;align-items:center;font-size:12.5px;color:var(--paper-dim)}
+
+/* ===== Saklar (toggle) — dipakai Sinkron otomatis (v0.1.108) ===== */
+.sw-wrap{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+.sw-t{font-size:12.5px;color:var(--paper-dim);min-width:34px;text-align:right}
+.sw{position:relative;width:54px;height:30px;padding:0;border:1.5px solid var(--paper-dim);border-radius:999px;background:var(--ink);cursor:pointer;flex:0 0 auto;transition:background .16s,border-color .16s}
+.sw::after{content:"";position:absolute;inset:-6px -2px}
+.sw-kenop{position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;background:var(--paper-dim);transition:transform .16s,background .16s}
+.sw[aria-checked="true"]{background:var(--fill);border-color:var(--gold)}
+.sw[aria-checked="true"] .sw-kenop{transform:translateX(24px);background:var(--ink-raised);box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.sw:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+html[data-glass="1"] .sw:not([aria-checked="true"]){background:rgba(0,0,0,.22);border-color:var(--paper-dim)}
+@media (prefers-reduced-motion:reduce){.sw,.sw-kenop{transition:none}}
+
+/* v0.1.110 — hero: penjelasan R/C; angka sejajar */
+html{font-variant-numeric:tabular-nums}
+.rc-tanya{display:block;background:none;border:0;padding:0;font:inherit;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;text-align:left;color:var(--paper-faint);cursor:pointer;line-height:1.25;white-space:nowrap;margin-bottom:6px;text-decoration:underline dotted;text-underline-offset:3px}
+.rc-tanya:hover,.rc-tanya:focus-visible{color:var(--gold)}
+.rc-info{font-size:12px;line-height:1.5;color:var(--paper-dim);padding:10px 4px 12px;border-top:1px solid var(--line-soft)}
+.rc-info[hidden]{display:none}

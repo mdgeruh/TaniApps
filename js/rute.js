@@ -1,4 +1,4 @@
-/* Tani Keuangan — rute web: tiap halaman punya alamat #nama yang bisa dibuka langsung, dimuat ulang, dan dibagikan (v0.1.077, docs/RUTE.md)
+/* Buku Kebun — rute web: tiap halaman punya alamat #nama yang bisa dibuka langsung, dimuat ulang, dan dibagikan (v0.1.077, docs/RUTE.md)
    Hanya "#nama" dengan huruf, angka, dan tanda hubung (tanpa "#/jalur"), supaya cocok dengan penampil artefak dan hosting statis.
    Halaman tetap dikelola App.go; modul ini hanya menerjemahkan keadaan aplikasi ke hash dan sebaliknya. */
 const Rute = {
@@ -38,7 +38,7 @@ const Rute = {
     if ((m = /^rencana-(\w+)$/.exec(h)) && Rencana.SUB.some((x) => x[0] === m[1])) { Rencana.sub = m[1]; App.go('rencana'); return true; }
     if (h === 'unit' || h === 'komoditas') { Siklus.msub = h === 'unit' ? 'unit' : 'kom'; App.go('master'); return true; }
     if (h === 'siklus') { Siklus.sub = 'berjalan'; App.go('siklus'); return true; }
-    if (h === 'siklus-selesai' || h === 'siklus-agenda') { Siklus.sub = h.slice(7); App.go('siklus'); return true; }
+    if (h === 'siklus-selesai' || h === 'siklus-agenda' || h === 'siklus-jurnal') { Siklus.sub = h.slice(7); App.go('siklus'); return true; }
     if (h === 'siklus-baru') { Siklus.sf = Siklus.sfBaru(); App.go('siklus-form'); return true; }
     if (h === 'catat-modal' || h === 'catat-hasil') { App.draft = { jenis: h === 'catat-hasil' ? 'masuk' : 'keluar' }; App.baru(); return true; }
     if ((m = /^jurnal-(.+)$/.exec(h))) { const s = this.cari(D.siklus, m[1]); if (s) { Siklus.sid = s.id; App.go('jurnal'); return true; } }

@@ -1,4 +1,4 @@
-/* Tani Keuangan — Jurnal siklus, Tahap 1: catatan teks per siklus (v0.1.088, docs/JURNAL.md)
+/* Buku Kebun — Jurnal siklus, Tahap 1: catatan teks per siklus (v0.1.088, docs/JURNAL.md)
    Koleksi akar `jurnal` (id jr_xxxxx). Satu entri satu catatan: { id, siklusId, tanggal, jenis, judul, isi, evaluasi?, dibuat, diubah, terhapus }.
    Siklus berjalan: tambah, ubah, hapus bebas. Siklus selesai: baca-saja, kecuali satu catatan Evaluasi. Tidak memengaruhi uang, panen, atau laporan. */
 const Jurnal = {
@@ -24,14 +24,14 @@ const Jurnal = {
       return '<div class="tx" data-do="jurnal-detail" data-id="' + j.id + '" role="button" tabindex="0" aria-haspopup="dialog"><div class="tx-l"><div class="note">' + Setelan.tgl(j.tanggal) + ' · hari ' + this.hariKe(s, j.tanggal) +
         (j.evaluasi ? ' · <span class="badge">evaluasi</span>' : '') + (j.foto && j.foto.length ? ' · ' + j.foto.length + ' foto' : '') + '</div><div class="tx-n">' + esc(this.judul(j)) + '</div>' + (ket ? '<div class="note">' + esc(ket) + '</div>' : '') + '</div></div>';
     };
-    return '<section><div class="sc-head"><h2 style="margin:0">Jurnal</h2><button type="button" class="btn" data-do="jurnal-linimasa" style="padding:7px 12px;font-size:12px;min-height:40px">Buka linimasa</button></div>' + (L.length ? (semuaOn ? L : L.slice(0, BJ)).map(baris).join('') + lagi(L.length, BJ) +
+    return '<section><div class="sc-head"><h2 style="margin:0">Jurnal</h2><button type="button" class="btn" data-do="jurnal-linimasa" style="padding:7px 12px;font-size:12px;min-height:40px">Buka linimasa</button></div>' + Cepat.chips(s) + (L.length ? (semuaOn ? L : L.slice(0, BJ)).map(baris).join('') + lagi(L.length, BJ) +
         '<p class="note">Ketuk catatan untuk detail' + (jalan ? ', mengubah, atau menghapus' : '') + '.</p>'
       : '<p class="note">Belum ada catatan.' + (jalan ? ' Ketuk tombol + lalu pilih Catat jurnal untuk mencatat perkembangan tanaman, hama, atau perawatan.' : '') + '</p>') +
       (!jalan && !ev ? '<button type="button" class="btn" data-do="jurnal-eval" style="width:100%;margin-top:10px;min-height:44px">Tulis evaluasi</button>' : '') +
       (!jalan ? '<p class="note">Siklus selesai hanya menerima satu evaluasi; catatan lain bisa dibaca saja. Buka kembali untuk menambah catatan.</p>' : '') + '</section>';
   },
   aksi(a, el) {
-    if (a === 'jurnal-detail') { Rencana.dlgBuka('jurnalDetail', el.dataset.id); return true; }
+    if (a === 'jurnal-detail') { if (el.dataset.sid) Siklus.sid = el.dataset.sid; Rencana.dlgBuka('jurnalDetail', el.dataset.id); return true; }
     if (a === 'jurnal-eval') { Rencana.dlgBuka('jurnalEval'); return true; }
     if (a === 'foto-lihat') { const j = this.cari(el.dataset.id); if (j) Foto.lihat(j.foto, +el.dataset.i); return true; }
     return false;
@@ -84,7 +84,7 @@ Object.assign(Rencana.FORM, {
       if (a === 'ubah') { Rencana.dlgTutup(true); Rencana.dlgBuka(j.evaluasi ? 'jurnalEval' : j.jenis === 'tahap' || j.jenis === 'kejadian' || j.jenis === 'ukuran' ? j.jenis : 'jurnal', id); return; }
       if (a !== 'hapus' || !Jurnal.boleh(s, j)) return;
       j.terhapus = true; j.diubah = nowIso(); s.diubah = nowIso(); const batalFoto = Foto.hapusNanti(j);
-      const hal = App.tab === 'jurnal' ? 'jurnal' : 'siklus-detail';
+      const hal = App.tab === 'jurnal' || App.tab === 'siklus' ? App.tab : 'siklus-detail';
       Rencana.dlgTutup(true); App.simpan(); App.go(hal, true); Modal.pulihFokus();
       App.toast(j.evaluasi ? 'Evaluasi dihapus' : 'Catatan dihapus', { label: 'Urungkan', fn: () => { batalFoto(); j.terhapus = false; j.diubah = nowIso(); s.diubah = nowIso(); App.simpan(); if (App.tab === hal) App.go(hal, true); } });
     } }

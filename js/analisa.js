@@ -1,4 +1,4 @@
-/* Tani Keuangan — Fase 3–4: laporan, dashboard, cetak laba-rugi, R/C, HPP, BEP, harga jual minimum (v0.1.014) */
+/* Buku Kebun — Fase 3–4: laporan, dashboard, cetak laba-rugi, R/C, HPP, BEP, harga jual minimum (v0.1.014) */
 const Analisa = {
   dim: 'siklus', per: 'semua',
   PER: [['bulan', 'Bulan ini'], ['tahun', 'Tahun ini'], ['semua', 'Semua']],
@@ -156,7 +156,7 @@ const Analisa = {
   namaPer() { const n = new Date(); return this.per === 'bulan' ? 'Bulan ini (' + this.BLN[n.getMonth()] + ' ' + n.getFullYear() + ')' : this.per === 'tahun' ? 'Tahun ini (' + n.getFullYear() + ')' : 'Semua periode'; },
   cetakKop(judul, baris2) {
     return '<div class="ct-kop"><h1>Laporan Usaha Tani</h1><p class="ct-sub">' + judul + '</p><table class="ct-meta"><tr><th>Periode</th><td>' + this.namaPer() + '</td><th>Dicetak</th><td>' + Setelan.tgl(isoHari()) + '</td></tr>' +
-      '<tr><th>' + baris2[0] + '</th><td>' + baris2[1] + '</td><th>Aplikasi</th><td>Tani Keuangan v' + VERSI + '</td></tr></table></div>';
+      '<tr><th>' + baris2[0] + '</th><td>' + baris2[1] + '</td><th>Aplikasi</th><td>Buku Kebun v' + VERSI + '</td></tr></table></div>';
   },
   cetakRingkasan(k) { // k === false: tanpa kop (dipakai cetakSemua)
     const L = this.hitung(), T = L.reduce((a, r) => ({ m: a.m + r.modal, h: a.h + r.hasil }), { m: 0, h: 0 }), un = T.h - T.m;
@@ -228,17 +228,18 @@ const Analisa = {
       bab(1, 'Ringkasan', this.cetakRingkasan(false)) + bab(2, 'Grafik', this.cetakGrafik(false)) + bab(3, 'Rincian per ' + dim, this.cetakRincian(false), 'ct-rincian-bag');
   },
   cetakPasang() { // dipanggil sebelum mencetak: hanya halaman Laporan yang punya dokumen cetak sendiri
+    if (Perjalanan.aktif) return; // dokumen perjalanan siklus sudah dipasang sendiri
     this.cetakLepas(); if (App.tab !== 'laporan' && App.tab !== 'jurnal') return;
     const d = document.createElement('div'); d.id = 'cetak-lap'; d.className = 'ct-semua'; d.innerHTML = App.tab === 'jurnal' ? Linimasa.cetakDoc() : this.cetakSemua();
     document.body.appendChild(d); document.documentElement.classList.add('cetak-lap');
   },
-  cetakLepas() { const d = document.getElementById('cetak-lap'); if (d) d.remove(); document.documentElement.classList.remove('cetak-lap'); },
+  cetakLepas() { if (typeof Perjalanan !== 'undefined' && Perjalanan.aktif) { Perjalanan.lepas(); return; } const d = document.getElementById('cetak-lap'); if (d) d.remove(); document.documentElement.classList.remove('cetak-lap'); },
   eksporXls() {
     const L = this.hitung(), n = (v) => v === null ? '' : Math.round(v * 100) / 100;
     const h = '<table border="1"><tr><th>Nama</th><th>Modal</th><th>Hasil</th><th>Untung</th><th>R/C</th><th>Panen bersih</th><th>HPP</th><th>Harga rata-rata</th><th>Harga min</th><th>BEP (satuan)</th></tr>' +
       L.map((r) => '<tr><td>' + esc(r.nama) + '</td>' + [r.modal, r.hasil, r.untung, r.rc, r.qty, r.hpp, r.harga, r.hmin, r.bep].map((v) => '<td>' + n(v) + '</td>').join('') + '</tr>').join('') + '</table>';
     const blob = new Blob(['\ufeff<html><head><meta charset="utf-8"></head><body>' + h + '</body></html>'], { type: 'application/vnd.ms-excel' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'laporan-tani-' + this.per + '-' + this.dim + '.xls';
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'laporan-buku-kebun-' + this.per + '-' + this.dim + '.xls';
     document.body.appendChild(a); a.click(); a.remove();
   },
   /* ---------- grafik garis halus + tooltip (v0.1.014) ---------- */

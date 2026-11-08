@@ -1,4 +1,4 @@
-/* Tani Keuangan — Tahap pertumbuhan (Fase 6E Tahap 3, v0.1.090): daftar bawaan per komoditas, tahap sekarang, saran, bilah (docs/JURNAL.md bagian 6) */
+/* Buku Kebun — Tahap pertumbuhan (Fase 6E Tahap 3, v0.1.090): daftar bawaan per komoditas, tahap sekarang, saran, bilah (docs/JURNAL.md bagian 6) */
 const Tahap = {
   /* [kode, nama, persen umur panen saat tahap dimulai] */
   TABEL: {
