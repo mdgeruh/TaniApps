@@ -1,7 +1,7 @@
 {
-  "name": "Tani Keuangan",
-  "short_name": "Tani Keuangan",
-  "description": "Catat dan analisa keuangan pertanian rumahan",
+  "name": "Buku Kebun",
+  "short_name": "Buku Kebun",
+  "description": "Buku Kebun: manajemen pertanian rumahan, dari keuangan dan jurnal siklus sampai jadwal kegiatan",
   "lang": "id",
   "start_url": "./index.html",
   "scope": "./",

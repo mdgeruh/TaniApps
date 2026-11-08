@@ -1,5 +1,216 @@
 # Changelog
 
+## v0.1.110 — 2026-11-08
+Butir kecil: hero (selisih periode setara, notasi ringkas, penjelasan R/C, uji tangkapan layar) dan angka sejajar. Rincian di `docs/HERO.md`.
+
+### Diubah
+- **Selisih di hero kini terhadap periode setara** (tanggal 1 sampai tanggal yang sama bulan lalu, bukan bulan penuh), jadi angkanya adil sejak hari-hari awal bulan. Rentang pembanding ada di `title` baris selisih.
+- **Notasi ringkas** untuk nilai sangat besar: "Rp 12,3 M" (miliar) dan "Rp 1,2 T" (triliun) pada angka utama, Modal, dan Hasil; nilai penuh di `title` dan dihapus saat mode Tersembunyi.
+- **Penjelasan R/C:** ketuk "R/C ratio ⓘ" untuk rumus, acuan (< 1,00 rugi, 1,00–1,29 tipis, ≥ 1,30 sehat), dan status angka saat ini.
+- **Angka sejajar:** `font-variant-numeric: tabular-nums` global.
+- `js/app.js` (`rpRingkas`, `heroIsi`, handler klik, versi), `index.dev.html`, `css/style.css`, `sw.js` (`buku-kebun-v0_1_110`), `index.html`, `buku-kebun.html` (hasil build), `docs/HERO.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Ditambahkan
+- `tools/uji-hero.py`: uji otomatis dan tangkapan layar kartu hero (4 skenario × lebar 320/360/390/1440; 41 pemeriksaan).
+
+### Roadmap
+- **PWA di hosting HTTPS dan di HP** dicentang: dikonfirmasi pengguna (dipasang dari Vercel dan jalan di HP).
+- Saran hero: periode setara, notasi miliaran, penjelasan R/C, dan uji tangkapan layar dicentang; **chip periode dan anggaran di hero dibatalkan** (hero cukup angka utama); sparkline interaktif dan cache agregat tetap terbuka.
+
+### Catatan
+- Diuji di Chromium headless: 41 pemeriksaan hero; semua halaman tanpa galat JavaScript dan tanpa overflow di 390 dan 1440 px. Belum diuji di pembaca layar.
+
+## v0.1.109 — 2026-11-08
+Pilihan nyala/mati dua tombol diganti saklar. Aturan di `docs/STYLE.md` (bagian Saklar).
+
+### Diubah
+- Setelan → Tampilan → **Efek kaca**: tombol Mati/Nyala menjadi saklar (tulisan Mati/Nyala di sebelahnya).
+- Setelan → Preferensi → **Angka untung saat dibuka**: tombol Tampil/Tersembunyi menjadi saklar (nyala = angka rupiah disamarkan; tulisan Tampil/Tersembunyi di sebelahnya). Teks bantuan disesuaikan ("Nyalakan agar…").
+- Saklar memakai gaya `.sw` yang sama dengan Sinkron otomatis (`role="switch"`, `aria-checked`, `aria-label`, area ketuk ±40 px); bisa dengan Spasi atau Enter, dan fokus keyboard tetap di saklar setelah halaman digambar ulang. Nilai pengaturan tidak berubah (`kaca` dan `sembunyi` tetap true/false), jadi pilihan yang sudah tersimpan tetap berlaku.
+- `js/setelan.js` (`saklar()`, penanganan klik), `js/app.js` (versi), `sw.js` (`buku-kebun-v0_1_109`), `index.html`, `buku-kebun.html` (hasil build), `docs/STYLE.md`, `docs/SETELAN.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Tidak diubah (sengaja)
+- Pilihan dua tombol yang bukan nyala/mati dibiarkan sebagai tombol pilihan: Skema (Hijau Padi / Emas Klasik), Format tanggal, Rentang tren (6 / 12 bulan), Masuk / Buat akun, Unit / Komoditas, dan Modal / Hasil di formulir catat. Pilihan tiga opsi atau lebih (Mode, Ukuran tampilan, Ingatkan catatan jurnal) juga tetap. Kotak centang persetujuan sinkron tetap kotak centang.
+- Sinkron otomatis sudah berupa saklar sejak v0.1.108.
+
+### Catatan
+- Diuji di Chromium 390 px: kedua saklar muncul, tombol lama hilang, klik/Spasi/Enter bekerja, efek kaca dan penyamaran angka berlaku, pilihan tersimpan setelah muat ulang, lebar halaman tidak melebar, tanpa galat JavaScript. Dipindai seluruh halaman dan modal Rencana: tidak ada pasangan nyala/mati dua tombol lain. Belum diuji di HP sungguhan.
+
+## v0.1.108 — 2026-11-08
+Sinkron otomatis memakai saklar (toggle) biasa, bukan dua tombol Aktif/Mati.
+
+### Diubah
+- Setelan → Akun dan sinkron → **Sinkron otomatis**: dua tombol "Aktif" dan "Mati" diganti satu saklar (`role="switch"`, `aria-checked`) dengan tulisan Aktif/Mati di sebelahnya. Aktif = jalur hijau dengan kenop di kanan; mati = jalur berbingkai dengan kenop di kiri, jelas terlihat di tema terang, gelap, dan efek kaca (sebelumnya status tombol hampir tidak terbaca pada efek kaca).
+- Mengetuk saklar langsung berlaku tanpa menggambar ulang halaman, sehingga fokus keyboard tetap di saklar; Spasi dan Enter juga bisa. Area ketuk ±40 px. Menyalakan saklar langsung menjadwalkan sinkron; pilihan tersimpan setelah muat ulang.
+- `js/sinkron.js`, `css/style.css` (kelas `.sw`, bisa dipakai pilihan hidup/mati lain), `js/app.js` (versi), `sw.js`, `index.html`, `buku-kebun.html` (hasil build), `docs/AKUN.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Pilihan hidup/mati lain di Setelan (misalnya Efek kaca Mati/Nyala dan Angka untung Tampil/Tersembunyi) masih berupa dua tombol; saklar `.sw` siap dipakai bila ingin diseragamkan.
+- Diuji di Chromium (HP): ketuk, Spasi, Enter, penyimpanan, muat ulang, dan tangkapan layar tema terang, gelap, serta gelap + kaca; tanpa galat JavaScript.
+
+## v0.1.107 — 2026-11-08
+Fase 6F Tahap 1: Layar Akun (Masuk dan Buat akun) dengan mode lokal sebagai bawaan. Rancangan: docs/AKUN.md.
+
+### Ditambahkan
+- **Layar Akun** (modal): Masuk, Buat akun (kata sandi minimal 8 karakter, indikator kekuatan, kotak persetujuan), dan Cek email bila server meminta konfirmasi. Tombol tampil/sembunyi kata sandi, `autocomplete` yang benar, Enter mengirim, jebakan Tab, Esc dan Kembali menutup.
+- **Label status di header** (tombol): Mode lokal, Menyinkronkan…, Tersinkron HH:MM, Belum sinkron, Gagal sinkron, Menunggu internet. Ketuk untuk membuka Layar Akun atau Setelan.
+- **Pesan galat berbahasa Indonesia** (`Sinkron.galatId`) untuk sandi salah, email belum dikonfirmasi, sudah terdaftar, batas kecepatan, server bermasalah, dan tanpa jaringan; validasi email dan kata sandi di klien.
+- `docs/AKUN.md` (rancangan, keadaan, pesan, keamanan); Fase 6F di roadmap (Tahap 1–6).
+
+### Diubah
+- Kartu Setelan "Sinkron cloud (opsional)" menjadi **Akun dan sinkron**: tanpa akun menampilkan Mode lokal dengan tombol Masuk dan Buat akun; alamat proyek dan kunci pindah ke bagian **Lanjutan (untuk pengelola)** dengan tombol Pakai bawaan aplikasi.
+- Keluar kini tombol tersendiri ("Keluar: kembali ke mode lokal; data di perangkat tetap ada").
+- `js/sinkron.js`, `js/app.js` (versi), `css/style.css`, `sw.js`, `index.html`, `buku-kebun.html` (hasil build), `docs/SINKRON.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Diuji dengan server Supabase tiruan di Chromium (HP): validasi, galat server, masuk, status, keluar, penutupan modal, jebakan Tab, tema terang dan gelap + kaca. Belum diuji pada proyek Supabase sungguhan.
+- Kotak centang persetujuan memakai gaya sendiri karena gaya input global menyembunyikan tanda centang bawaan.
+- Tahap 2 (kode 6 angka dan lupa kata sandi) butuh templat email Supabase yang memuat kode.
+
+## v0.1.106 — 2026-11-08
+**Konfigurasi Supabase bawaan.** Rincian di `docs/SINKRON.md`.
+
+### Diubah
+- Setelan → Sinkron cloud kini sudah terisi alamat proyek `https://yvjhovpyopglwlilntdt.supabase.co` dan kunci publishable; pengguna cukup mengisi email dan kata sandi, Daftar (sekali), lalu Masuk. Konfigurasi yang tersimpan pengguna tetap menang atas bawaan; nilai tersimpan yang kosong kembali ke bawaan. Catatan di layar menyesuaikan.
+
+### Catatan
+- Kunci publishable memang publik; perlindungan data ada pada login dan RLS (SQL di `docs/SINKRON.md`). Kunci `service_role`/secret tidak boleh dipakai di kode.
+- Tidak mengubah skema data. Diubah: `js/sinkron.js`, `js/app.js` (versi), `sw.js` (cache `buku-kebun-v0_1_106`), `index.html`, `buku-kebun.html`, `VERSION`, `README.md`, `roadmap.md`, `docs/SINKRON.md`.
+- Diuji di Chromium dengan Supabase tiruan: isian terisi, Masuk memanggil `POST /auth/v1/token?grant_type=password` ke proyek bawaan dengan header `apikey` kunci publishable, galat login tampil, konfigurasi pengguna tidak ditimpa. **Belum diuji ke proyek Supabase sungguhan** (tanpa akses internet di lingkungan ini): keberadaan tabel `tani_data`, kebijakan RLS, dan pengaturan Email perlu dipastikan di dasbor Supabase.
+
+## v0.1.105 — 2026-11-08
+**Fase 7 / Jurnal Tahap 7 (sebagian): performa 1.000+ entri diukur dan aksesibilitas diaudit.** Rincian dan angka di `docs/AUDIT.md`.
+
+### Diperbaiki
+- Tombol pilihan (chip rentang 6/12 bulan, saringan Semua/Siklus, tab Berjalan/Selesai/Agenda/Jurnal, Periode bulanan/tahunan, sub-tab Rencana, dll.) kini diberi `aria-pressed` agar pilihan aktif terbaca pembaca layar, tidak hanya terlihat dari warna. Modul baru `js/aksesibel.js` menyinkronkannya otomatis tiap tampilan berubah; tombol aksi tidak disentuh.
+
+### Diukur (tanpa perubahan kode)
+- 1.500 jurnal + 5.000 transaksi: semua layar di bawah 130 ms; 5.000 jurnal + 20.000 transaksi: di bawah 300 ms, tanpa galat. Linimasa dan Umpan sudah bertahap dan pencarian sudah ditunda, jadi tidak ada optimasi yang diperlukan.
+- Audit aksesibilitas otomatis (14 tampilan + modal, terang/gelap) dan uji keyboard (Enter/Spasi, Escape, focus trap, pengumuman toast, tautan lewati): tidak ada temuan selain tombol pilihan di atas.
+
+### Catatan
+- Tidak mengubah skema data. Berkas baru `js/aksesibel.js`; diubah `index.dev.html`, `index.html`, `buku-kebun.html`, `sw.js` (cache `buku-kebun-v0_1_105`), `js/app.js` (versi), `VERSION`, `README.md`, `roadmap.md`, `docs/AUDIT.md`.
+- Belum diuji: pembaca layar sungguhan, HP berspesifikasi rendah, pembesaran teks 200%, mode kontras tinggi, dan data nyata 1–2 siklus. Data 5,5 MB mendekati batas `localStorage`.
+
+## v0.1.104 — 2026-11-08
+**Fase 6E Tahap 7 (sebagian): umpan Jurnal lintas siklus.** Rincian di `docs/JURNAL.md`.
+
+### Ditambahkan
+- Chip **Jurnal** di tab Siklus (`js/umpan.js`): semua entri jurnal lintas siklus dengan pencarian kata kunci, saringan jenis, 100 entri bertahap, dan modal detail yang sama dengan linimasa. Rute `#siklus-jurnal`.
+
+### Diubah
+- Empat chip tab Siklus tersusun 2 × 2 di HP dan satu baris di layar lebar. Tidak ada perubahan skema data.
+
+## v0.1.103 — 2026-11-08
+**Fase 6E Tahap 6 selesai: laporan perjalanan siklus dan pengalaman lintas siklus.** Rincian di `docs/JURNAL.md`.
+
+### Ditambahkan
+- **Laporan perjalanan siklus** (`js/perjalanan.js`): tombol Cetak perjalanan / Dengan foto di Ringkasan detail siklus. Dokumen cetak polos berisi ringkasan uang dan modal per kategori, tahap, catatan, kejadian, ukuran, panen, kegiatan, dan evaluasi; foto kecil opsional.
+- **Pengalaman lintas siklus** (`js/pengalaman.js`) di modal detail komoditas: panen pertama rata-rata hari ke-N, selisih terhadap umur panen, lama rata-rata tiap tahap, dan tombol Pakai N hari sebagai umur panen (Urungkan tersedia).
+
+### Catatan
+- Tidak mengubah skema data. `js/analisa.js` melewati dokumen cetak lain selama laporan perjalanan aktif.
+
+## v0.1.102 — 2026-11-07
+**Impor data dengan pratinjau dan toast.** Rincian di `docs/IMPOR.md`.
+
+### Diubah
+- **Impor JSON** (Setelan → Data) tidak lagi langsung mengganti data saat berkas dipilih. Pratinjau menampilkan nama dan ukuran berkas, tanggal catatan terbaru, jumlah per koleksi (Sekarang vs Berkas), bagian tidak valid, dan peringatan bila berkas lebih sedikit atau kosong; data baru diganti setelah **Impor dan ganti data**. Berhasil: toast "Impor berhasil: …" dengan **Urungkan**.
+- **Impor CSV** (Lainnya): pratinjau berisi baris terbaca, akan diimpor, dilewati, rentang tanggal, total modal dan hasil, kategori baru, baris tanpa kategori, 5 contoh baris, dan **peringatan baris yang sama persis dengan transaksi yang ada** (mencegah impor ganda). Berhasil: toast dengan Urungkan. Baris kosong tidak lagi dihitung sebagai baris dilewati.
+- **Pulihkan foto dari ZIP**: pratinjau jumlah foto baru, sudah ada, dan tidak valid sebelum dipulihkan; tanpa foto baru hanya toast.
+- Kesalahan impor (JSON tidak valid, format tidak dikenali, kolom CSV hilang) kini juga tampil sebagai toast; berkas JSON dibatasi 20 MB dan CSV 5 MB; kotak berkas dikosongkan agar berkas yang sama bisa dipilih ulang.
+
+### Catatan
+- Tidak mengubah skema data. Modul baru `js/impor.js`; `js/app.js` (`pasangData`, `analisaCsv`, `terapkanCsv`, `batalkanCsv`), `js/setelan.js`, `js/cadanganfoto.js` (hitung tanpa menyimpan), `index.dev.html`, `index.html`, `buku-kebun.html`, `sw.js` (cache `buku-kebun-v0_1_102`), `VERSION`, dan dokumen terkait.
+
+## v0.1.101 — 2026-11-07
+**Keamanan data multi-tab** (Fase 6D). Rincian di `docs/MULTITAB.md`.
+
+### Masalah
+Tab yang terakhir menyimpan menimpa perubahan tab lain tanpa peringatan (PWA terpasang + tab Chrome terbuka bersamaan di HP bisa menghapus catatan secara diam-diam).
+
+### Diperbaiki
+- **Gabung 3 arah per entri saat menyimpan:** bila `localStorage` sudah diubah tab lain sejak data dimuat, hasilnya digabung (dasar, tab ini, isi sekarang) alih-alih ditimpa. Bentrok pada entri yang sama: `diubah` terbaru menang. Hapus lunak tersebar; hapus keras (mis. hapus data contoh) tidak dihidupkan kembali oleh tab basi.
+- **Pembaruan langsung:** `storage` event (serta `visibilitychange` dan `pageshow` untuk tab yang ditangguhkan) menggabung data tab lain ke memori dan menyegarkan tampilan. Saat modal terbuka atau kursor di kolom isian, tampilan ditunda agar isian tidak hilang.
+- **Penggantian sengaja tidak digabung:** impor JSON, pulihkan cadangan, hapus semua data, dan ambil dari cloud memakai `simpan(true)`.
+- **Toast bersamaan bertumpuk** (sebelumnya saling menimpa di posisi yang sama).
+
+### Catatan
+- Diuji di Chromium dengan beberapa tab satu konteks (16 pemeriksaan, tiga kali berturut-turut stabil): penerimaan lewat storage event, tab basi menyimpan (a1 + b2 + b1 utuh), bentrok entri sama, B lebih baru menang, hapus lunak tersebar, hapus data contoh tidak hidup lagi, formulir terisi tidak rusak, hapus semua (timpa), simpan biasa 2.500 transaksi 12 ms tanpa gabung, gabung 2.500 transaksi ±20–70 ms, tanpa galat JavaScript. Uji Catat cepat (26 pemeriksaan) tetap lolos.
+- **Batas:** `localStorage` tidak atomik; dua tab yang menyimpan dalam beberapa milidetik yang sama masih bisa saling menimpa (Chrome menyebarkan isi antar-proses secara asinkron). **Belum diuji** pada PWA terpasang di HP bersama tab Chrome.
+- Berkas: `js/app.js`, `js/sinkron.js` (ambil dari cloud = timpa), `sw.js` (cache `buku-kebun-v0_1_101`), `docs/MULTITAB.md` (baru), `README.md`, `roadmap.md`, `VERSION`, `index.html`, `buku-kebun.html` (hasil build).
+
+## v0.1.100 — 2026-11-07
+**Catat cepat Jurnal** (Fase 6E Tahap 7, sebagian). Rincian di `docs/JURNAL.md` bagian "Catatan cepat".
+
+### Ditambahkan
+- **Chip Catat cepat** di bagian Jurnal pada detail siklus berjalan dan di Linimasa: satu ketukan membuat catatan kegiatan hari ini (jurnal `kegiatan`, `cepat:true`). Chip mengikuti komoditas: Sayur daun/Cabai (Siram, Pupuk, Semprot, Penyiangan, Pindah tanam), Tomat, Lele, Ayam petelur, dan daftar Umum. Tombol **+ Catatan lain** membuka formulir lengkap.
+- Toast **Dicatat: nama** dengan **Urungkan** dan **Tambah detail** (membuka Ubah catatan untuk isi atau foto).
+- **Setelah menandai jadwal selesai**, toast menawarkan **Tambah catatan** (membuka Ubah catatan untuk entri kegiatan yang baru dibuat) di samping Urungkan.
+- Modul baru `js/cepat.js`; ketukan ganda pada chip yang sama dalam 2,5 detik diabaikan; Urungkan memakai hapus lunak agar sinkron konsisten.
+
+### Diperbaiki
+- **Toast menyempit setengah layar** (tombol dan teks bertumpuk) karena `left: 50%` pada elemen fixed membatasi lebar; kini `width: max-content` dengan batas lebar layar. Berlaku untuk semua toast.
+- `App.toast` kini menerima satu tombol (seperti sebelumnya) atau daftar tombol; toast dengan dua tombol tampil 6,5 detik.
+
+### Catatan
+- Diuji di Chromium (HP 390/320/360 px dan desktop 1440 px): 26 pemeriksaan lolos — chip per komoditas, entri hari ini, Urungkan, Tambah detail, + Catatan lain, ketukan ganda, linimasa, tawaran setelah jadwal selesai (Urungkan tetap menghapus entrinya), siklus mulai di masa depan dan siklus selesai tanpa chip, validasi impor, tanpa luapan mendatar, toast muat di 320 px, tanpa galat JavaScript.
+- **Belum diuji di HP sungguhan.** Chip tidak bisa diubah pengguna; di layar ≤360 px chip tersusun tiga baris.
+- Berkas: `js/cepat.js` (baru), `js/app.js` (toast, versi), `js/jadwal.js`, `js/jurnal.js`, `js/linimasa.js`, `js/siklus.js`, `index.dev.html`, `css/style.css`, `sw.js` (cache `buku-kebun-v0_1_100`), `docs/JURNAL.md`, `docs/DATA-SCHEMA.md`, `README.md`, `roadmap.md`, `VERSION`, `index.html`, `buku-kebun.html` (hasil build).
+
+## v0.1.099 — 2026-11-07
+Perbaikan kartu hero di Beranda (rincian di `docs/HERO.md`) dan daftar saran optimasi di roadmap.
+
+### Diperbaiki
+- **Angka terpecah di layar sempit.** Di 320–360 px, nilai Modal/Hasil terpecah ke dua atau tiga baris ("Rp" di satu baris, angka di baris lain, bahkan terputus di tengah angka) dan tingginya tidak sama antar kolom; angka utama juga pecah setelah "Rp" untuk nilai miliaran. Kini angka tidak pernah putus: angka utama dikecilkan hingga muat; ringkasan dikecilkan (17→14 px) dan, bila tetap tidak muat, disusun ke bawah. Dihitung ulang saat ukuran berubah, font selesai dimuat, atau mode Tersembunyi diganti.
+- **Margin yang menyesatkan.** "margin -9876443%" (tanpa pemisah ribuan, tanda hubung) diganti "< −999%"; modal tanpa hasil menampilkan "belum ada hasil" (sebelumnya "margin —"); tanda minus memakai "−".
+- **Selisih bulan lalu.** Disembunyikan selama bulan ini belum punya transaksi (sebelumnya "▼ Rp … dibanding bulan lalu" pada hari pertama bulan, padahal membandingkan dengan bulan penuh).
+- **Label sparkline di desktop** kini tepat di bawah titik datanya (label tengah sebelumnya di 50%, titik datanya di 60%).
+
+### Diubah
+- **Aksesibilitas:** kartu berlabel, ringkasan `role="group"`, tombol mata memakai `aria-pressed` dan judul yang berganti, teks pembaca layar "naik/turun" pada selisih, `aria-label` sparkline kini menjelaskan arah tren.
+- **Performa:** hero hanya dihitung bila kartu terlihat (tab Beranda) dan deret 6 bulan dihitung sekali. Dengan 6.000 transaksi, `ringkas()` di halaman selain Beranda turun dari 3,0 ke 1,1 ms; di Beranda tetap.
+- Angka hero dan ringkasan memakai angka lurus lebar tetap (`tabular-nums`) agar tidak bergeser.
+- `js/app.js` (`heroIsi`, `fitHero`, `ringkas`), `index.dev.html`, `css/style.css`, `sw.js` (cache `buku-kebun-v0_1_099`), `index.html`, `buku-kebun.html` (hasil build), `docs/HERO.md` (baru), `README.md`, `roadmap.md` (8 saran optimasi hero), `VERSION`.
+
+### Catatan
+- Diuji di Chromium headless: lebar 320, 360, 390, 768, 1440 dengan data contoh, untung miliaran, rugi miliaran, dan nol (angka satu baris, ringkasan tidak putus), perubahan ukuran 1440→390, mode Tersembunyi, margin dan selisih, label sparkline, atribut aksesibilitas, 5 lebar × 8 kombinasi tema/kaca tanpa overflow, tanpa galat JavaScript. Belum diuji di HP sungguhan atau pembaca layar.
+- Kartu hero di layar sangat sempit (320 px) kini lebih tinggi bila ringkasan disusun ke bawah (±60 px); itu pilihan agar angka tetap utuh.
+
+## v0.1.098 — 2026-11-07
+Label versi hanya tampil di kartu **Tentang** pada Setelan.
+
+### Diubah
+- Header tidak lagi menampilkan nomor versi (HP dan desktop): baris di bawah judul kini hanya berisi tagline **Manajemen pertanian** (ditambah status sinkron bila sedang masuk akun). Elemen `#versi` dan pengisinya di `js/app.js` dihapus.
+- Nomor versi tetap bisa dilihat di **Setelan → Tentang → Versi**.
+- `index.dev.html`, `js/app.js`, `sw.js` (nama cache `buku-kebun-v0_1_098`), `index.html`, `buku-kebun.html` (hasil build), `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Kop laporan cetak dan Laporan Jurnal tetap mencantumkan "Aplikasi Buku Kebun v…" agar cetakan bisa ditelusuri ke versinya; beri tahu bila ingin dihapus juga.
+- Diuji di Chromium (HP 390 px dan desktop 1440 px) pada 7 halaman: tidak ada nomor versi di header atau kartu hero, kartu Tentang menampilkan versi, tanpa galat JavaScript.
+
+## v0.1.097 — 2026-11-07
+Ganti nama aplikasi: **Tani Keuangan** menjadi **Buku Kebun**, tagline **Manajemen pertanian**.
+
+### Alasan
+Cakupan aplikasi sudah melampaui keuangan (jurnal siklus, foto, jadwal, harga pasar, kelayakan), sehingga nama baru mewakili "buku kebun" secara utuh.
+
+### Diubah
+- Nama dan tagline: judul tab, judul di header (**Buku Kebun**), tagline **Manajemen pertanian**, judul halaman (`Transaksi · Buku Kebun`), panduan cepat, baris Versi dan keterangan skema warna di Setelan, kop laporan cetak, dan tulisan kaki halaman cetak.
+- PWA: `manifest.webmanifest` (`name`, `short_name`, `description`) dan nama cache service worker (`buku-kebun-v0_1_097`; cache lama dihapus otomatis saat aktivasi).
+- Nama berkas unduhan: `buku-kebun-YYYY-MM-DD.json`, `.xlsx`, `buku-kebun-transaksi-…csv`, `buku-kebun-jurnal-…csv`, `buku-kebun-foto-….zip`, `laporan-buku-kebun-….xls`; indeks cadangan foto memakai `aplikasi: "buku-kebun"`.
+- Berkas satu halaman kini `buku-kebun.html` (selain `index.html`); folder paket `buku-kebun/`; skrip `bangun-mandiri.py` menyesuaikan. Berkas `tani-keuangan.html` yang lama boleh dihapus.
+- README, roadmap, dan semua dokumen di `docs/` memakai nama baru (entri CHANGELOG sebelumnya dibiarkan sebagai sejarah).
+
+### Tidak diubah (disengaja)
+- Kunci penyimpanan internal (`tani.v1`, `tani.setelan`, `tani.cadangan`, `tani.contoh`, `tani.panduan`) dan basis data foto IndexedDB `tani-nota`, agar data pengguna yang sudah ada tetap terbaca. Berkas ekspor lama (JSON, ZIP foto, CSV) tetap bisa diimpor.
+- Ikon aplikasi dan palet warna.
+
+### Catatan
+- Pengguna yang sudah memasang PWA mungkin masih melihat nama lama di layar utama sampai aplikasi dipasang ulang (nama ikon disimpan oleh sistem saat pemasangan).
+- Alamat hosting dan nama folder di server tidak berubah dengan sendirinya; sesuaikan bila ingin.
+- Diuji di Chromium (HP dan desktop): semua halaman memuat judul benar, unduhan memakai nama baru, data lama terbaca setelah muat ulang, tanpa galat JavaScript.
+
 ## v0.1.096 — 2026-11-07
 Perbaikan: dropdown di modal **Tambah unit** (dan **Ubah unit**) masih dropdown bawaan browser.
 
