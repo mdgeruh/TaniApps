@@ -1,5 +1,5 @@
-/* Tani Keuangan — Fase 1: pencatatan transaksi + efek kaca (v0.1.039) */
-const VERSI = '0.1.096';
+/* Buku Kebun — Fase 1: pencatatan transaksi + efek kaca (v0.1.039) */
+const VERSI = '0.1.110';
 const KUNCI = 'tani.v1';
 const IKON = {
   master: '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><path d="M16.5 13v7M13 16.5h7"/>',
@@ -65,9 +65,45 @@ const Store = {
     return { versi: 1, utang: [], unit: [], komoditas: [], siklus: [], transaksi: [], panen: [], aset: [], kategori: [], jurnal: [],
              pengaturan: { mataUang: 'IDR', bulanMulai: 1 } };
   },
+  /* ---------- keamanan multi-tab (v0.1.101, docs/MULTITAB.md) ----------
+     Tab/PWA lain di perangkat yang sama menulis ke localStorage yang sama. `_dasar` = teks JSON terakhir yang dimuat atau ditulis tab ini.
+     Bila isi localStorage berbeda dari `_dasar` saat menyimpan, tab lain telah mengubah data: gabung 3 arah per entri (dasar, tab ini, isi sekarang)
+     alih-alih menimpa. Entri yang hanya diubah satu pihak diambil dari pihak itu; bila keduanya mengubah, `diubah` terbaru menang (seri: tab ini). */
+  _dasar: null,
+  sama(a, b) { return JSON.stringify(a) === JSON.stringify(b); },
+  stempel(x) { return (x && (x.diubah || x.dibuat)) || ''; },
+  gabungDaftar(D, L, J, n) {
+    const peta = (a) => { const m = {}; (a || []).forEach((x) => { if (x && x.id !== undefined) m[x.id] = x; }); return m; };
+    const md = peta(D), ml = peta(L), mj = peta(J), ids = [], lihat = {};
+    (J || []).concat(L || []).forEach((x) => { if (x && x.id !== undefined && !lihat[x.id]) { lihat[x.id] = 1; ids.push(x.id); } });
+    const out = [];
+    ids.forEach((id) => {
+      const d = md[id], l = ml[id], j = mj[id];
+      if (l && j) {
+        if (this.sama(l, j)) out.push(l);
+        else if (d && this.sama(l, d)) { out.push(j); n.dariLuar++; }
+        else if (d && this.sama(j, d)) out.push(l);
+        else { if (this.stempel(j) > this.stempel(l)) { out.push(j); n.dariLuar++; } else out.push(l); n.konflik++; }
+      } else if (l) { if (d && this.sama(l, d)) n.dariLuar++; else out.push(l); }   // hilang di isi sekarang: dihapus tab lain bila tab ini tidak mengubahnya
+      else if (j) { if (d && this.sama(j, d)) { /* dihapus tab ini */ } else { out.push(j); n.dariLuar++; } }
+    });
+    return out;
+  },
+  gabung3(dasar, lokal, jauh) {
+    const n = { dariLuar: 0, konflik: 0 }, o = {}, skalar = (d, l, j) => (this.sama(l, d) ? j : l);
+    new Set(Object.keys(dasar).concat(Object.keys(lokal), Object.keys(jauh))).forEach((k) => {
+      if (this.KOLEKSI.includes(k)) o[k] = this.gabungDaftar(dasar[k], lokal[k], jauh[k], n);
+      else if (k === 'pengaturan') {
+        const d = dasar[k] || {}, l = lokal[k] || {}, j = jauh[k] || {}, p = {};
+        new Set(Object.keys(d).concat(Object.keys(l), Object.keys(j))).forEach((q) => { const v = skalar(d[q], l[q], j[q]); if (v !== undefined) p[q] = v; });
+        o[k] = p;
+      } else { const v = skalar(dasar[k], lokal[k], jauh[k]); if (v !== undefined) o[k] = v; }
+    });
+    return { data: o, n };
+  },
   muat() {
     try {
-      const m = Penyimpanan.get(KUNCI);
+      const m = Penyimpanan.get(KUNCI); this._dasar = m || null;
       return m ? this.dari(JSON.parse(m)).data : this.kosong();
     } catch (e) { console.error('Gagal memuat data', e); return this.kosong(); }
   },
@@ -97,8 +133,20 @@ const Store = {
     if (!d.pengaturan || typeof d.pengaturan !== 'object' || Array.isArray(d.pengaturan)) d.pengaturan = this.kosong().pengaturan;
     return { data: d, dibuang };
   },
-  simpan(d) {
-    try { Penyimpanan.set(KUNCI, JSON.stringify(d)); } catch (e) { console.error('Gagal menyimpan data', e); }
+  /* timpa = true untuk penggantian sengaja (impor, pulihkan, hapus semua, ambil dari cloud): tanpa gabung. Mengembalikan { data, digabung, n }. */
+  simpan(d, timpa) {
+    const r = { data: d, digabung: false, n: null };
+    try {
+      if (!timpa && !Penyimpanan.terbatas) {
+        const kini = Penyimpanan.get(KUNCI);
+        if (kini && kini !== this._dasar) {
+          const g = this.gabung3(JSON.parse(this._dasar === null ? '{}' : this._dasar), d, JSON.parse(kini));
+          r.data = this.dari(g.data).data; r.digabung = true; r.n = g.n;
+        }
+      }
+      const teks = JSON.stringify(r.data); Penyimpanan.set(KUNCI, teks); this._dasar = teks;
+    } catch (e) { console.error('Gagal menyimpan data', e); }
+    return r;
   }
 };
 
@@ -144,7 +192,21 @@ const App = {
   },
   semuaKat() { return this.kategori('keluar').concat(this.kategori('masuk')); },
   namaKat(id) { const k = this.semuaKat().find((x) => x.id === id); return k ? k.nama : id; },
-  simpan() { this._ak = null; Store.simpan(this.data); Cadangan.otomatis(); Sinkron.tandai(); },
+  simpan(timpa) {
+    this._ak = null; const r = Store.simpan(this.data, timpa === true);
+    if (r.digabung) { this.data = r.data; this.toast('Perubahan dari jendela lain digabung' + (r.n.konflik ? ' (' + r.n.konflik + ' bentrok, yang terbaru dipakai)' : '')); }
+    Cadangan.otomatis(); Sinkron.tandai();
+  },
+  /* Perubahan data oleh tab/PWA lain (v0.1.101): gabung ke data di memori, lalu segarkan tampilan bila tidak sedang mengisi sesuatu */
+  dariLuar() {
+    if (Penyimpanan.terbatas) return;
+    const kini = Penyimpanan.get(KUNCI); if (!kini || kini === Store._dasar) return;
+    let g; try { g = Store.gabung3(JSON.parse(Store._dasar === null ? '{}' : Store._dasar), this.data, JSON.parse(kini)); } catch (e) { return; }
+    this.data = Store.dari(g.data).data; Store._dasar = kini; this._ak = null;
+    const el = document.activeElement, sibuk = (typeof Modal !== 'undefined' && Modal.m) || (el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) && $('app').contains(el));
+    if (!sibuk) this.go(this.tab, true);
+    this.toast('Data diperbarui dari jendela lain' + (sibuk ? '; tampilan menyusul setelah Anda selesai' : ''));
+  },
   jumlah(list, jenis) { return list.filter((t) => t.jenis === jenis).reduce((a, t) => a + t.jumlah, 0); },
   saring() {
     const f = this.filter, bi = bulanIni(), bl = bulanLalu();
@@ -171,26 +233,25 @@ const App = {
     this.data = Store.muat();
     const pertama = Contoh.otomatis();
     if (Penyimpanan.terbatas) { const w = $('peringatan'); w.hidden = false; w.textContent = 'Penyimpanan browser tidak tersedia (halaman dibuka lewat pengelola berkas). Data hanya bertahan selama tab ini tidak ditutup — ekspor CSV/JSON secara berkala, atau buka lewat Chrome dengan alamat file:// agar tersimpan permanen.'; }
-    $('versi').textContent = 'v' + VERSI;
     $('tabs').innerHTML = TAB.map((t) => '<button class="main-tab-btn" data-go="' + t[0] + '">' + ikon(t[0], 'tab-icon') + t[1] + '</button>').join('');
     $('bnav').innerHTML = TAB.map((t) => '<button class="bnav-btn" data-go="' + t[0] + '" title="' + t[1] + '">' + ikon(t[0], 'bnav-icon') + '<span>' + t[1] + '</span></button>').join('') +
       '<button class="bnav-btn rail-set" data-go="setelan" title="Setelan">' + ikon('setelan', 'bnav-icon') + '<span>Setelan</span></button>';
     Setelan.init({
       versi: VERSI,
       ambil: () => this.data,
-      pasang: (o) => { const r = Store.dari(o); Cadangan.catat('Sebelum impor', true); this.data = r.data; this.simpan(); this.go(this.tab, true); return r; },
-      hapus: () => { Cadangan.catat('Sebelum hapus', true); this.data = Store.kosong(); this.simpan(); this.go(this.tab, true); },
+      pasang: (o) => this.pasangData(o),
+      hapus: () => { Cadangan.catat('Sebelum hapus', true); this.data = Store.kosong(); this.simpan(true); this.go(this.tab, true); },
       ubah: () => { this.ringkas(); if (this.tab === 'setelan' || this.tab === 'transaksi' || this.tab === 'beranda') this.go(this.tab, true); }
     });
     Cadangan.init({
       ambil: () => this.data,
-      pulih: (o) => { this.data = Store.dari(o).data; this.simpan(); this.go(this.tab, true); },
+      pulih: (o) => { this.data = Store.dari(o).data; this.simpan(true); this.go(this.tab, true); },
       segar: () => { if (this.tab === 'setelan') this.go('setelan', true); }
     });
     Sinkron.init({
       ambil: () => this.data,
-      terapkan: (o, segarkan) => {
-        this.data = Store.dari(o).data; this._ak = null; Store.simpan(this.data); Cadangan.otomatis();
+      terapkan: (o, segarkan, timpa) => {
+        this.data = Store.dari(o).data; this._ak = null; const r = Store.simpan(this.data, timpa === true); if (r.digabung) this.data = r.data; Cadangan.otomatis();
         if (segarkan) this.go(this.tab, true); else this.ringkas();
       },
       segar: () => { if (this.tab === 'setelan') this.go('setelan', true); }
@@ -198,6 +259,9 @@ const App = {
     Pwa.init({ segar: () => { if (this.tab === 'setelan') this.go('setelan', true); } });
     Setelan.bind($('app'));
     document.addEventListener('click', (e) => this.klik(e));
+    window.addEventListener('storage', (e) => { if (e.key === KUNCI) this.dariLuar(); }); /* tab lain menyimpan */
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) this.dariLuar(); }); /* tab dibuka kembali setelah ditangguhkan */
+    window.addEventListener('pageshow', () => this.dariLuar());
     document.addEventListener('keydown', (e) => {
       const t = e.target;
       if ((e.key === 'Enter' || e.key === ' ') && t && t.matches && t.matches('[role="button"][tabindex]')) { e.preventDefault(); t.click(); }
@@ -231,6 +295,8 @@ const App = {
     $('eye').addEventListener('click', () => { this.buka = !this.buka; this.ringkas(); });
     Rute.awal(); Rute.pasang();
     if (pertama) Panduan.otomatis();
+    if (window.ResizeObserver && $('heroCard')) { let lebar = 0; new ResizeObserver((es) => { const w = Math.round(es[0].contentRect.width); if (w !== lebar) { lebar = w; this.fitHero(); } }).observe($('heroCard')); }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => this.fitHero());
     setTimeout(() => Nota.rapikan(), 4000);
   },
 
@@ -241,6 +307,7 @@ const App = {
     const ed = e.target.closest('[data-edit]');
     if (ed) { this.ubahTx(ed.dataset.edit); return; }
     if (e.target.closest('[data-bu]')) { Rencana.sub = 'utang'; this.go('rencana'); return; }
+    const rcb = e.target.closest('#rcTanya'); if (rcb) { const w = $('rcInfo'); w.hidden = !w.hidden; rcb.setAttribute('aria-expanded', String(!w.hidden)); this.fitHero(); return; }
     if (e.target.closest('[data-bp]')) { Beranda.semua = !Beranda.semua; this.go('beranda', true); return; }
     const fl = e.target.closest('[data-fl]');
     if (fl) { this.filter.lain = !this.filter.lain; this.go('transaksi', true); return; }
@@ -261,9 +328,11 @@ const App = {
       this.go('transaksi', true);
     } else if (e.target.id === 'f_nota') { Nota.pilih(e.target);
     } else if (e.target.id === 'csvFile' && e.target.files[0]) {
-      const r = new FileReader();
-      r.onload = () => { $('csvBox').value = r.result; this.imporCsv(); };
-      r.readAsText(e.target.files[0]);
+      const f = e.target.files[0], r = new FileReader();
+      if (f.size > Impor.MAKSCSV) { this.toast('Berkas terlalu besar (maks. 5 MB)'); e.target.value = ''; return; }
+      r.onload = () => { $('csvBox').value = r.result; this.imporCsv({ nama: f.name, ukuran: f.size }); };
+      r.onerror = () => this.toast('Berkas tidak bisa dibaca');
+      r.readAsText(f); e.target.value = '';
     }
   },
 
@@ -278,45 +347,92 @@ const App = {
     el.textContent = n > 9 ? '9+' : String(n);
     b.title = 'Beranda · ' + n + ' perlu perhatian'; b.setAttribute('aria-label', 'Beranda, ' + n + ' perlu perhatian');
   },
-  ringkas() {
-    const bi = bulanIni();
-    const bln = this.aktif().filter((t) => t.tanggal.slice(0, 7) === bi);
+  /* Kartu hero Beranda (v0.1.099): hanya dihitung bila kartu terlihat; deret 6 bulan dihitung sekali */
+  /* Notasi ringkas untuk angka sangat besar (v0.1.110): Rp 12,3 M (miliar), Rp 1,2 T (triliun) */
+  rpRingkas(n) {
+    const a = Math.abs(n); if (a < 1e9) return rp(n);
+    const [v, s] = a >= 1e12 ? [a / 1e12, ' T'] : [a / 1e9, ' M'];
+    return (n < 0 ? '−' : '') + 'Rp ' + (v >= 100 ? Math.round(v) : v.toFixed(1)).toString().replace('.', ',').replace(/,0$/, '') + s;
+  },
+  heroIsi() {
+    const bi = bulanIni(), h = new Date();
+    const semua = this.aktif(), bln = semua.filter((t) => t.tanggal.slice(0, 7) === bi);
     const modal = this.jumlah(bln, 'keluar'), hasil = this.jumlah(bln, 'masuk'), untung = hasil - modal;
-    const set = (id, v) => { const el = $(id); if (el) el.dataset.val = v; };
-    set('heroNum', rp(untung)); set('stModal', rp(modal)); set('stHasil', rp(hasil));
+    const set = (id, v) => { const el = $(id); if (!el) return; el.dataset.val = this.rpRingkas(v); if (this.rpRingkas(v) !== rp(v)) el.dataset.full = rp(v); else delete el.dataset.full; };
+    set('heroNum', untung); set('stModal', modal); set('stHasil', hasil);
     $('heroNum').className = 'hero-number' + (untung < 0 ? ' rugi' : '');
     $('heroLbl').textContent = untung < 0 ? 'Rugi bulan ini' : 'Untung bulan ini';
-    $('heroSub').innerHTML = bln.length
-      ? bln.length + ' transaksi bulan ini' + (modal > 0 ? ' · margin ' + (hasil ? Math.round(untung / hasil * 100) + '%' : '—') : '')
-      : 'Belum ada transaksi bulan ini';
-    $('stRC').textContent = modal > 0 ? (hasil / modal).toFixed(2).replace('.', ',') : '—';
+    /* margin: tidak bermakna bila belum ada hasil atau nilainya ekstrem */
+    let mg = '';
+    if (bln.length && modal > 0) {
+      if (hasil <= 0) mg = ' · belum ada hasil';
+      else { const m = Math.round(untung / hasil * 100); mg = ' · margin ' + (m < -999 ? '< −999' : m > 999 ? '> 999' : String(m).replace('-', '−')) + '%'; }
+    }
+    $('heroSub').textContent = bln.length ? bln.length + ' transaksi bulan ini' + mg : 'Belum ada transaksi bulan ini';
+    const rc = modal > 0 ? hasil / modal : null;
+    $('stRC').textContent = rc !== null ? rc.toFixed(2).replace('.', ',') : '—';
+    const info = $('rcInfo');
+    if (info) info.textContent = 'R/C = hasil ÷ modal: tiap Rp 1 modal kembali berapa rupiah. Acuan: di bawah 1,00 rugi; 1,00–1,29 tipis; 1,30 ke atas sehat.' +
+      (rc === null ? '' : ' Saat ini ' + rc.toFixed(2).replace('.', ',') + ': ' + (rc >= 1.3 ? 'sehat.' : rc >= 1 ? 'tipis (balik modal, untung kecil).' : 'rugi.'));
+    /* selisih terhadap periode setara: tanggal 1 sampai tanggal yang sama bulan lalu (dipotong ke akhir bulan), bukan bulan penuh */
     const dl = $('heroDelta');
-    if (dl && typeof Beranda !== 'undefined') {
-      const lalu = Beranda.per(bulanLalu());
-      if (!lalu.n) dl.innerHTML = '';
-      else {
-        const d = untung - lalu.u;
-        dl.innerHTML = d === 0 ? 'Sama dengan bulan lalu' : '<span class="' + (d > 0 ? 'up' : 'down') + '">' + (d > 0 ? '▲ ' : '▼ ') + '<span data-mask data-val="' + rp(Math.abs(d)) + '">' + rp(Math.abs(d)) + '</span></span> dibanding bulan lalu';
+    if (dl) {
+      let html = '', tip = '';
+      if (bln.length) {
+        const x = new Date(h.getFullYear(), h.getMonth() - 1, 1);
+        x.setDate(Math.min(h.getDate(), new Date(x.getFullYear(), x.getMonth() + 1, 0).getDate()));
+        const a1 = isoHari(new Date(h.getFullYear(), h.getMonth() - 1, 1)), a2 = isoHari(x);
+        const lama = semua.filter((t) => { const d = t.tanggal.slice(0, 10); return d >= a1 && d <= a2; });
+        if (lama.length) {
+          const d = untung - (this.jumlah(lama, 'masuk') - this.jumlah(lama, 'keluar'));
+          tip = 'Dibanding ' + a1 + ' sampai ' + a2;
+          html = d === 0 ? 'Sama dengan periode sama bulan lalu' : '<span class="' + (d > 0 ? 'up' : 'down') + '"><span aria-hidden="true">' + (d > 0 ? '▲ ' : '▼ ') + '</span><span class="sr-only">' + (d > 0 ? 'naik ' : 'turun ') + '</span><span data-mask data-val="' + rp(Math.abs(d)) + '">' + rp(Math.abs(d)) + '</span></span> dibanding periode sama bulan lalu';
+        }
       }
+      dl.innerHTML = html; if (tip && html) dl.title = tip; else dl.removeAttribute('title');
     }
     const sp = $('heroSpark');
     if (sp && typeof Analisa !== 'undefined') {
-      const T = Analisa.bulanN(6).map((x) => x.h - x.m);
-      sp.toggleAttribute('hidden', !T.some((x) => x));
-      const LB = $('heroSparkLbl'); if (LB) { LB.hidden = !T.some((x) => x); const nb = Analisa.bulanN(6); LB.innerHTML = '<span>' + nb[0].n + '</span><span>' + nb[Math.floor(nb.length / 2)].n + '</span><span>' + nb[nb.length - 1].n + '</span>'; }
-      if (T.some((x) => x)) {
-        const mx = Math.max(1, ...T.map(Math.abs)), W = 300, H = 40, mg = 5;
-        const P = T.map((u, i) => [i * W / (T.length - 1), H / 2 - u / mx * (H / 2 - mg)]);
+      const nb = Analisa.bulanN(6), T = nb.map((x) => x.h - x.m), ada = T.some((x) => x), LB = $('heroSparkLbl');
+      sp.toggleAttribute('hidden', !ada);
+      if (LB) LB.hidden = !ada;
+      if (ada) {
+        const mx = Math.max(1, ...T.map(Math.abs)), W = 300, H = 40, mg2 = 5, N = T.length;
+        const P = T.map((u, i) => [i * W / (N - 1), H / 2 - u / mx * (H / 2 - mg2)]);
         sp.innerHTML = '<line x1="0" y1="' + H / 2 + '" x2="' + W + '" y2="' + H / 2 + '" class="hs-nol" vector-effect="non-scaling-stroke"/>' +
           '<path d="' + Analisa.kurva(P) + '" class="hs-garis" vector-effect="non-scaling-stroke"/>';
+        const lalu = T[N - 2], kini = T[N - 1];
+        sp.setAttribute('aria-label', 'Tren untung bersih ' + N + ' bulan terakhir, ' + nb[0].n + ' sampai ' + nb[N - 1].n + '; bulan ini ' + (kini === lalu ? 'sama dengan bulan lalu' : kini > lalu ? 'lebih tinggi dari bulan lalu' : 'lebih rendah dari bulan lalu'));
+        /* label bulan tepat di bawah titik datanya (awal, tengah, akhir) */
+        const mid = Math.floor(N / 2);
+        if (LB) LB.innerHTML = '<span class="a">' + nb[0].n + '</span><span class="m" style="left:' + (mid * 100 / (N - 1)).toFixed(1) + '%">' + nb[mid].n + '</span><span class="z">' + nb[N - 1].n + '</span>';
       }
     }
+  },
+  /* Muat angka hero ke ruang yang ada: kecilkan angka utama; bila ringkasan Modal/Hasil/R/C tak muat, susun ke bawah */
+  fitHero() {
+    const hc = $('heroCard'); if (!hc || hc.hidden || !hc.offsetWidth) return;
+    const n = $('heroNum'), st = hc.querySelector('.stats'); if (!n || !st) return;
+    n.style.fontSize = '';
+    const dasar = parseFloat(getComputedStyle(n).fontSize);
+    if (n.scrollWidth > n.clientWidth + 1) n.style.fontSize = Math.max(22, Math.floor(dasar * n.clientWidth / n.scrollWidth * 0.98)) + 'px';
+    st.classList.remove('tumpuk'); st.style.removeProperty('--sv');
+    const muat = (q) => [...st.querySelectorAll(q)].every((e) => e.scrollWidth <= e.clientWidth + 1);
+    if (!muat('.stat-lbl')) { st.classList.add('tumpuk'); return; }
+    let sv = 17; // kecilkan huruf angka (maks. sampai 14 px) sebelum menyusun ke bawah
+    while (!muat('.stat-val') && sv > 14) { sv--; st.style.setProperty('--sv', sv + 'px'); }
+    if (!muat('.stat-val')) { st.style.removeProperty('--sv'); st.classList.add('tumpuk'); }
+  },
+  ringkas() {
+    if (this.tab === 'beranda') this.heroIsi();
     const sembunyi = Setelan.get('sembunyi') && !this.buka;
     document.querySelectorAll('[data-mask]').forEach((el) => { el.textContent = sembunyi ? 'Rp ••••••' : el.dataset.val; });
-    $('eye').textContent = sembunyi ? '○' : '◉';
+    document.querySelectorAll('[data-full]').forEach((el) => { if (sembunyi) el.removeAttribute('title'); else el.title = el.dataset.full; });
+    $('eye').textContent = sembunyi ? '○' : '◉'; $('eye').setAttribute('aria-pressed', String(!sembunyi)); $('eye').title = sembunyi ? 'Tampilkan angka' : 'Sembunyikan angka';
     const e2 = $('eye2'); if (e2) { e2.hidden = !(Setelan.get('sembunyi') && this.tab !== 'beranda'); e2.textContent = sembunyi ? '○' : '◉'; e2.setAttribute('aria-pressed', String(!sembunyi)); }
     Samar.terapkan();
     this.lencana();
+    this.fitHero();
   },
 
   /* ---------- navigasi ---------- */
@@ -405,15 +521,15 @@ const App = {
     }[t];
     const h1 = $('hdrJudul'), bk = $('hdrBack'), tag = $('hdrTag');
     if (!J) {
-      h1.innerHTML = 'Tani <em>Keuangan</em>'; h1.removeAttribute('title'); tag.textContent = 'Keuangan pertanian rumahan';
+      h1.innerHTML = 'Buku <em>Kebun</em>'; h1.removeAttribute('title'); tag.textContent = 'Manajemen pertanian';
       bk.hidden = true; bk.removeAttribute('data-go');
-      document.title = 'Tani Keuangan'; this.umumkan('Beranda'); return;
+      document.title = 'Buku Kebun'; this.umumkan('Beranda'); return;
     }
-    h1.textContent = J[0]; h1.title = J[0]; tag.textContent = 'Tani Keuangan';
+    h1.textContent = J[0]; h1.title = J[0]; tag.textContent = 'Buku Kebun';
     bk.hidden = !J[1];
     if (J[1]) { bk.dataset.go = J[1]; bk.setAttribute('aria-label', 'Kembali ke ' + J[2]); bk.title = 'Kembali ke ' + J[2]; }
     else { bk.removeAttribute('data-go'); bk.removeAttribute('title'); }
-    document.title = J[0] + ' · Tani Keuangan';
+    document.title = J[0] + ' · Buku Kebun';
     this.umumkan(J[0]);
   },
 
@@ -555,7 +671,7 @@ const App = {
       '<button class="btn gold" data-do="tambah-kat">Tambah kategori</button></section>' +
       '<section><h2>Ekspor Excel</h2><p class="note">Satu berkas .xlsx berisi lembar Siklus, Transaksi, Panen, Utang dan piutang, Aset, Harga pasar, Jadwal, dan Jurnal (catatan, tahap, kejadian, ukuran). Untung dan R/C memakai rumus Excel. Cadangan yang bisa dipulihkan tetap JSON di Setelan.</p>' +
       '<button class="btn" data-do="ekspor-xlsx" style="width:100%;margin-top:12px">Ekspor Excel (.xlsx)</button><button class="btn" data-do="ekspor-csv-jurnal" style="width:100%;margin-top:8px">Ekspor CSV jurnal</button><div class="note" id="xlsMsg" role="status" aria-live="polite" style="margin-top:8px"></div></section>' +
-      '<section><h2>Ekspor &amp; impor CSV</h2><p class="note">Kolom: tanggal, jenis (keluar/masuk), kategori, siklus, jumlah, catatan. Cadangan penuh (JSON) ada di Setelan.</p>' +
+      '<section><h2>Ekspor &amp; impor CSV</h2><p class="note">Kolom: tanggal, jenis (keluar/masuk), kategori, siklus, jumlah, catatan. Cadangan penuh (JSON) ada di Setelan. Sebelum diimpor, pratinjau ditampilkan dulu.</p>' +
       '<div class="seg tiga" style="margin-top:12px"><button class="btn" data-do="ekspor-csv">Ekspor CSV</button><button class="btn" data-do="impor-csv">Impor teks</button>' +
       '<button class="btn" data-do="berkas-csv">Pilih berkas</button></div>' +
       '<input type="file" id="csvFile" accept=".csv,text/csv" hidden>' +
@@ -568,8 +684,10 @@ const App = {
   toast(t, aksi) {
     const el = document.createElement('div');
     el.className = 'toast'; el.textContent = t; el.setAttribute('role', 'status');
-    if (aksi) { const b = document.createElement('button'); b.type = 'button'; b.className = 'toast-btn'; b.textContent = aksi.label; b.onclick = () => { el.remove(); aksi.fn(); }; el.appendChild(b); }
-    document.body.appendChild(el); setTimeout(() => el.remove(), aksi ? 5000 : 1800);
+    const ada = document.querySelectorAll('.toast').length; if (ada) el.style.marginBottom = ada * 52 + 'px'; /* toast bersamaan bertumpuk, tidak saling menimpa (v0.1.101) */
+    const L = aksi ? (Array.isArray(aksi) ? aksi : [aksi]) : []; /* satu tombol atau beberapa (v0.1.100) */
+    L.forEach((a) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'toast-btn'; b.textContent = a.label; b.onclick = () => { el.remove(); a.fn(); }; el.appendChild(b); });
+    document.body.appendChild(el); setTimeout(() => el.remove(), L.length > 1 ? 6500 : L.length ? 5000 : 1800);
   },
   aksi(a, el) {
     if (a === 'tukar-tgl') { const f = this.filter, x = f.dari; f.dari = f.sampai; f.sampai = x; this.go('transaksi', true); return; }
@@ -649,7 +767,7 @@ const App = {
     try {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv' }));
-      a.download = 'tani-transaksi-' + isoHari() + '.csv';
+      a.download = 'buku-kebun-transaksi-' + isoHari() + '.csv';
       document.body.appendChild(a); a.click(); a.remove();
     } catch (e) {}
     $('csvMsg').textContent = this.aktif().length + ' transaksi diekspor. Jika unduhan tidak mulai, salin teks di kotak.';
@@ -668,26 +786,52 @@ const App = {
     r.push(f); if (r.some((x) => x.trim())) rows.push(r);
     return rows;
   },
-  imporCsv() {
-    const rows = this.urai($('csvBox').value || '');
-    if (rows.length < 2) { $('csvMsg').textContent = 'CSV kosong atau tanpa baris data.'; return; }
+  /* mengganti seluruh data dengan isi berkas (impor JSON, Urungkan impor); data lama dicadangkan otomatis */
+  pasangData(o) { const r = Store.dari(o); Cadangan.catat('Sebelum impor', true); this.data = r.data; this.simpan(true); this.go(this.tab, true); return r; },
+  /* impor CSV (v0.1.102): analisa dulu tanpa mengubah data, tampilkan pratinjau (Impor.csv), baru terapkan */
+  analisaCsv(teks) {
+    const rows = this.urai(teks || '');
+    if (rows.length < 2) return { galat: 'CSV kosong atau tanpa baris data.' };
     const h = rows[0].map((x) => x.trim().toLowerCase()), ix = (n) => h.indexOf(n);
-    if (ix('tanggal') < 0 || ix('jenis') < 0 || ix('jumlah') < 0) { $('csvMsg').textContent = 'Kolom tanggal, jenis, dan jumlah wajib ada.'; return; }
-    let ok = 0, lewat = 0;
-    rows.slice(1).forEach((r) => {
+    if (ix('tanggal') < 0 || ix('jenis') < 0 || ix('jumlah') < 0) return { galat: 'Kolom tanggal, jenis, dan jumlah wajib ada.' };
+    const data = rows.slice(1).filter((r) => r.some((c) => String(c).trim()));
+    const a = { baris: [], lewat: 0, total: data.length, masuk: 0, keluar: 0, dari: '', sampai: '', kategoriBaru: [], tanpaKategori: 0, kembar: 0 }, baru = {};
+    const ada = new Set(this.aktif().map((t) => [t.tanggal, t.jenis, t.jumlah, t.catatan || ''].join('|')));
+    data.forEach((r) => {
       const tgl = (r[ix('tanggal')] || '').trim(), jenis = (r[ix('jenis')] || '').trim().toLowerCase(), jml = angka(r[ix('jumlah')]);
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(tgl) || (jenis !== 'keluar' && jenis !== 'masuk') || jml <= 0) { lewat++; return; }
-      const nama = ix('kategori') >= 0 ? (r[ix('kategori')] || '').trim() : '';
-      let k = this.kategori(jenis).find((x) => x.nama.toLowerCase() === nama.toLowerCase());
-      if (!k && nama) { k = { id: uid('c'), nama, jenis, sifatBiaya: jenis === 'keluar' ? 'variabel' : null, bawaan: false, terhapus: false }; this.data.kategori.push(k); }
-      if (!k) k = this.kategori(jenis).slice(-1)[0];
-      this.data.transaksi.push({ id: uid('t'), tanggal: tgl, jenis, kategoriId: k.id, jumlah: jml, siklusId: null,
-        sifatBiaya: jenis === 'keluar' ? k.sifatBiaya || 'variabel' : null, catatan: ix('catatan') >= 0 ? (r[ix('catatan')] || '').trim() : '',
-        dibuat: nowIso(), diubah: nowIso(), terhapus: false });
-      ok++;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(tgl) || (jenis !== 'keluar' && jenis !== 'masuk') || jml <= 0) { a.lewat++; return; }
+      const nama = ix('kategori') >= 0 ? (r[ix('kategori')] || '').trim() : '', catatan = ix('catatan') >= 0 ? (r[ix('catatan')] || '').trim() : '';
+      a.baris.push({ tgl: tgl, jenis: jenis, jml: jml, nama: nama, catatan: catatan }); a[jenis === 'masuk' ? 'masuk' : 'keluar'] += jml;
+      if (!a.dari || tgl < a.dari) a.dari = tgl; if (!a.sampai || tgl > a.sampai) a.sampai = tgl;
+      if (!nama) a.tanpaKategori++; else if (!this.kategori(jenis).some((x) => x.nama.toLowerCase() === nama.toLowerCase())) baru[jenis + '|' + nama.toLowerCase()] = nama;
+      if (ada.has([tgl, jenis, jml, catatan].join('|'))) a.kembar++;
+    });
+    a.kategoriBaru = Object.keys(baru).map((k) => baru[k]);
+    return a;
+  },
+  terapkanCsv(a) {
+    const ids = [], kat = [];
+    a.baris.forEach((r) => {
+      let k = this.kategori(r.jenis).find((x) => x.nama.toLowerCase() === r.nama.toLowerCase());
+      if (!k && r.nama) { k = { id: uid('c'), nama: r.nama, jenis: r.jenis, sifatBiaya: r.jenis === 'keluar' ? 'variabel' : null, bawaan: false, terhapus: false }; this.data.kategori.push(k); kat.push(k.id); }
+      if (!k) k = this.kategori(r.jenis).slice(-1)[0];
+      const t = { id: uid('t'), tanggal: r.tgl, jenis: r.jenis, kategoriId: k.id, jumlah: r.jml, siklusId: null,
+        sifatBiaya: r.jenis === 'keluar' ? k.sifatBiaya || 'variabel' : null, catatan: r.catatan, dibuat: nowIso(), diubah: nowIso(), terhapus: false };
+      this.data.transaksi.push(t); ids.push(t.id);
     });
     this.simpan(); this.ringkas();
-    $('csvMsg').textContent = ok + ' transaksi diimpor' + (lewat ? ', ' + lewat + ' baris dilewati (format tidak sesuai)' : '') + '.';
+    return { ids: ids, kat: kat };
+  },
+  batalkanCsv(h) { // Urungkan: hapus lunak transaksi dan kategori yang baru dibuat oleh impor itu
+    const n = nowIso();
+    this.data.transaksi.forEach((t) => { if (h.ids.includes(t.id)) { t.terhapus = true; t.diubah = n; } });
+    this.data.kategori.forEach((k) => { if (h.kat.includes(k.id)) { k.terhapus = true; k.diubah = n; } });
+    this.simpan(); this.ringkas(); this.go(this.tab, true);
+  },
+  imporCsv(info) {
+    const a = this.analisaCsv($('csvBox').value || ''), pesan = (t) => { const e = $('csvMsg'); if (e) e.textContent = t; };
+    if (a.galat) { pesan(a.galat); this.toast(a.galat); return; }
+    Impor.csv(a, info, pesan);
   },
   contoh() { Contoh.isi(); }
 };

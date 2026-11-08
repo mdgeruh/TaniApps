@@ -1,4 +1,4 @@
-/* Tani Keuangan — Beranda yang lebih berguna (v0.1.018): perlu perhatian, kas, banding bulan lalu */
+/* Buku Kebun — Beranda yang lebih berguna (v0.1.018): perlu perhatian, kas, banding bulan lalu */
 const Beranda = {
   m(n) { return '<span data-mask data-val="' + rp(n) + '">' + rp(n) + '</span>'; },
   per(k) { const tx = App.aktif().filter((t) => t.tanggal.slice(0, 7) === k); const m = App.jumlah(tx, 'keluar'), h = App.jumlah(tx, 'masuk'); return { m, h, u: h - m, n: tx.length }; },

@@ -1,4 +1,4 @@
-/* Tani Keuangan — Foto nota/bukti transaksi, lokal (v0.1.037).
+/* Buku Kebun — Foto nota/bukti transaksi, lokal (v0.1.037).
    Foto disimpan di IndexedDB browser ini (basis data "tani-nota"), bukan di localStorage, supaya kuota data utama aman.
    Transaksi hanya menyimpan rujukan `notaId`. Foto tidak ikut ekspor JSON, cadangan otomatis, maupun sinkron cloud. */
 var Nota = (function () {

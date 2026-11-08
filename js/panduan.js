@@ -1,4 +1,4 @@
-/* Tani Keuangan — panduan cepat 4 layar, tampil otomatis saat pertama dibuka (v0.1.034) */
+/* Buku Kebun — panduan cepat 4 layar, tampil otomatis saat pertama dibuka (v0.1.034) */
 var Panduan = (function () {
   var KUNCI = 'tani.panduan', i = 0, el = null;
   var IK = {
@@ -10,7 +10,7 @@ var Panduan = (function () {
   function layar() {
     var contoh = typeof Contoh !== 'undefined' && Contoh.ada();
     return [
-      { ik: 'tunas', j: 'Selamat datang di Tani Keuangan', t: ['Catat modal dan hasil kebun, kolam, atau kandang Anda, lalu lihat untung atau ruginya per siklus.',
+      { ik: 'tunas', j: 'Selamat datang di Buku Kebun', t: ['Catat modal dan hasil kebun, kolam, atau kandang Anda, lalu lihat untung atau ruginya per siklus.',
         contoh ? 'Data contoh sudah terisi agar Anda bisa langsung mencoba. Hapus kapan saja lewat Setelan.' : 'Semua data tersimpan di perangkat ini.'] },
       { ik: 'plus', j: 'Catat dengan tombol +', t: ['Ketuk tombol + untuk mencatat modal (pengeluaran) atau hasil (pemasukan). Pilih siklusnya agar biaya dan hasil terhitung per siklus.',
         'Di daftar Transaksi, geser baris ke kiri untuk menghapus; ada tombol Urungkan bila salah.'] },

@@ -1,4 +1,4 @@
-/* Tani Keuangan — mesin modal bersama (v0.1.061, docs/MODAL.md)
+/* Buku Kebun — mesin modal bersama (v0.1.061, docs/MODAL.md)
    Satu mesin untuk semua jendela (juga Panduan cepat dan foto nota, v0.1.076): Rencana (formulir dan detail), Siklus (unit/komoditas), Bayar utang.
    Menangani: role dialog, kunci gulir, Esc, jebakan Tab, Enter menyimpan, klik latar, format Rupiah, penyamaran angka (Samar),
    pesan galat di dalam modal, pengembalian fokus, dan satu entri riwayat browser (tombol kembali menutup modal). */

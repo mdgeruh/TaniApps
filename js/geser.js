@@ -1,4 +1,4 @@
-/* Tani Keuangan — geser ke kiri untuk hapus transaksi, dengan Urungkan (v0.1.032) */
+/* Buku Kebun — geser ke kiri untuk hapus transaksi, dengan Urungkan (v0.1.032) */
 const Geser = {
   r: null, x0: 0, y0: 0, dx: 0, arah: '', baru: 0,
   tutup() { document.querySelectorAll('.tx.geser').forEach((e) => { e.classList.remove('geser'); e.style.transform = ''; }); },

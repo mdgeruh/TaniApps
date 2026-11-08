@@ -1,4 +1,4 @@
-/* Tani Keuangan — Foto jurnal siklus, lokal (v0.1.092, Fase 6E Tahap 4, docs/JURNAL.md)
+/* Buku Kebun — Foto jurnal siklus, lokal (v0.1.092, Fase 6E Tahap 4, docs/JURNAL.md)
    Memakai penyimpanan IndexedDB milik modul Nota (basis data "tani-nota"): foto dikecilkan (1280 px, JPEG) lalu disimpan sebagai blob.
    Catatan jurnal hanya menyimpan rujukan id foto di `jurnal.foto` (maks. 4, id berawalan f_). Foto tidak ikut ekspor JSON, cadangan otomatis,
    maupun sinkron cloud; di perangkat yang tidak punya fotonya, tampil penanda "tidak ada di perangkat ini". */

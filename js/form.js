@@ -1,4 +1,4 @@
-/* Tani Keuangan — form kustom: dropdown dan pemilih tanggal (v0.1.009).
+/* Buku Kebun — form kustom: dropdown dan pemilih tanggal (v0.1.009).
    Elemen asli (select, input date) tetap ada tapi disembunyikan, jadi nilai dan event change tetap bekerja. */
 var Form = (function () {
   var BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];

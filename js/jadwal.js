@@ -1,4 +1,4 @@
-/* Tani Keuangan — jadwal kegiatan per siklus: pupuk, semprot, dsb., sekali atau berulang (v0.1.051, docs/JADWAL.md)
+/* Buku Kebun — jadwal kegiatan per siklus: pupuk, semprot, dsb., sekali atau berulang (v0.1.051, docs/JADWAL.md)
    Disimpan di siklus.jadwal = [{ id, nama, tanggal, ulang, selesai, terakhir }]; ulang = tiap N hari (0 = sekali). */
 const Jadwal = {
   tambahHari(iso, n) { const [y, m, d] = iso.split('-').map(Number); return isoHari(new Date(y, m - 1, d + n)); },
@@ -67,7 +67,8 @@ const Jadwal = {
       const n = nowIso(), rk = { id: uid('jr'), siklusId: s.id, tanggal: hari < s.mulai ? s.mulai : hari, jenis: 'kegiatan', judul: j.nama, isi: '', dibuat: n, diubah: n, terhapus: false };
       Jurnal.semua().push(rk);
       simpan();
-      App.toast(j.selesai ? 'Kegiatan selesai' : 'Dijadwalkan lagi ' + Setelan.tgl(j.tanggal), { label: 'Urungkan', fn: () => { Object.assign(j, JSON.parse(lama)); const i = Jurnal.semua().indexOf(rk); if (i >= 0) Jurnal.semua().splice(i, 1); s.diubah = nowIso(); App.simpan(); App.go(rute, true); } });
+      App.toast(j.selesai ? 'Kegiatan selesai' : 'Dijadwalkan lagi ' + Setelan.tgl(j.tanggal), [{ label: 'Urungkan', fn: () => { Object.assign(j, JSON.parse(lama)); const i = Jurnal.semua().indexOf(rk); if (i >= 0) Jurnal.semua().splice(i, 1); s.diubah = nowIso(); App.simpan(); App.go(rute, true); } },
+        { label: 'Tambah catatan', fn: () => { Siklus.sid = s.id; Rencana.dlgBuka('jurnal', rk.id); } }]); /* v0.1.100 */
     } else if (a === 'jadwal-hapus') {
       const i = s.jadwal.indexOf(j); s.jadwal.splice(i, 1); simpan();
       App.toast('Kegiatan dihapus', { label: 'Urungkan', fn: () => { s.jadwal.splice(i, 0, j); s.diubah = nowIso(); App.simpan(); App.go(rute, true); } });

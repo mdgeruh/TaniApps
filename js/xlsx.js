@@ -1,4 +1,4 @@
-/* Tani Keuangan — ekspor Excel (.xlsx) multi-lembar tanpa pustaka luar (v0.1.054, docs/EKSPOR.md)
+/* Buku Kebun — ekspor Excel (.xlsx) multi-lembar tanpa pustaka luar (v0.1.054, docs/EKSPOR.md)
    Xlsx.buat(lembar) menghasilkan Uint8Array berkas .xlsx (ZIP tanpa kompresi); Xlsx.unduh() mengekspor seluruh data aplikasi. */
 const Xlsx = {
   /* ---------- ZIP (metode simpan, tanpa kompresi) ---------- */
@@ -103,7 +103,7 @@ const Xlsx = {
   /* unduh berkas; kembalikan jumlah lembar yang berisi data */
   unduh() {
     const L = this.lembar(), bytes = this.buat(L), blob = new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'tani-keuangan-' + isoHari() + '.xlsx';
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'buku-kebun-' + isoHari() + '.xlsx';
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
     return L.filter((l) => l.baris.length).length;
   }

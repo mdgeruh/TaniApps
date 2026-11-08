@@ -1,4 +1,4 @@
-/* Tani Keuangan — FAB mengikuti halaman aktif (v0.1.020; Rencana lewat modal v0.1.055) */
+/* Buku Kebun — FAB mengikuti halaman aktif (v0.1.020; Rencana lewat modal v0.1.055) */
 const Fab = {
   c: null, terbuka: false,
   catat(jenis, sid) { App.draft = { id: null, jenis }; App.baru(sid); },

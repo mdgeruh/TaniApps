@@ -1,4 +1,4 @@
-/* Tani Keuangan — Cadangan foto ke ZIP (Fase 6E Tahap 6, v0.1.094; docs/CADANGAN.md)
+/* Buku Kebun — Cadangan foto ke ZIP (Fase 6E Tahap 6, v0.1.094; docs/CADANGAN.md)
    Foto nota dan jurnal hanya di IndexedDB browser ini. ZIP berisi indeks.json + foto/<id>.<jpg|png|webp>, tanpa kompresi (memakai Xlsx.zip). */
 const CadFoto = {
   KUNCI: 'tk-foto-cad', MAKS: 250 * 1048576, MAKSFOTO: 30 * 1048576,
@@ -28,12 +28,12 @@ const CadFoto = {
       berkas.push({ nama: nama, data: new Uint8Array(await r.blob.arrayBuffer()) });
       daftar.push(Object.assign({ id: r.id, berkas: nama, tipe: r.tipe || 'image/jpeg', ukuran: r.ukuran || r.blob.size }, this.meta(r.id)));
     }
-    berkas.unshift({ nama: 'indeks.json', data: JSON.stringify({ versi: 1, aplikasi: 'tani-keuangan', dibuat: new Date().toISOString(), foto: daftar }, null, 1) });
+    berkas.unshift({ nama: 'indeks.json', data: JSON.stringify({ versi: 1, aplikasi: 'buku-kebun', dibuat: new Date().toISOString(), foto: daftar }, null, 1) });
     return { zip: Xlsx.zip(berkas), n: L.length, total: total };
   },
   async ekspor() {
     const r = await this.buat(), a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([r.zip], { type: 'application/zip' })); a.download = 'tani-foto-' + isoHari() + '.zip';
+    a.href = URL.createObjectURL(new Blob([r.zip], { type: 'application/zip' })); a.download = 'buku-kebun-foto-' + isoHari() + '.zip';
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
     Penyimpanan.set(this.KUNCI, JSON.stringify({ ms: Date.now(), n: r.n }));
     return r;
@@ -50,7 +50,7 @@ const CadFoto = {
     }
     return out;
   },
-  async imporBuf(buf) {
+  async imporBuf(buf, kering) { // kering = true: hanya menghitung (pratinjau), tanpa menyimpan
     const L = this.baca(buf), ix = L.find((x) => x.nama === 'indeks.json'); if (!ix) throw new Error('indeks.json tidak ditemukan; ini bukan ZIP cadangan foto.');
     let idx; try { idx = JSON.parse(new TextDecoder().decode(ix.data)); } catch (e) { throw new Error('indeks.json tidak terbaca.'); }
     if (!idx || idx.versi !== 1 || !Array.isArray(idx.foto)) throw new Error('Versi cadangan foto tidak dikenal.');
@@ -60,6 +60,7 @@ const CadFoto = {
       const m = f && /^foto\/([A-Za-z0-9_]{3,40})\.(jpg|png|webp)$/.exec(String(f.berkas || '')), data = m && peta[f.berkas];
       if (!m || m[1] !== f.id || !data || !data.length || data.length > this.MAKSFOTO) { r.lewat++; continue; }
       if (await Nota.ambil(f.id)) { r.ada++; continue; }
+      if (kering) { r.baru++; continue; }
       const tipe = this.TIPE[m[2]]; await Nota.simpan({ id: f.id, blob: new Blob([data], { type: tipe }), tipe: tipe, ukuran: data.length, ms: Date.now() }); r.baru++;
     }
     return r;
@@ -72,9 +73,15 @@ const CadFoto = {
   async impor(file) {
     try {
       if (file.size > this.MAKS + 5242880) throw new Error('Berkas terlalu besar.');
-      const r = await this.imporBuf(await file.arrayBuffer());
-      App.toast(r.baru + ' foto dipulihkan' + (r.ada ? ', ' + r.ada + ' sudah ada' : '') + (r.lewat ? ', ' + r.lewat + ' dilewati' : '')); Foto.isiInfo();
-      if (App.tab) App.go(App.tab, true);
+      const buf = await file.arrayBuffer(), k = await this.imporBuf(buf, true);
+      if (!k.baru) { App.toast('Tidak ada foto baru untuk dipulihkan' + (k.ada ? ': ' + k.ada + ' sudah ada' : '') + (k.lewat ? ', ' + k.lewat + ' dilewati' : '')); return; }
+      Impor.foto(k, { nama: file.name, ukuran: file.size }, async () => {
+        try {
+          const r = await this.imporBuf(buf);
+          App.toast('Impor berhasil: ' + r.baru + ' foto dipulihkan' + (r.ada ? ', ' + r.ada + ' sudah ada' : '') + (r.lewat ? ', ' + r.lewat + ' dilewati' : '')); Foto.isiInfo();
+          if (App.tab) App.go(App.tab, true);
+        } catch (e) { App.toast(e && e.message ? e.message : 'Foto tidak bisa dipulihkan'); }
+      });
     } catch (e) { App.toast(e && e.message ? e.message : 'Foto tidak bisa dipulihkan'); }
   },
   async aksiEkspor() {

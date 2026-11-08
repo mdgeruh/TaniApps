@@ -1,4 +1,4 @@
-/* Tani Keuangan — PWA: pendaftaran service worker dan tombol pasang (v0.1.019) */
+/* Buku Kebun — PWA: pendaftaran service worker dan tombol pasang (v0.1.019) */
 var Pwa = (function () {
   var h = { segar: function () {} }, tawaran = null;
   var layak = /^https?:$/.test(location.protocol);

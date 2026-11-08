@@ -1,4 +1,4 @@
-/* Tani Keuangan — kalkulator kelayakan usaha: NPV, IRR, balik modal, PI (v0.1.053, docs/KELAYAKAN.md)
+/* Buku Kebun — kalkulator kelayakan usaha: NPV, IRR, balik modal, PI (v0.1.053, docs/KELAYAKAN.md)
    Model sederhana: investasi awal, arus kas bersih tetap per periode, nilai sisa di akhir. Tidak memakai data transaksi kecuali tombol isi cepat. */
 const Kelayakan = {
   s: null,
