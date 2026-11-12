@@ -4,7 +4,7 @@
 const Jurnal = {
   semua() { const D = Siklus.d(); return D.jurnal || (D.jurnal = []); },
   cari(id) { return this.semua().find((j) => j.id === id && !j.terhapus) || null; },
-  of(sid) { return this.semua().filter((j) => !j.terhapus && j.siklusId === sid).sort((a, b) => b.tanggal.localeCompare(a.tanggal) || String(b.dibuat).localeCompare(String(a.dibuat))); },
+  of(sid) { return this.semua().filter((j) => !j.terhapus && j.siklusId === sid).sort((a, b) => b.tanggal.localeCompare(a.tanggal) || String(b.dibuat).localeCompare(String(a.dibuat)) || String(b.id).localeCompare(String(a.id))); },
   evaluasiOf(sid) { return this.of(sid).find((j) => j.evaluasi) || null; },
   /* hari ke-N sejak mulai (tanggal mulai = hari ke-1, sama dengan Siklus.hari) */
   hariKe(s, tgl) { const p = (x) => { const a = x.split('-').map(Number); return new Date(a[0], a[1] - 1, a[2]); }; return Math.round((p(tgl) - p(s.mulai)) / 864e5) + 1; },
@@ -31,6 +31,7 @@ const Jurnal = {
       (!jalan ? '<p class="note">Siklus selesai hanya menerima satu evaluasi; catatan lain bisa dibaca saja. Buka kembali untuk menambah catatan.</p>' : '') + '</section>';
   },
   aksi(a, el) {
+    if (a === 'jurnal-detail' && App.tab === 'jurnal' && Linimasa.lebar()) { Linimasa.pilihJ(el.dataset.id); return true; }
     if (a === 'jurnal-detail') { if (el.dataset.sid) Siklus.sid = el.dataset.sid; Rencana.dlgBuka('jurnalDetail', el.dataset.id); return true; }
     if (a === 'jurnal-eval') { Rencana.dlgBuka('jurnalEval'); return true; }
     if (a === 'foto-lihat') { const j = this.cari(el.dataset.id); if (j) Foto.lihat(j.foto, +el.dataset.i); return true; }
