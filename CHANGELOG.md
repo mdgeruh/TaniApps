@@ -1,5 +1,165 @@
 # Changelog
 
+## v0.1.121
+Fase 6D (desktop) Tahap 2: **master–detail** — form catat/ubah transaksi di **panel kanan** pada halaman Transaksi. Dokumen: `docs/DESKTOP.md`.
+
+### Ditambahkan
+- Di layar ≥1100 px pada halaman **Transaksi**, mengetuk baris tabel (atau Catat baru lewat tombol +/`N`) membuka formulir di **panel kanan** tanpa meninggalkan halaman; tabel tetap terlihat dan baris yang sedang diubah disorot (garis aksen di kiri). Tombol Simpan, Simpan & tambah lagi, Duplikat, Batal, Hapus, ganti jenis Modal/Hasil, foto nota, dan opsi pembayaran bekerja sama dengan formulir halaman penuh (memakai kode formulir yang sama).
+- Saat panel terbuka, kartu filter disembunyikan agar tabel tetap lega dan tombol + disembunyikan agar tidak menutupi tombol di panel.
+- **Fokus dan posisi dijaga:** setelah Simpan atau Batal, tabel diperbarui di tempat (tanpa melompat ke atas halaman) dan fokus kembali ke baris yang tadi diubah.
+- **Penjaga perubahan belum tersimpan:** berpindah ke baris lain, Catat baru, atau menutup panel dengan Esc atau tombol ✕ saat ada isian yang diubah menampilkan pertanyaan "Perubahan belum disimpan. Buang perubahan?"; tanpa perubahan, panel langsung tertutup/berganti.
+- **Esc** menutup panel (setelah dropdown atau dialog menangani Esc lebih dulu).
+- Berpindah halaman atau mengecilkan jendela di bawah 1100 px menutup panel dan membuang drafnya; di HP dan tablet kecil tetap halaman penuh seperti sebelumnya.
+
+### Diubah
+- `js/app.js` (`bukaForm`, `renderPanel`, `tutupPanel`, `kotor`, `lanjutBuang`, penyesuaian `go`, `baru`, `ubahTx`), `js/desktop.js` (Esc, perubahan lebar), `index.dev.html` (panel `#txPanel`), `css/style.css`, `sw.js` (`buku-kebun-v0_1_121`), `index.html`, `buku-kebun.html`, `docs/DESKTOP.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Panel adalah panel sisi tetap (tidak mengunci tabel) dan bukan dialog; roadmap "modal menjadi dialog/drawer" untuk jenis formulir lain (Rencana, Siklus, Unit) belum dikerjakan.
+- Pembaruan data dari luar (mis. sinkron) saat panel terbuka hanya menyegarkan tabel, tidak menutup panel atau membuang isian Anda.
+- Pengujian visual menemukan garis aksen baris aktif terulang di setiap sel dan tombol + menimpa tombol Hapus di panel; keduanya diperbaiki sebelum rilis.
+- Diuji di Chromium 1440 px (terang, gelap, terang + kaca): buka lewat klik sel, isian terisi, tabel tidak tertutup panel, simpan memperbarui nilai di tabel dan menutup panel, Esc tanpa perubahan, penjaga perubahan (tolak lalu terima), Batal, tombol ✕, catat baru lewat `N`, simpan baru, Simpan & tambah lagi (panel tetap terbuka dengan form kosong), hapus + Urungkan, ganti jenis, pindah halaman, mengecilkan ke 900 px; di 390 px tetap membuka halaman Catat; rangkaian pilih banyak, pintasan, dan tabel diulang tanpa regresi; tanpa galat JavaScript. Belum diuji di Firefox/Safari, tablet, atau pembaca layar (peran panel `complementary`, judul berlabel; fokus awal ke kolom Jumlah).
+- Belum ada: panel untuk edit Siklus, Unit, dan Rencana; menyimpan draf yang belum selesai saat panel ditutup.
+
+## v0.1.120
+Fase 6D (desktop) Tahap 2: **pilih banyak, hapus massal, dan ikon hapus per baris** di tabel Transaksi. Dokumen: `docs/DESKTOP.md`.
+
+### Ditambahkan
+- **Kolom kotak centang** di tabel (≥1100 px): pilih satu baris, **Shift+klik** untuk memilih rentang, kotak "pilih semua" di header (tanda strip bila sebagian terpilih) untuk semua baris yang tampil. Klik di sel kotak (bukan hanya kotaknya) juga memilih dan tidak membuka form ubah. Spasi pada kotak yang difokus memilih; fokus tetap di kotak setelah tabel digambar ulang.
+- **Bilah pilihan** di atas tabel: jumlah dipilih, **nilai bersih** (hasil dikurangi modal) dari yang dipilih, tombol **Hapus yang dipilih** dan **Batal pilih**. Baris terpilih disorot. Pilihan bertahan saat tabel diurutkan; pilihan yang sudah tidak ada di daftar (mis. setelah filter berubah) dibuang.
+- **Hapus massal** memakai hapus lunak dengan **Urungkan** (5 detik) untuk seluruh kelompok, seperti geser-hapus dan hapus di form. Transaksi yang tertaut utang/piutang yang **sudah ada pembayarannya** dilewati dan dilaporkan ("2 transaksi dihapus, 1 dilewati (sudah ada pembayaran)"); bila semuanya dilewati tidak ada yang dihapus. Penghapusan ikut menghapus catatan utang/piutang tertaut dan Urungkan mengembalikannya (`Utang.ikut`).
+- **Ikon hapus per baris** (tong sampah) di kolom paling kanan: muncul saat baris diarahkan mouse atau difokus keyboard, selalu terlihat di layar sentuh (`hover:none`); menghapus satu transaksi dengan Urungkan.
+
+### Diubah
+- `js/app.js` (`pilihTx`, `pilihSemua`, `hapusTx`, `segarTx`, `pilihUi`, penanganan klik, versi), `css/style.css`, `sw.js` (`buku-kebun-v0_1_120`), `index.html`, `buku-kebun.html`, `docs/DESKTOP.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Pengujian menemukan kotak centang tidak menampilkan tanda centang karena gaya `input` global menimpa tampilan bawaannya; sudah diperbaiki dan diperiksa di terang, gelap, dan terang + kaca.
+- Diuji di Chromium 1440 px: pilih/lepas, klik sel, Shift+klik rentang (2–6 → 5 baris), pilih semua/lepas semua, pilihan bertahan saat urut, hapus 2 lalu Urungkan (75 → 73 → 75), ikon hapus satu baris + Urungkan, transaksi tertaut utang dibayar dilewati (dengan tiruan) dan seluruhnya dilewati, pilihan dibuang setelah filter berubah, Spasi di kotak; di 390 px tidak ada kotak centang dan tetap 8 baris `.tx`; tanpa galat JavaScript. Skenario utang dibayar diuji dengan tiruan fungsi, belum dengan data utang sungguhan.
+- Belum ada: tombol Delete untuk menghapus pilihan, Ctrl+A, pilihan antar halaman daftar ("Tampilkan lebih banyak" hanya memilih baris yang tampil), dan konfirmasi tambahan untuk penghapusan sangat banyak (hanya Urungkan 5 detik).
+- Belum diuji di Firefox/Safari, tablet, atau pembaca layar.
+
+## v0.1.119 — 2026-11-10
+Fase 6D (desktop) Tahap 2: **Transaksi sebagai tabel** di layar lebar. Dokumen: `docs/DESKTOP.md`.
+
+### Ditambahkan
+- Di layar ≥1100 px, halaman **Transaksi** menampilkan **tabel** (Tanggal, Kategori, Siklus, Catatan, Jumlah) menggantikan daftar baris. Filter, pencarian, ringkasan Modal/Hasil/Untung, dan "Tampilkan lebih banyak" tetap sama. Di bawah 1100 px dan di HP tetap daftar baris (termasuk geser untuk hapus); berpindah melewati 1100 px (mis. mengubah ukuran jendela) langsung berganti tampilan.
+- **Urut per kolom:** klik judul kolom untuk mengurutkan; klik lagi membalik arah. Bawaan Tanggal menurun; Tanggal dan Jumlah mulai menurun, kolom teks mulai A–Z. Jumlah diurutkan bertanda (hasil di atas modal). Seri tie-break: tanggal terbaru dulu. Indikator ▲/▼ dan `aria-sort`; fokus keyboard tetap di judul kolom setelah mengurutkan.
+- **Header lengket** (menempel di atas saat menggulir), baris disorot saat diarahkan mouse (`hover:hover`) atau difokus, angka rata kanan.
+- **Keyboard:** tanggal di tiap baris adalah tombol (Tab lalu Enter membuka Ubah transaksi); seluruh baris juga bisa diklik. Tabel diberi nama yang menyebut jumlah catatan untuk pembaca layar.
+- Teks panjang di Siklus dan Catatan dipotong dengan "…" dan teks lengkap muncul sebagai tooltip; tag utang/piutang tertaut dan ikon nota tetap tampil.
+
+### Diubah
+- `js/app.js` (`tabelTx`, `daftarTx`, `urutTx`, klik judul kolom, versi), `js/desktop.js` (ganti tampilan saat lebar melewati 1100 px), `css/style.css`, `sw.js` (`buku-kebun-v0_1_119`), `index.html`, `buku-kebun.html`, `docs/DESKTOP.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Diuji di Chromium 1440 px: 7 baris tampil sebagai tabel; urut tanggal, jumlah (naik/turun), kategori, dan catatan (lewat Enter di judul kolom); filter Modal, pencarian ("Plastik" 2 baris, "zzzz" kosong); klik sel dan Enter pada tanggal membuka Ubah transaksi; header menempel saat menggulir 195 baris; "Tampilkan lebih banyak" bekerja; ganti lebar 900 ⇄ 1300 px; di 390 px tetap 7 baris `.tx`; tanpa galat JavaScript.
+- Pengujian menemukan tombol "Tampilkan lebih banyak" muncul dua kali pada mode tabel; sudah diperbaiki sebelum rilis.
+- Pilihan urutan tidak disimpan setelah muat ulang (kembali ke Tanggal menurun). Belum diuji di Firefox/Safari, layar sentuh besar (tablet ≥1100 px), atau pembaca layar.
+- Belum dikerjakan di Tahap 2: master–detail, dialog/drawer, interaksi mouse (ikon hapus di baris, pilih banyak), dan baris KPI.
+
+## v0.1.118 — 2026-11-10
+Fase 6D (desktop) Tahap 1: **pintasan keyboard**, **ukuran teks grafik dibatasi**, dan **12 bulan bawaan di desktop**. Dokumen: `docs/DESKTOP.md`.
+
+### Ditambahkan
+- **Pintasan keyboard** (`js/desktop.js`, objek `Pintasan`): `N` catat transaksi (membuka pilihan tombol + dan memfokuskan pilihan pertama; di halaman yang tombolnya satu aksi, langsung menjalankannya), `/` cari transaksi (fokus ke kolom cari, atau pindah ke Transaksi lalu fokus), `G` lalu `B`/`T`/`S`/`U`/`L`/`R` pindah ke Beranda, Transaksi, Siklus, Unit dan komoditas, Laporan, Rencana, `,` Setelan, `?` membuka daftar pintasan (tekan lagi untuk menutup). `G` menampilkan petunjuk singkat dan kedaluwarsa dalam 1,5 detik.
+- Pintasan **tidak aktif** saat mengetik di kolom isian, pilihan, atau dropdown kustom, saat dialog terbuka (kecuali `?`), dan bila Ctrl/Alt/Cmd ditekan, sehingga tidak bentrok dengan pintasan browser.
+- **Setelan → Preferensi → Pintasan keyboard**: saklar Nyala/Mati (bawaan Nyala; WCAG 2.1.4 mensyaratkan pintasan satu tombol bisa dimatikan) dan tombol **Lihat daftar**.
+- **Teks grafik dibatasi** (`GrafikFont`): teks di grafik SVG tidak lagi ikut membesar tanpa batas di layar lebar; dibatasi sekitar 1,25× ukuran dasar. Tren hasil/modal di lebar 1440 px: huruf terender **19,6 px → 11,3 px**. Di HP tidak ada perubahan (tidak ada gaya tambahan pada teks).
+- **Tren 12 bulan menjadi bawaan di layar ≥1100 px** (6 bulan di layar lebih kecil); pilihan 6/12 bulan tetap ada.
+
+### Diubah
+- `js/desktop.js` (baru), `js/setelan.js` (pengaturan dan baris `pintasan`), `js/analisa.js` (bawaan rentang), `css/style.css` (`kbd`, `.pn-tab`), `index.dev.html`, `js/app.js` (versi), `sw.js` (`buku-kebun-v0_1_118`), `index.html`, `buku-kebun.html`, `docs/DESKTOP.md`, `docs/SETELAN.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Pembatasan teks dilakukan dengan mengatur ukuran huruf saat tampil dan mengukur ulang saat layar berubah ukuran atau isi halaman berganti, bukan menggambar ulang grafik; hasilnya sama untuk tujuan ini dan tidak mengubah kode pembuat grafik. Ini berbeda dari rancangan awal di roadmap ("ResizeObserver, gambar ulang").
+- Diuji di Chromium 1440 px: semua pintasan dan kombinasi di atas, termasuk tidak aktif saat mengetik, Ctrl+N, dialog terbuka, `G` lalu huruf lain, `G` kedaluwarsa, saklar mati (bertahan setelah muat ulang), dan tombol Lihat daftar; di 390 px tampilan grafik tidak berubah dan bawaan tetap 6 bulan; tanpa galat JavaScript. Belum diuji di Firefox/Safari, keyboard non-QWERTY (tombol `?` dan `/` berada di tempat berbeda pada tata letak lain), atau pembaca layar.
+- Belum dikerjakan di Tahap 1: Laporan dua kolom dan layar 1024–1099 px, serta rata kanan angka di semua daftar.
+
+## v0.1.117 — 2026-11-09
+Audit dan perapian CSS (tanpa perubahan tampilan). Laporan lengkap di `docs/AUDIT-CSS.md`.
+
+### Diperbaiki
+- **Hover tidak lagi menempel di layar sentuh (HP/PWA):** 31 aturan `:hover` dibungkus `@media (hover:hover)` di tempatnya, sehingga urutan kaskade dan tampilan desktop tetap sama.
+- **Mode kontras tinggi:** `@media (forced-colors:active)` (Windows High Contrast) memberi garis tepi sistem pada tombol/tab terpilih, bilah progres, FAB, dan lencana; `@media (prefers-contrast:more)` menegaskan teks sekunder dan garis.
+- **Kode mati dihapus:** `.sc`, `.tblwrap`, `table.ledger` (+ varian kaca), `.m-edit`, `.sk-ok/.sk-sibuk/.sk-offline/.sk-gagal`, token `--glass-th`, dan selektor `.chev` (13 aturan, ±1 KB).
+- **Token z-index** untuk semua lapisan (`--z-*`); tidak ada angka mentah tersisa.
+- `.theme-toggle` langsung 40 px di definisi awalnya (sebelumnya 30 px lalu ditimpa).
+
+### Ditambahkan
+- `tools/audit-css.py`: audit statis (token, hover di luar media, z-index mentah, kelas mati, hex keras, selektor berulang). Kode keluar 1 bila ada pelanggaran.
+- `tools/tangkapan.py`: rekam dan bandingkan tangkapan layar deterministik (waktu dibekukan, angka acak diberi benih) untuk menjaga tampilan saat merapikan CSS.
+- `docs/AUDIT-CSS.md`; bagian baru di `docs/STYLE.md` (sentuh, kontras tinggi, token lapisan, alat).
+
+### Diubah
+- `css/style.css`, `js/app.js` (versi), `sw.js` (`buku-kebun-v0_1_117`), `index.html`, `buku-kebun.html` (hasil build), `docs/STYLE.md`, `docs/AUDIT-CSS.md` (baru), `tools/audit-css.py` (baru), `tools/tangkapan.py` (baru), `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Bukti: 88 tangkapan layar (2 lebar × 4 tema × 11 halaman) dibandingkan dengan sebelum perubahan: nol perbedaan melebihi toleransi (sisa piksel hanya derau data seperti estimasi penyimpanan). Uji fungsi: token z-index, nilai z-index komputasi, hover aktif di desktop dan tidak di perangkat sentuh, outline `forced-colors`, `prefers-contrast` (termasuk Emas gelap), tanpa galat JS.
+- Belum diuji di perangkat sentuh sungguhan, Windows High Contrast sungguhan, atau Safari/Firefox.
+- Tidak dikerjakan (tetap di roadmap): konsolidasi blok CSS yang tersebar, skala font/radius, pengurangan selektor `#id`/`:has()`.
+
+## v0.1.116 — 2026-11-09
+Perbaikan: chip terpilih kurang jelas saat Efek kaca hidup di mode terang.
+
+### Penyebab
+- Dengan efek kaca, chip terpilih (`.btn.on`) memakai lensa kaca bening yang hampir sama dengan chip biasa; yang berbeda hanya warna teks yang sedikit lebih gelap dan bingkai tipis.
+
+### Diubah
+- `css/style.css`: pada efek kaca di mode terang, chip terpilih kini berlatar hijau (atau emas pada skema Emas Klasik) yang jelas, bingkai aksen ganda, dan teks tebal berwarna gelap. Berlaku untuk semua chip dan tombol pilihan (filter Laporan, periode, Skema, tab Masuk/Daftar, dan sebagainya). Mode gelap, dan mode terang tanpa efek kaca, tidak diubah.
+- `js/app.js` (versi), `sw.js` (`buku-kebun-v0_1_116`), `index.html`, `buku-kebun.html`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Diukur dari tangkapan layar Chromium (filter Laporan): kontras teks chip terpilih sekitar 9:1 (Hijau Padi) dan 10:1 (Emas Klasik) pada terang + kaca, jauh di atas batas AA 4,5:1; perbedaan latar dengan chip biasa naik dari hampir tak terlihat menjadi jelas secara visual. Ukuran itu perkiraan dari piksel, bukan alat kontras resmi.
+- Mode gelap + kaca: chip terpilih sudah terbaca lewat warna teks hijau/emas dan latar sedikit lebih terang, tetapi bedanya lebih halus daripada di terang. Tidak diubah karena bukan yang dikeluhkan; bisa dipertegas bila diinginkan.
+- Belum diuji di HP sungguhan.
+
+## v0.1.115 — 2026-11-09
+### Ditambahkan
+- Linimasa **master–detail** di desktop (≥ 1100 px): detail catatan di panel kiri, Ubah/Hapus di panel, Esc menutup.
+- Pintasan **J** untuk Catat jurnal (siklus berjalan) di detail siklus dan linimasa. Tidak ada perubahan data.
+
+## v0.1.114 — 2026-11-09
+### Ditambahkan
+- Tombol **Dengan foto** di linimasa: cetak dengan foto kecil di bawah entri, mengikuti saringan dan urutan layar. Tidak ada perubahan data.
+
+## v0.1.113 — 2026-11-09
+**Cetak Jurnal siklus: P3, P5, P9 Tahap 7B.** Hanya dokumen cetak; tidak ada perubahan data.
+
+### Ditambahkan
+- Cetak linimasa mengikuti saringan dan urutan layar, dikelompokkan per Minggu ke-N, kop memuat saringan.
+- Tombol Cetak di chip Jurnal tab Siklus (umpan lintas siklus).
+
+## v0.1.112 — 2026-11-09
+**Cetak Jurnal siklus: butir kecil Tahap 7B.** Hanya aturan cetak dan pembuat dokumen cetak; tidak ada perubahan data.
+
+### Diperbaiki
+- Halaman 1 cetakan linimasa tidak lagi hanya berisi kop; laporan perjalanan tidak lagi menyisakan ruang kosong sebelum bagian Catatan (PDF uji: 7 halaman jadi 6).
+- Teks ganda pada entri Kejadian dan catatan tanpa judul di cetakan.
+- Urutan entri pada waktu yang sama konsisten di semua tempat.
+
+### Ditingkatkan
+- Kop cetakan linimasa: periode, status, jumlah peristiwa, untung/rugi.
+
+## v0.1.111 — 2026-11-08
+**Cetak laporan diperbarui dan diperbaiki** (Laporan → Cetak). Rincian di `docs/LAPORAN.md` bagian "Cetak polos". Hanya aturan cetak dan fungsi pembuat dokumen cetak; layar dan data tidak berubah.
+
+### Diperbaiki
+- **Bab Rincian terpotong di kertas.** Tabel 10 kolom dicetak di halaman lanskap bernama (`@page rincian`), tetapi Chromium menata isinya dengan lebar halaman potret; kolom di kanan (HPP, harga rata-rata, harga min., BEP) dan keterangan rumus terpotong. Kini dua tabel yang muat di potret: **Laba-rugi** (Modal, Hasil, Untung/rugi, R/C, **Margin baru**, Total) dan **Produksi dan harga** (Panen bersih, HPP, Harga rata-rata, Harga min., Titik impas/BEP). Halaman lanskap dihapus; semua halaman A4 potret.
+- **Angka grafik terlalu kecil** (±4 pt): kanvas SVG 700 → 540 satuan sehingga label tercetak ±8 pt; angka di atas batang hanya untuk ≤ 8 bulan (12 bulan: tanpa angka di batang, angka lengkap ada di tabel).
+- Legenda grafik tidak lagi menempel ke tabel; judul "3. Rincian" tidak menempel ke tabel di atasnya.
+- Tanda minus persentase seragam (−30%, bukan -30%).
+
+### Ditingkatkan
+- **Ringkasan** kini berupa empat kartu angka (Untung atau Rugi, Hasil, Modal, R/C ratio) dengan keterangan satu baris ("Modal melebihi hasil", "Hasil belum menutup modal"), ditambah margin dan jumlah transaksi periode itu.
+- **Aliran halaman:** grafik naik ke halaman 1 (tabel tren dipisah dari grafik); tabel pendek (≤ 14 baris) tidak dipecah antarhalaman; tabel panjang mengalir dengan judul kolom berulang. Contoh data: 3 halaman rapat tanpa ruang kosong besar.
+- Rincian tidak lagi dipaksa mulai di halaman baru.
+
+### Catatan
+- Diuji di Chromium (PDF A4 dari media print): 44 pemeriksaan lolos untuk 9 variasi — terang, gelap + Efek kaca (isi teks identik dengan terang), periode bulan, rentang 12 bulan, pengelompokan komoditas dan unit, data besar (45 siklus, 6 halaman, judul kolom berulang), dan data kosong. Tiap variasi memeriksa: semua halaman A4 potret, tidak ada teks melewati tepi kanan, tanpa NaN/undefined/null, kolom BEP dan Harga min. tercetak, nomor halaman sesuai. Pemeriksaan yang sama pada v0.1.110 gagal (halaman lanskap, kolom hilang).
+- **Belum diuji** di dialog cetak Firefox/Safari dan pada pencetak nyata atau layanan cetak Android.
+- Berkas: `js/analisa.js`, `css/style.css`, `js/app.js` (versi), `sw.js` (cache `buku-kebun-v0_1_111`), `docs/LAPORAN.md`, `README.md`, `roadmap.md`, `VERSION`, `index.html`, `buku-kebun.html` (hasil build).
+
 ## v0.1.110 — 2026-11-08
 Butir kecil: hero (selisih periode setara, notasi ringkas, penjelasan R/C, uji tangkapan layar) dan angka sejajar. Rincian di `docs/HERO.md`.
 

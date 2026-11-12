@@ -1,6 +1,6 @@
 # Roadmap — Web App Keuangan Pertanian Rumahan
 
-> Status dokumen: draf v0.1 · Terakhir diperbarui: 5 November 2026 · Fase 5 selesai; Fase 6 berjalan: cadangan otomatis + dasar PWA; FAB kontekstual; chart di Beranda; data contoh otomatis; sinkron Supabase (v0.1.023); penyempurnaan UX (v0.1.024); kartu hero Beranda (v0.1.025); judul halaman (v0.1.026); foto nota lokal (v0.1.037); optimasi performa/aksesibilitas bagian 1 (v0.1.038); pembayaran utang/piutang tahap 1 (v0.1.048) dan tahap 2: tombol Bayar + cicilan (v0.1.049); Catat panen vs Catat hasil (v0.1.050); jadwal kegiatan per siklus (v0.1.051); katalog harga pasar (v0.1.052); kalkulator kelayakan usaha (v0.1.053); ekspor Excel (v0.1.054); isian Rencana keuangan lewat modal FAB (v0.1.055); ringkasan, sub-tab geser, ubah aset/utang (v0.1.056); daftar anggaran dengan detail (v0.1.057); daftar aset dan utang dengan detail (v0.1.058); grafik arus kas, saringan utang, simpan & tambah lagi, tren harga (v0.1.059); Jadwal dan Panen lewat modal detail (v0.1.060); modal bersama, tombol kembali, hapus seragam (v0.1.061); detail siklus dipadatkan (v0.1.066); duplikat FAB dibersihkan (v0.1.067); layout desktop dashboard tahap A–C (v0.1.081); Fase 6E Jurnal Siklus direncanakan, 8 tahap (v0.1.086); Tahap 0 selesai: docs/JURNAL.md dan wireframe, menunggu konfirmasi keputusan (v0.1.087); Fase 6E Tahap 4 foto jurnal (v0.1.092); Jurnal Tahap 7: Catat cepat (v0.1.100); keamanan data multi-tab (v0.1.101); performa 1.000+ entri dan aksesibilitas Jurnal diaudit (v0.1.105)
+> Status dokumen: draf v0.1 · Terakhir diperbarui: 5 November 2026 · Fase 5 selesai; Fase 6 berjalan: cadangan otomatis + dasar PWA; FAB kontekstual; chart di Beranda; data contoh otomatis; sinkron Supabase (v0.1.023); penyempurnaan UX (v0.1.024); kartu hero Beranda (v0.1.025); judul halaman (v0.1.026); foto nota lokal (v0.1.037); optimasi performa/aksesibilitas bagian 1 (v0.1.038); pembayaran utang/piutang tahap 1 (v0.1.048) dan tahap 2: tombol Bayar + cicilan (v0.1.049); Catat panen vs Catat hasil (v0.1.050); jadwal kegiatan per siklus (v0.1.051); katalog harga pasar (v0.1.052); kalkulator kelayakan usaha (v0.1.053); ekspor Excel (v0.1.054); isian Rencana keuangan lewat modal FAB (v0.1.055); ringkasan, sub-tab geser, ubah aset/utang (v0.1.056); daftar anggaran dengan detail (v0.1.057); daftar aset dan utang dengan detail (v0.1.058); grafik arus kas, saringan utang, simpan & tambah lagi, tren harga (v0.1.059); Jadwal dan Panen lewat modal detail (v0.1.060); modal bersama, tombol kembali, hapus seragam (v0.1.061); detail siklus dipadatkan (v0.1.066); duplikat FAB dibersihkan (v0.1.067); layout desktop dashboard tahap A–C (v0.1.081); Fase 6E Jurnal Siklus direncanakan, 8 tahap (v0.1.086); Tahap 0 selesai: docs/JURNAL.md dan wireframe, menunggu konfirmasi keputusan (v0.1.087); Fase 6E Tahap 4 foto jurnal (v0.1.092); Jurnal Tahap 7: Catat cepat (v0.1.100); keamanan data multi-tab (v0.1.101); performa 1.000+ entri dan aksesibilitas Jurnal diaudit (v0.1.105); cetak laporan diperbarui (v0.1.111)
 
 ## 1. Visi & Tujuan
 
@@ -136,16 +136,16 @@ Aturan: hanya tata letak untuk layar ≥1100 px; token warna, font, dan gaya kar
 **Tahap 1 — murah dan berdampingan dengan Tahap 0**
 - [ ] Wadah lebih lebar dengan grid dua kolom: Beranda selesai lewat Tahap 0 (v0.1.080, mulai 1100 px); Laporan (ringkasan | tren) dan layar 1024–1099 px belum
 - [x] Navigasi desktop konsisten di semua halaman: rail kiri tetap (ikon dengan tooltip nama; label penuh menunggu Tahap 0-E), bilah bawah tetap untuk HP, tab atas dipertahankan di 721–1099 px (v0.1.080)
-- [ ] Grafik: ukuran font tetap dan tinggi dibatasi (ukur lebar dengan ResizeObserver, gambar ulang); 12 bulan sebagai bawaan di desktop
+- [x] *(v0.1.118; teks dibatasi ±1,25× lewat pengukuran saat tampil, bukan gambar ulang; tinggi dibatasi sejak Tahap 0-B)* Grafik: ukuran font tetap dan tinggi dibatasi; 12 bulan sebagai bawaan di desktop
 - [ ] Angka (sebagian: tabular-nums global sudah ada, v0.1.110; rata kanan di semua daftar dan tabel belum diperiksa): `font-variant-numeric: tabular-nums` dan rata kanan di semua daftar dan tabel jumlah
 - [x] Keamanan data multi-tab: deteksi perubahan dari tab lain (`storage` event) dan gabung 3 arah per entri alih-alih menimpa — *selesai v0.1.101 (docs/MULTITAB.md); belum diuji pada PWA terpasang di HP bersama tab Chrome; dua simpan dalam beberapa milidetik yang sama masih bisa saling menimpa (batas `localStorage`)*
-- [ ] Pintasan keyboard: `N` catat baru, `/` cari, `G` lalu `B/T/S/L` pindah halaman, `?` daftar pintasan; tooltip pada tombol ikon
+- [x] *(v0.1.118; saklar Mati/Nyala di Setelan, tooltip tombol ikon sudah ada dari Tahap 0-E)* Pintasan keyboard: `N` catat baru, `/` cari, `G` lalu `B/T/S/L` pindah halaman, `?` daftar pintasan; tooltip pada tombol ikon
 
 **Tahap 2 — lebih besar**
-- [ ] Transaksi sebagai tabel di desktop (tanggal, kategori, siklus, catatan, jumlah): header lengket, bisa diurutkan, baris hover
-- [ ] Pola master–detail: daftar di kiri, detail/ubah di panel kanan (bukan pindah halaman penuh)
+- [x] *(v0.1.119)* Transaksi sebagai tabel di desktop (tanggal, kategori, siklus, catatan, jumlah): header lengket, bisa diurutkan, baris hover
+- [x] *(v0.1.121; khusus Transaksi, panel kanan)* Pola master–detail: daftar di kiri, detail/ubah di panel kanan (bukan pindah halaman penuh)
 - [ ] Modal menjadi dialog atau drawer selebar 480–560 px di desktop; formulir dua kolom untuk isian pendek; urutan Tab dan fokus otomatis
-- [ ] Interaksi mouse: `@media (hover:hover) and (pointer:fine)` — efek hover, target klik lebih rapat, ikon hapus di baris (geser tidak berguna dengan mouse), pilih banyak dengan kotak centang untuk hapus massal
+- [~] *(v0.1.120: ikon hapus di baris, pilih banyak + hapus massal, hover/fokus di tabel; target klik lebih rapat belum)* Interaksi mouse: `@media (hover:hover) and (pointer:fine)` — efek hover, target klik lebih rapat, ikon hapus di baris (geser tidak berguna dengan mouse), pilih banyak dengan kotak centang untuk hapus massal
 - [ ] 3–4 kartu KPI dalam satu baris (lihat Tahap 0-C)
 
 **Tahap 3 — pelengkap**
@@ -234,9 +234,23 @@ Perkiraan ukuran: S kecil · M sedang · L besar. Urutan: 0 → 1 → 2 → (3 d
 **Tahap 7 — Penyempurnaan (M, sebagian opsional)**
 - [x] *(v0.1.104)* Chip **Jurnal** di tab Siklus: umpan lintas siklus (seperti Agenda) dengan pencarian kata kunci dan saringan siklus/jenis
 - [x] **Catatan cepat:** chip satu ketukan yang langsung membuat entri hari ini; tawaran "Tambah catatan" setelah menandai jadwal selesai — *selesai v0.1.100 (modul `js/cepat.js`; chip per jenis komoditas, toast Urungkan + Tambah detail, linimasa dan detail siklus; belum diuji di HP sungguhan; chip yang bisa diubah pengguna belum)*
-- [ ] Desktop: pola master–detail untuk linimasa (Fase 6D Tahap 2); pintasan keyboard catat jurnal
+- [x] *(v0.1.115)* Desktop: pola master–detail untuk linimasa (Fase 6D Tahap 2); pintasan keyboard catat jurnal — ketuk catatan di layar ≥ 1100 px membuka detail di panel kiri (Ubah, Hapus, Esc menutup); tombol J membuka Catat jurnal
 - [ ] Performa 1.000+ entri, aksesibilitas (urutan Tab, label, pengumuman perubahan), dan uji dengan data nyata 1–2 siklus (menyambung ke Fase 7) — *sebagian (v0.1.105): performa diukur sampai 5.000 jurnal + 20.000 transaksi (semua layar < 300 ms), audit aksesibilitas otomatis dan uji keyboard dikerjakan, `aria-pressed` pada tombol pilihan diperbaiki (docs/AUDIT.md); belum: data nyata 1–2 siklus, pembaca layar sungguhan, HP berspesifikasi rendah*
 - **Hasil:** jurnal terasa cepat dan tidak memberatkan, layak dipakai tiap hari
+
+**Tahap 7B — Perbaikan cetak Jurnal siklus (hasil audit PDF A4 pada v0.1.111, 99 entri campuran; belum dikerjakan)**
+Prioritas dari tinggi ke rendah. Berkas terkait: `js/linimasa.js` (`cetakDoc`), `js/perjalanan.js`, `css/style.css` (blok `#cetak-lap`).
+- [x] *(v0.1.112)* **P1 — Halaman 1 hampir kosong (linimasa).** `.ct-bag{break-inside:avoid}` membungkus satu tabel panjang, jadi kop sendirian di halaman 1 dan tabel mulai di halaman 2. Lepas aturan itu dari bagian panjang (tabel linimasa, Catatan, Kejadian, Panen), pertahankan hanya untuk bagian pendek (Ringkasan uang); baris tetap utuh lewat `tr{break-inside:avoid}`
+- [x] *(v0.1.112)* **P2 — Ruang kosong di laporan perjalanan.** Sebab sama: bagian Catatan dilompatkan seluruhnya ke halaman 2 dan separuh halaman 1 kosong. Judul bagian harus menempel ke baris pertama tabel (`break-after:avoid`)
+- [x] *(v0.1.113)* **P3 — Saringan dan urutan layar diabaikan saat cetak.** Dengan saringan Uang + urutan Terlama, cetakan tetap memuat semua jenis. Usulan: cetak sesuai saringan layar dan cantumkan "Saringan: …" di kop (alternatif: selalu lengkap dan tulis "Semua peristiwa")
+- [x] *(v0.1.112)* **P4 — Kop linimasa kurang informatif.** Tambah status, hari ke-N atau tanggal selesai, jumlah entri, dan ringkasan untung/rugi; samakan dengan kop laporan perjalanan
+- [x] *(v0.1.113)* **P5 — Pengelompokan Minggu ke-N tidak ikut tercetak.** Tambah baris pemisah per minggu agar 100+ entri mudah dibaca
+- [x] *(v0.1.114)* **P6 — Foto tidak ikut di cetakan linimasa** (`lm-galeri` bersifat `no-print`). Pakai mekanisme "Dengan foto" milik laporan perjalanan, atau arahkan pengguna ke tombol itu
+- [x] *(v0.1.112)* **P7 — Teks ganda pada Kejadian.** Entri tanpa judul tampil "Hama: Ditemukan di 5 batang" lalu isinya diulang di baris kedua; sembunyikan baris kedua bila isi sudah menjadi judul
+- [x] *(v0.1.112)* **P8 — Urutan entri pada detik yang sama tidak konsisten** (linimasa 0, 40, 80; laporan perjalanan 40, 0, 80). Tambah pengikat urutan tetap (mis. `id`) di kedua tempat
+- [x] *(v0.1.113)* **P9 — Chip Jurnal di tab Siklus tidak punya cetak;** menekan cetak di sana mencetak tampilan layar apa adanya. Beri dokumen cetak sendiri atau sembunyikan antarmukanya saat dicetak
+- [ ] **P10 — Uji perangkat nyata:** printer sungguhan, Chrome Android (Cetak ke PDF), Safari iOS; mode Tersembunyi (ketukan kedua), tema gelap dan kaca
+- **Definisi selesai:** PDF A4 diperiksa untuk 1 halaman, 3 halaman, dan 7+ halaman (tanpa halaman kosong atau terpotong), siklus berjalan dan selesai, dengan dan tanpa saringan; CHANGELOG dan `docs/JURNAL.md` diperbarui
 
 **Definisi selesai tiap tahap:** dokumentasi (docs/JURNAL.md, DATA-SCHEMA.md, CHANGELOG.md, baris roadmap); uji otomatis di Chromium (HP 390 px dan desktop 1440 px, tema terang/gelap/kaca) tanpa galat JavaScript; impor data lama tanpa regresi; cetak dan ekspor yang ada tetap berfungsi; zip full + update dan pratinjau web; butir yang belum diuji di HP sungguhan dicatat apa adanya.
 
@@ -378,6 +392,12 @@ Perkiraan ukuran: S kecil · M sedang · L besar. Urutan: 0 → 1 → 2 → (3 d
 | Lingkup membengkak | Disiplin per fase; fitur baru masuk backlog dulu |
 | Istilah akuntansi membingungkan | Bahasa awam + tooltip penjelasan |
 
+### Utang teknis CSS (hasil audit v0.1.117)
+- [x] Audit CSS: kode mati, hover di layar sentuh, kontras tinggi, token z-index, `.theme-toggle` (v0.1.117, `docs/AUDIT-CSS.md`)
+- [ ] Konsolidasi blok CSS yang tersebar (±52 blok bertanda versi di akhir file; aturan kaca di ±11 area; `.bottom-nav`, `textarea`, `.tx` ditulis 4 kali), bertahap dan dijaga `tools/tangkapan.py`
+- [ ] Skala desain: 29 ukuran font dan 28 nilai radius tanpa token (usul skala font 11/12/13/14/16/20/22+ dan radius 8/12/16/999)
+- [ ] Kurangi ketergantungan pada selektor `#id` (93 aturan) dan `:has()` di layout desktop Beranda (Safari 15.4+/Firefox 121+), mis. kelas modifier dari JS
+
 ## 10. Pertanyaan Terbuka
 
 1. Jenis usaha apa yang jadi fokus awal — sayuran, hidroponik, perikanan, ternak, atau campuran?
@@ -501,3 +521,14 @@ Perkiraan ukuran: S kecil · M sedang · L besar. Urutan: 0 → 1 → 2 → (3 d
 | 0.1.108 | 2026-11-08 | Sinkron otomatis memakai saklar (toggle) yang terlihat jelas di efek kaca |
 | 0.1.109 | 2026-11-08 | Efek kaca dan Angka untung saat dibuka diganti saklar; pilihan dua tombol non-nyala/mati tetap |
 | 0.1.110 | 2026-11-08 | Butir kecil: hero (selisih periode setara, notasi miliar/triliun, penjelasan R/C, uji tangkapan layar), angka sejajar, PWA di HTTPS dan HP dicentang (docs/HERO.md, tools/uji-hero.py) |
+| 0.1.111 | 2026-11-08 | Cetak laporan diperbarui: bab Rincian tidak lagi terpotong di kertas (dua tabel potret, kolom Margin baru, halaman lanskap dihapus), kartu angka di Ringkasan, label grafik terbaca, aliran halaman rapat; diuji 44 pemeriksaan PDF |
+| 0.1.112 | 2026-11-09 | Tahap 7B (butir kecil): cetak Jurnal tanpa halaman kosong, kop linimasa lengkap, teks kejadian tidak ganda, urutan entri tetap; sisa P3, P5, P6, P9, P10 |
+| 0.1.113 | 2026-11-09 | Tahap 7B: cetak linimasa mengikuti saringan dan urutan layar dengan pemisah Minggu ke-N dan baris Saringan di kop; cetak umpan Jurnal lintas siklus; sisa P6 dan P10 |
+| 0.1.114 | 2026-11-09 | Tahap 7B: tombol Dengan foto di linimasa (foto kecil di cetakan, mengikuti saringan); sisa hanya P10 (uji perangkat nyata) |
+| 0.1.115 | 2026-11-09 | Tahap 7: linimasa master–detail di desktop (panel detail catatan di kiri) dan pintasan J (Catat jurnal), Esc menutup panel |
+| 0.1.116 | 2026-11-09 | Chip terpilih jelas saat Efek kaca di mode terang (latar aksen, bingkai ganda, teks tebal) |
+| 0.1.117 | 2026-11-09 | Audit dan perapian CSS: hover khusus perangkat hover, mode kontras tinggi, kode mati dihapus, token z-index, alat tools/audit-css.py dan tools/tangkapan.py (docs/AUDIT-CSS.md) |
+| 0.1.118 | 2026-11-10 | Desktop Tahap 1: pintasan keyboard (N, /, G+huruf, ?, ,), teks grafik dibatasi, tren 12 bulan bawaan di layar lebar |
+| 0.1.119 | 2026-11-10 | Desktop Tahap 2: Transaksi sebagai tabel (urut per kolom, header lengket, keyboard) di layar ≥1100 px |
+| 0.1.120 | 2026-11-10 | Desktop Tahap 2: pilih banyak, hapus massal (Urungkan), ikon hapus per baris di tabel Transaksi |
+| 0.1.121 | 2026-11-10 | Desktop Tahap 2: master–detail Transaksi (formulir catat/ubah di panel kanan, penjaga perubahan, Esc) |

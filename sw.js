@@ -1,5 +1,5 @@
 /* Buku Kebun — service worker (luring). Naikkan V setiap versi agar cache lama diganti. */
-var V = 'buku-kebun-v0_1_110';
+var V = 'buku-kebun-v0_1_121';
 var BERKAS = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', function (e) {
