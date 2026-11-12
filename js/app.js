@@ -1,5 +1,5 @@
 /* Buku Kebun — Fase 1: pencatatan transaksi + efek kaca (v0.1.039) */
-const VERSI = '0.1.110';
+const VERSI = '0.1.121';
 const KUNCI = 'tani.v1';
 const IKON = {
   master: '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><path d="M16.5 13v7M13 16.5h7"/>',
@@ -183,7 +183,7 @@ const Samar = {
 const App = {
   data: null, tab: 'beranda', buka: false, balik: 'beranda', hapusMinta: null,
   filter: { periode: 'bulan', jenis: 'semua', kat: 'semua', siklus: 'semua', dari: '', sampai: '', cari: '', lain: false },
-  draft: null, lastKat: {}, batasTx: 100,
+  draft: null, lastKat: {}, batasTx: 100, sortTx: { k: 'tanggal', a: -1 }, selTx: new Set(), selTerakhir: null, tampilTx: [], panel: false, panelSnap: '', lastEdit: null,
 
   /* ---------- data ---------- */
   aktif() { return this._ak || (this._ak = this.data.transaksi.filter((t) => !t.terhapus)); },
@@ -304,6 +304,16 @@ const App = {
     if (Analisa.klik(e) || Rencana.klik(e)) return;
     const g = e.target.closest('[data-go]');
     if (g) { this.go(g.dataset.go); return; }
+    if (e.target.closest('[data-tpx]')) { if (this.lanjutBuang()) { const id = this.lastEdit; this.tutupPanel(true); const b = id && document.querySelector('.tt-buka[data-edit="' + id + '"]'); if (b) b.focus(); } return; }
+    const tp = e.target.closest('[data-tp]');
+    if (tp) { this.pilihTx(tp.dataset.tp, tp.checked, e.shiftKey); return; }
+    if (e.target.closest('[data-tpa]')) { this.pilihSemua(e.target.closest('[data-tpa]').checked); return; }
+    const tc = e.target.closest('td.tt-c'); if (tc && tc.querySelector('[data-tp]')) { tc.querySelector('[data-tp]').click(); return; }
+    const tr = e.target.closest('[data-tr]'); if (tr) { this.hapusTx([tr.dataset.tr]); return; }
+    if (e.target.closest('[data-tph]')) { this.hapusTx([...this.selTx]); return; }
+    if (e.target.closest('[data-tpb]')) { this.selTx.clear(); this.selTerakhir = null; this.segarTx(); return; }
+    const ts = e.target.closest('[data-ts]');
+    if (ts) { this.urutTx(ts.dataset.ts); return; }
     const ed = e.target.closest('[data-edit]');
     if (ed) { this.ubahTx(ed.dataset.edit); return; }
     if (e.target.closest('[data-bu]')) { Rencana.sub = 'utang'; this.go('rencana'); return; }
@@ -462,6 +472,15 @@ const App = {
     try { if (ent.sid) Siklus.sid = ent.sid; this.go(ent.t); } finally { this._pop = false; }
   },
   go(t, tetap) {
+    if (this.panel) { /* panel transaksi terbuka */
+      if (t === 'catat') { this.renderPanel(); return; }
+      if (t === 'transaksi' && this.tab === 'transaksi') {
+        if (tetap) { this.segarTx(); return; }
+        const id = this.lastEdit; this.tutupPanel(); this.segarTx();
+        if (id) { const b = document.querySelector('.tt-buka[data-edit="' + id + '"]'); if (b) b.focus(); } return;
+      }
+      this.tutupPanel(true);
+    }
     if (!tetap && !this._pop && this.rw && this.nav(t)) return;
     this._ak = null;
     if (typeof Siklus !== 'undefined') Siklus.pindah(t, this.tab);
@@ -541,6 +560,54 @@ const App = {
       '<div class="note">' + Setelan.tgl(t.tanggal) + (t.siklusId && this.tab !== 'siklus-detail' && Siklus.cari(t.siklusId) ? ' · ' + esc(Siklus.nama(t.siklusId).split(' · ')[0]) : '') + (t.catatan ? ' · ' + esc(t.catatan) : '') + (() => { const u = Utang.tertaut(t), s = u && Utang.sisa(u); return s ? ' · <span class="' + (u.jenis === 'utang' ? 'down' : 'up') + '">' + u.jenis + ' ' + rp(s) + '</span>' : ''; })() + '</div></div>' +
       '<div class="tx-a ' + (m ? 'up' : 'down') + '">' + (m ? '+' : '−') + rp(t.jumlah).replace('Rp ', 'Rp\u00a0') + '</div></div>';
   },
+  /* tabel transaksi di desktop (≥1100 px, halaman Transaksi); HP tetap daftar baris (v0.1.121) */
+  tabelTx() { return this.tab === 'transaksi' && window.matchMedia && matchMedia('(min-width:1100px)').matches; },
+  daftarTx(list) {
+    if (!this.tabelTx()) return list.slice(0, this.batasTx).map((t) => this.barisTx(t)).join('');
+    const s = this.sortTx, nilai = {
+      tanggal: (t) => t.tanggal, kategori: (t) => this.namaKat(t.kategoriId).toLowerCase(), siklus: (t) => (t.siklusId && Siklus.cari(t.siklusId) ? Siklus.nama(t.siklusId) : '').toLowerCase(),
+      catatan: (t) => (t.catatan || '').toLowerCase(), jumlah: (t) => (t.jenis === 'masuk' ? 1 : -1) * t.jumlah }[s.k] || ((t) => t.tanggal);
+    const U = list.slice().sort((a, b) => { const x = nilai(a), y = nilai(b), c = typeof x === 'number' ? x - y : String(x).localeCompare(String(y), 'id'); return c * s.a || b.tanggal.localeCompare(a.tanggal) || String(b.dibuat).localeCompare(String(a.dibuat)); });
+    const ada = new Set(list.map((t) => t.id)); [...this.selTx].forEach((id) => { if (!ada.has(id)) this.selTx.delete(id); });
+    const tampil = U.slice(0, this.batasTx); this.tampilTx = tampil.map((t) => t.id);
+    const nPilih = tampil.filter((t) => this.selTx.has(t.id)).length, bersih = this.data.transaksi.filter((t) => this.selTx.has(t.id) && !t.terhapus).reduce((a, t) => a + (t.jenis === 'masuk' ? t.jumlah : -t.jumlah), 0);
+    const kol = [['tanggal', 'Tanggal', ''], ['kategori', 'Kategori', ''], ['siklus', 'Siklus', ''], ['catatan', 'Catatan', ''], ['jumlah', 'Jumlah', ' tt-a']];
+    const th = kol.map((k) => '<th scope="col" class="' + k[0] + k[2] + '" aria-sort="' + (s.k === k[0] ? (s.a > 0 ? 'ascending' : 'descending') : 'none') + '"><button type="button" class="tt-th" data-ts="' + k[0] + '">' + k[1] + '<span aria-hidden="true">' + (s.k === k[0] ? (s.a > 0 ? ' ▲' : ' ▼') : '') + '</span></button></th>').join('');
+    const tr = U.slice(0, this.batasTx).map((t) => {
+      const ket = esc(this.namaKat(t.kategoriId)) + ' ' + Setelan.tgl(t.tanggal), pilih = this.selTx.has(t.id);
+      const m = t.jenis === 'masuk', u = Utang.tertaut(t), sisa = u && Utang.sisa(u), sk = t.siklusId && Siklus.cari(t.siklusId) ? Siklus.nama(t.siklusId).split(' · ')[0] : '';
+      return '<tr data-edit="' + t.id + '"' + (pilih || (this.panel && this.draft && this.draft.id === t.id) ? ' class="' + (pilih ? 'tt-sel ' : '') + (this.panel && this.draft && this.draft.id === t.id ? 'tt-aktif' : '') + '"' : '') + '><td class="tt-c"><input type="checkbox" data-tp="' + t.id + '" aria-label="Pilih transaksi ' + ket + '"' + (pilih ? ' checked' : '') + '></td><td><button type="button" class="tt-buka" data-edit="' + t.id + '" aria-label="Ubah transaksi ' + esc(this.namaKat(t.kategoriId)) + ' ' + Setelan.tgl(t.tanggal) + '">' + Setelan.tgl(t.tanggal) + '</button></td>' +
+        '<td>' + esc(this.namaKat(t.kategoriId)) + (t.notaId ? Nota.ikon : '') + '</td><td title="' + esc(sk) + '">' + esc(sk) + '</td>' +
+        '<td title="' + esc(t.catatan || '') + '">' + esc(t.catatan || '') + (sisa ? ' <span class="' + (u.jenis === 'utang' ? 'down' : 'up') + '">' + u.jenis + ' ' + rp(sisa) + '</span>' : '') + '</td>' +
+        '<td class="tt-a ' + (m ? 'up' : 'down') + '">' + (m ? '+' : '−') + rp(t.jumlah).replace('Rp ', 'Rp\u00a0') + '</td>' +
+        '<td class="tt-x"><button type="button" class="tt-hapus" data-tr="' + t.id + '" aria-label="Hapus transaksi ' + ket + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12h10l1-12M9 7V4h6v3"/></svg></button></td></tr>';
+    }).join('');
+    const bulk = this.selTx.size ? '<div class="tt-bulk" role="status"><span>' + this.selTx.size + ' dipilih · bersih <b class="' + (bersih >= 0 ? 'up' : 'down') + '">' + (bersih < 0 ? '−' : '') + rp(Math.abs(bersih)) + '</b></span><span class="tt-bulk-a"><button type="button" class="btn danger" data-tph>Hapus yang dipilih</button><button type="button" class="btn" data-tpb>Batal pilih</button></span></div>' : '';
+    setTimeout(() => this.pilihUi(), 0);
+    return bulk + '<table class="tt" aria-label="Daftar transaksi, ' + list.length + ' catatan"><thead><tr><th scope="col" class="pilih tt-c"><input type="checkbox" data-tpa aria-label="Pilih semua transaksi yang tampil"' + (nPilih && nPilih === tampil.length ? ' checked' : '') + (nPilih && nPilih < tampil.length ? ' data-ind="1"' : '') + '></th>' + th + '<th scope="col" class="aksi"><span class="sr-only">Aksi</span></th></tr></thead><tbody>' + tr + '</tbody></table>'; // tombol "Tampilkan lebih banyak" ditambahkan oleh hasilTx
+  },
+  /* pilih banyak (v0.1.121) */
+  pilihUi() { const a = document.querySelector('[data-tpa][data-ind]'); if (a) a.indeterminate = true; },
+  segarTx(fokus) { const el = $('txHasil'); if (el) el.innerHTML = this.hasilTx(); if (fokus) { const b = document.querySelector(fokus); if (b) b.focus(); } },
+  pilihTx(id, on, rentang) {
+    const ids = this.tampilTx, i = ids.indexOf(id), j = this.selTerakhir ? ids.indexOf(this.selTerakhir) : -1;
+    (rentang && j >= 0 && i >= 0 ? ids.slice(Math.min(i, j), Math.max(i, j) + 1) : [id]).forEach((x) => { if (on) this.selTx.add(x); else this.selTx.delete(x); });
+    this.selTerakhir = id; this.segarTx('[data-tp="' + id + '"]');
+  },
+  pilihSemua(on) { this.tampilTx.forEach((x) => { if (on) this.selTx.add(x); else this.selTx.delete(x); }); this.segarTx('[data-tpa]'); },
+  hapusTx(ids) {
+    const T = ids.map((id) => this.data.transaksi.find((x) => x.id === id)).filter((t) => t && !t.terhapus), ok = [], lewat = [];
+    T.forEach((t) => { const u = Utang.tertaut(t); (u && Utang.ada(u) ? lewat : ok).push(t); });
+    if (!ok.length) { this.toast(lewat.length ? 'Tidak ada yang dihapus: sudah ada pembayaran utang/piutang' : 'Tidak ada yang dipilih'); return; }
+    ok.forEach((t) => { t.terhapus = true; t.diubah = nowIso(); Utang.ikut(t, true); this.selTx.delete(t.id); });
+    this.simpan(); this.go(this.tab, true);
+    this.toast(ok.length + ' transaksi dihapus' + (lewat.length ? ', ' + lewat.length + ' dilewati (sudah ada pembayaran)' : ''), { label: 'Urungkan', fn: () => { ok.forEach((t) => { t.terhapus = false; t.diubah = nowIso(); Utang.ikut(t, false); }); this.simpan(); this.go(this.tab, true); } });
+  },
+  urutTx(k) {
+    const s = this.sortTx; if (s.k === k) s.a = -s.a; else { s.k = k; s.a = (k === 'tanggal' || k === 'jumlah') ? -1 : 1; }
+    const el = $('txHasil'); if (el) el.innerHTML = this.hasilTx();
+    const b = document.querySelector('[data-ts="' + k + '"]'); if (b) b.focus();
+  },
   grafikLipat(bln) {
     const g = Beranda.grafik(bln);
     return g ? '<details class="lipat luar" data-lipat="grafik" data-bx="grafik"' + (Lipat.buka('grafik', window.innerWidth > 720) ? ' open' : '') + '><summary><h2>Grafik</h2></summary><div class="dash-grid">' + g + '</div></details>' : '';
@@ -596,24 +663,46 @@ const App = {
       '<div><span class="note">Hasil</span><strong class="up">' + rp(hasil) + '</strong></div>' +
       '<div><span class="note">' + (hasil - modal < 0 ? 'Rugi' : 'Untung') + '</span><strong class="' + (hasil - modal < 0 ? 'down' : 'up') + '">' + rp(hasil - modal) + '</strong></div></div>' +
       (terbalik ? '<p class="note down" role="alert" style="margin-top:14px">Tanggal "Dari" setelah "Sampai", jadi tidak ada hasil.</p><button type="button" class="btn" data-do="tukar-tgl" style="width:100%;margin-top:8px">Tukar tanggal</button>' :
-       list.length ? list.slice(0, this.batasTx).map((t) => this.barisTx(t)).join('') +
+       list.length ? this.daftarTx(list) +
          (list.length > this.batasTx ? '<button type="button" class="btn" data-do="tx-lagi" style="width:100%;margin-top:12px;min-height:44px">Tampilkan lebih banyak (sisa ' + (list.length - this.batasTx).toLocaleString('id-ID') + ')</button>' : '') :
          '<p class="note" style="margin-top:14px">Tidak ada transaksi pada filter ini.</p>');
   },
 
   /* ---------- tampilan: catat / ubah ---------- */
   baru(sid) {
+    if (!this.lanjutBuang()) return;
     const jenis = (this.draft && !this.draft.id && this.draft.jenis) || 'keluar';
     this.draft = { id: null, jenis, jumlah: 0, kat: this.lastKat[jenis] || this.kategori(jenis)[0].id, tanggal: isoHari(), catatan: '', siklus: sid || '', nota: null, notaLama: null, ...Utang.d0() };
-    this.hapusMinta = null;
-    this.go('catat');
+    this.hapusMinta = null; this.lastEdit = null;
+    this.bukaForm();
   },
   ubahTx(id) {
+    if (!this.lanjutBuang()) return;
     const t = this.data.transaksi.find((x) => x.id === id);
     if (!t) return;
     this.draft = { id: t.id, jenis: t.jenis, jumlah: t.jumlah, kat: t.kategoriId, tanggal: t.tanggal, catatan: t.catatan || '', siklus: t.siklusId || '', nota: t.notaId || null, notaLama: t.notaId || null, ...Utang.dari(t) };
-    this.hapusMinta = null;
-    this.go('catat');
+    this.hapusMinta = null; this.lastEdit = id;
+    this.bukaForm();
+  },
+  /* master–detail di desktop (v0.1.121): form catat/ubah di panel kanan pada halaman Transaksi; selain itu halaman penuh seperti biasa */
+  bukaForm() { if (this.tabelTx()) { this.panel = true; this.balik = 'transaksi'; this.renderPanel(true); } else this.go('catat'); },
+  snapPanel() { return [...document.querySelectorAll('#txPanelIsi input,#txPanelIsi select,#txPanelIsi textarea')].map((e) => (e.type === 'checkbox' ? e.checked : e.value)).join('\u0001'); },
+  kotor() { return this.panel && this.snapPanel() !== this.panelSnap; },
+  lanjutBuang() { return !this.kotor() || confirm('Perubahan belum disimpan. Buang perubahan?'); },
+  renderPanel(fokus) {
+    const d = this.draft, p = $('txPanel'); if (!d || !p) return;
+    $('txPanelJudul').textContent = d.id ? 'Ubah transaksi' : (d.jenis === 'masuk' ? 'Catat hasil' : 'Catat modal');
+    const isi = $('txPanelIsi'); isi.innerHTML = this.vCatat(); Form.upgrade(isi); Nota.isiBox(); if (typeof Foto !== 'undefined') Foto.muat(isi);
+    p.hidden = false; document.body.dataset.panel = 'tx'; this.panelSnap = this.snapPanel();
+    document.querySelectorAll('tr.tt-aktif').forEach((r) => r.classList.remove('tt-aktif'));
+    if (d.id) { const r = document.querySelector('tr[data-edit="' + d.id + '"]'); if (r) r.classList.add('tt-aktif'); }
+    if (fokus) { const j = $('f_jumlah'); if (j) j.focus(); }
+  },
+  tutupPanel(buang) {
+    if (!this.panel) return;
+    if (buang && this.draft) { Nota.buang(this.draft); this.draft = null; }
+    this.panel = false; const p = $('txPanel'); if (p) { p.hidden = true; $('txPanelIsi').innerHTML = ''; } delete document.body.dataset.panel;
+    document.querySelectorAll('tr.tt-aktif').forEach((r) => r.classList.remove('tt-aktif'));
   },
   bacaForm() {
     const d = this.draft;

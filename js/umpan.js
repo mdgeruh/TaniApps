@@ -32,13 +32,23 @@ const Umpan = {
       (L.length > this.n ? '<button type="button" class="btn" data-do="uj-lagi" style="width:100%;margin-top:12px;min-height:44px">Tampilkan lebih banyak (sisa ' + (L.length - this.n) + ')</button>' : '');
   },
   v(base) {
-    return '<input type="search" id="uj_cari" class="cari" style="margin-top:12px" placeholder="Cari judul, isi, siklus" aria-label="Cari jurnal" value="' + esc(this.q) + '" autocomplete="off">' +
+    return '<div class="lap-aksi no-print" style="margin:12px 0 0"><button type="button" class="ikon-btn" data-an="cetak" aria-label="Cetak umpan jurnal atau simpan PDF">' + Analisa.IKON.cetak + '<span>Cetak</span></button></div>' +
+      '<input type="search" id="uj_cari" class="cari" style="margin-top:12px" placeholder="Cari judul, isi, siklus" aria-label="Cari jurnal" value="' + esc(this.q) + '" autocomplete="off">' +
       '<div class="seg sm lm-filter" role="group" aria-label="Saring jenis entri">' + this.JENIS.map((c) => '<button type="button" class="btn' + (this.jenis === c[0] ? ' gold' : '') + '" data-do="uj-f" data-f="' + c[0] + '" aria-pressed="' + (this.jenis === c[0]) + '">' + c[1] + '</button>').join('') + '</div>' +
       '<div id="ujHasil" aria-live="polite">' + this.hasil(base) + '</div>';
   },
   basis() {
     const fu = Siklus.fu && Siklus.unit(Siklus.fu) ? Siklus.fu : '', fk = Siklus.fk && Siklus.kom(Siklus.fk) ? Siklus.fk : '';
     return Siklus.daftar().filter((s) => (!fu || s.unitId === fu) && (!fk || s.komoditasId === fk));
+  },
+  /* dokumen cetak polos: semua entri yang lolos saringan dan pencarian saat ini */
+  cetakDoc() {
+    const base = this.basis(), L = this.saring(base), fl = this.JENIS.find((c) => c[0] === this.jenis)[1];
+    const fu = Siklus.fu && Siklus.unit(Siklus.fu) ? Siklus.unit(Siklus.fu).nama : 'Semua unit', fk = Siklus.fk && Siklus.kom(Siklus.fk) ? Siklus.kom(Siklus.fk).nama : 'Semua komoditas';
+    const baris = L.map((e) => { const x = e.x; return '<tr><td>' + Setelan.tgl(e.j.tanggal) + '</td><td>' + esc(Siklus.nama(e.s.id)) + '</td><td>' + Jurnal.hariKe(e.s, e.j.tanggal) + '</td><td>' + x.label + '</td><td>' + esc(x.judul) + Linimasa.rinci(e.j, x.judul) + '</td></tr>'; }).join('');
+    return '<div class="ct-kop"><h1>Jurnal Lintas Siklus</h1><p class="ct-sub">' + esc(fu) + ' · ' + esc(fk) + '</p><table class="ct-meta"><tr><th>Entri</th><td>' + L.length + '</td><th>Dicetak</th><td>' + Setelan.tgl(isoHari()) + '</td></tr>' +
+      '<tr><th>Jenis</th><td>' + fl + '</td><th>Aplikasi</th><td>Buku Kebun v' + VERSI + '</td></tr>' + (this.q.trim() ? '<tr><th>Kata kunci</th><td colspan="3">' + esc(this.q.trim()) + '</td></tr>' : '') + '</table></div>' +
+      '<div class="ct-bag ct-lanjut"><table class="ct-tab"><thead><tr><th>Tanggal</th><th>Siklus</th><th>Hari</th><th>Jenis</th><th>Keterangan</th></tr></thead><tbody>' + (baris || '<tr><td colspan="5">Tidak ada entri.</td></tr>') + '</tbody></table></div>';
   },
   ulang() { const el = document.getElementById('ujHasil'); if (el) { el.innerHTML = this.hasil(this.basis()); if (typeof Samar !== 'undefined') Samar.terapkan(); } },
   aksi(a, el) {

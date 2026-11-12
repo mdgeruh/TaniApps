@@ -21,7 +21,7 @@ document.addEventListener('toggle', function (e) { var d = e.target; if (d && d.
 /* Buku Kebun — halaman setelan (dipakai aplikasi dan pratinjau) */
 var Setelan = (function () {
   var KUNCI = 'tani.setelan';
-  var BAWAAN = { mode: 'light', skema: 'hijau', ukuran: 100, kaca: false, tanggal: 'dmy', sembunyi: false, margin: 30, ingatJurnal: 0 };
+  var BAWAAN = { mode: 'light', skema: 'hijau', ukuran: 100, kaca: false, tanggal: 'dmy', sembunyi: false, margin: 30, ingatJurnal: 0, pintasan: true };
   var s = Object.assign({}, BAWAAN);
   var h = { versi: '', ambil: function () { return {}; }, pasang: function () {}, hapus: function () {}, ubah: function () {} };
   var konfirmasi = null, konfirmasi2 = null;
@@ -77,7 +77,8 @@ var Setelan = (function () {
       row('Format tanggal', 'Tabel transaksi dan daftar siklus.', seg('tanggal', [['dmy', '03/11/2026'], ['iso', '2026-11-03']])) +
       row('Angka untung saat dibuka', 'Nyalakan agar semua nominal rupiah di aplikasi disamarkan. Tombol mata menampilkannya sementara; saat mencetak, angka tetap tampil.', saklar('sembunyi', 'Sembunyikan angka untung saat dibuka', !!s.sembunyi, ['Tampil', 'Tersembunyi'], 80)) +
       row('Target margin', 'Dipakai menghitung harga jual minimum per siklus (1 sampai 90 persen).', '<input type="number" id="margin" class="settings-input" min="1" max="90" step="1" inputmode="numeric" value="' + s.margin + '" aria-label="Target margin persen">') +
-      row('Ingatkan catatan jurnal', 'Beranda mengingatkan bila siklus berjalan belum dicatat selama sekian hari. Hanya tampil saat aplikasi dibuka; bawaan mati.', seg('ingatJurnal', [[0, 'Mati'], [3, '3 hari'], [7, '7 hari'], [14, '14 hari']]));
+      row('Ingatkan catatan jurnal', 'Beranda mengingatkan bila siklus berjalan belum dicatat selama sekian hari. Hanya tampil saat aplikasi dibuka; bawaan mati.', seg('ingatJurnal', [[0, 'Mati'], [3, '3 hari'], [7, '7 hari'], [14, '14 hari']])) +
+      row('Pintasan keyboard', 'Tombol tunggal untuk berpindah halaman dan mencatat tanpa mouse: N, /, G lalu huruf, ?. Matikan bila bentrok dengan alat bantu. Tekan ? untuk daftar.', '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">' + saklar('pintasan', 'Pintasan keyboard', s.pintasan !== false, ['Mati', 'Nyala']) + '<button type="button" class="btn" data-act="pintasan">Lihat daftar</button></div>');
     var data = head('Data', 'Cadangan dan pemulihan. Data tersimpan di browser ini.') +
       '<div class="settings-row"><div class="settings-desc"><strong>Ekspor dan impor</strong><span>Ekspor mengisi kotak di bawah dengan JSON. Untuk impor, tempel JSON ke kotak atau pilih berkas; pratinjau tampil dulu sebelum data diganti.</span></div>' +
       '<div class="seg sm"><button type="button" class="btn" data-act="ekspor">Ekspor</button><button type="button" class="btn" data-act="impor">Impor</button><button type="button" class="btn" data-act="berkas">Pilih berkas</button></div></div>' +
@@ -132,6 +133,7 @@ var Setelan = (function () {
       else if (x === 'ekspor') ekspor();
       else if (x === 'impor') impor();
       else if (x === 'berkas') document.getElementById('fileImp').click();
+      else if (x === 'pintasan') Pintasan.bantuan();
       else if (x === 'foto-zip') CadFoto.aksiEkspor();
       else if (x === 'foto-pulih') CadFoto.pilih();
       else if (x === 'foto-tetap') { Foto.minta().then(function (t) { App.toast(t); Foto.isiInfo(); }); }

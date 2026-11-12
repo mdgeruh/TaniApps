@@ -16,7 +16,7 @@ const Perjalanan = {
   tab(kepala, baris, kls) {
     return '<table class="ct-tab' + (kls ? ' ' + kls : '') + '"><thead><tr>' + kepala.map((k) => '<th' + (k[1] ? ' class="n"' : '') + '>' + k[0] + '</th>').join('') + '</tr></thead><tbody>' + baris.join('') + '</tbody></table>';
   },
-  bag(judul, isi) { return isi ? '<div class="ct-bag"><h2>' + judul + '</h2>' + isi + '</div>' : ''; },
+  bag(judul, isi) { return isi ? '<div class="ct-bag' + (judul === 'Ringkasan uang' ? '' : ' ct-lanjut') + '"><h2>' + judul + '</h2>' + isi + '</div>' : ''; },
   teks(j) { return esc(Jurnal.judul(j)) + (j.isi && j.judul ? '<br>' + esc(j.isi).replace(/\n/g, '<br>') : j.isi && !j.judul && String(j.isi).split('\n').length > 1 ? '<br>' + esc(String(j.isi).split('\n').slice(1).join('\n')).replace(/\n/g, '<br>') : ''); },
   foto(j, dgn) { return dgn && (j.foto || []).length ? '<div class="ct-foto">' + j.foto.map((id) => '<img alt="" data-foto="' + id + '">').join('') + '</div>' : ''; },
 
@@ -66,10 +66,10 @@ const Perjalanan = {
   },
 
   /* muat foto jadi gambar sementara, lalu cetak setelah semua gambar siap */
-  async cetak(dgn) {
+  async cetak(dgn, mode) {
     const s = Siklus.cari(Siklus.sid); if (!s) return;
     this.lepas();
-    const d = document.createElement('div'); d.id = 'cetak-lap'; d.className = 'ct-semua'; d.innerHTML = this.dok(s, dgn);
+    const d = document.createElement('div'); d.id = 'cetak-lap'; d.className = 'ct-semua'; d.innerHTML = mode === 'linimasa' ? Linimasa.cetakDoc(dgn) : this.dok(s, dgn);
     document.body.appendChild(d); document.documentElement.classList.add('cetak-lap'); this.aktif = true;
     const L = [...d.querySelectorAll('img[data-foto]')];
     await Promise.all(L.map((im) => Nota.ambil(im.dataset.foto).then((r) => new Promise((ok) => {
@@ -90,6 +90,6 @@ const Perjalanan = {
       this._cf = setTimeout(() => { this._cf = null; if (el.isConnected) el.textContent = lb; }, 4000); return true;
     }
     clearTimeout(this._cf); this._cf = null;
-    this.cetak(!!el.dataset.foto); return true;
+    this.cetak(!!el.dataset.foto, el.dataset.mode); return true;
   }
 };
