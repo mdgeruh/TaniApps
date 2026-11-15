@@ -2,7 +2,7 @@
 const Pintasan = {
   g: false, t: null,
   TUJUAN: { b: 'beranda', t: 'transaksi', s: 'siklus', u: 'master', l: 'laporan', r: 'rencana' },
-  DAFTAR: [['N', 'Catat transaksi (atau tombol + di halaman ini)'], ['/', 'Cari transaksi'], ['G lalu B', 'Beranda'], ['G lalu T', 'Transaksi'], ['G lalu S', 'Siklus'], ['G lalu U', 'Unit dan komoditas'],
+  DAFTAR: [['N', 'Catat transaksi (atau tombol + di halaman ini)'], ['/', 'Cari cepat (transaksi, siklus, jurnal)'], ['G lalu B', 'Beranda'], ['G lalu T', 'Transaksi'], ['G lalu S', 'Siklus'], ['G lalu U', 'Unit dan komoditas'],
     ['G lalu L', 'Laporan'], ['G lalu R', 'Rencana keuangan'], [',', 'Setelan'], ['?', 'Daftar pintasan ini'], ['Esc', 'Tutup dialog atau menu']],
   aktif() { return Setelan.get('pintasan') !== false; },
   /* tidak aktif saat mengetik, memakai Ctrl/Alt/Cmd, atau mengisi huruf lewat IME */
@@ -33,11 +33,7 @@ const Pintasan = {
     if (!Fab.c) { App.toast('Tombol + tidak tersedia di halaman ini'); return; }
     if (Fab.c.pilih) { Fab.bukaDial(); setTimeout(() => { const b = document.querySelector('#fabDial [data-fi]'); if (b) b.focus(); }, 60); } else Fab.c.aksi();
   },
-  cari() {
-    const id = App.tab === 'jurnal' ? 'uj_cari' : 'f_cari', f = document.getElementById(id);
-    if (f) { f.focus(); f.select(); return; }
-    App.go('transaksi'); setTimeout(() => { const g = document.getElementById('f_cari'); if (g) g.focus(); }, 120);
-  },
+  cari() { Cari.buka(); },
   bantuan() {
     if (Modal.m) { if (Modal.m.el.querySelector('#pnJudul')) Modal.tutup(); return; }
     Modal.buka({ judulId: 'pnJudul', tutupLatar: true,
@@ -77,4 +73,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape' || e.defaultPrevented || !App.panel || Modal.m || document.querySelector('.toast-pop')) return;
   if (App.lanjutBuang()) { const id = App.lastEdit; App.tutupPanel(true); const b = id && document.querySelector('.tt-buka[data-edit="' + id + '"]'); if (b) b.focus(); }
 });
+/* cetak langsung dari halaman Transaksi: selalu tabel, semua baris (bukan 100 pertama); dipulihkan sesudah cetak */
+window.addEventListener('beforeprint', () => { if (App.tab !== 'transaksi' || App.cetakTabel) return; App.cetakTabel = true; App.batasSimpan = App.batasTx; App.batasTx = 1e9; App.segarTx(); });
+window.addEventListener('afterprint', () => { if (!App.cetakTabel) return; App.cetakTabel = false; App.batasTx = App.batasSimpan || 100; if (App.tab === 'transaksi') App.segarTx(); });
 Pintasan.init(); GrafikFont.init();

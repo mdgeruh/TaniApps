@@ -1,5 +1,355 @@
 # Changelog
 
+## v0.1.146 — 2026-11-15
+Warna titik badge Beranda di navbar (HP) tidak lagi hijau saja.
+
+### Diperbaiki
+- **Titik "Perlu perhatian" di ikon Beranda (<1100 px)** memakai `--gold` untuk butir akan datang. Di skema Hijau `--gold` berwarna hijau, sehingga di atas kaca hijau (Efek kaca) titik tampak hijau dan menyatu dengan navbar. Kini butir akan datang memakai token baru `--warn` (amber: `#A86400` terang, `#F2C14E` gelap), butir yang sudah lewat tetap merah (`--loss`).
+- **Efek kaca:** cincin titik tidak lagi memakai warna latar padat (`--ink-raised`) yang tampak seperti lubang di atas kaca tembus pandang; kini cincin putih tembus pandang (terang) atau gelap tembus pandang (gelap) dengan bayangan tipis.
+- `css/style.css`, `js/app.js` (versi), `sw.js`, `VERSION`, `README.md`, `docs/STYLE.md`, `index.html` dan `buku-kebun.html` (hasil build).
+
+### Catatan
+- Badge angka di rail desktop (≥1100 px) tidak diubah (selalu merah). Ikon `.pi.dekat` pada kartu Perlu perhatian dan ikon awan sinkron (sibuk) masih memakai `--gold`; bisa ikut `--warn` bila diinginkan.
+- Diuji di Chromium lebar 390 px: skema Hijau dan Emas × terang/gelap × kaca nyala/mati × butir lewat/akan datang. Belum diuji di HP sungguhan.
+
+## v0.1.145 — 2026-11-15
+Status sinkron di header berupa ikon awan.
+
+### Diubah
+- **Label teks di header diganti ikon awan** (tanpa teks "Tersinkron HH:MM" dan sejenisnya). Lapisan di dalam awan menandai keadaan: centang = tersinkron (hijau), panah ke atas = menyinkronkan (emas, berdenyut) atau belum sinkron, tanda seru = gagal sinkron (merah), tiga titik pada awan putus-putus = menunggu internet, awan putus-putus bercoret = mode lokal (abu-abu).
+- Teks lengkap (mis. "Tersinkron 14:30") tetap ada di `title` (tooltip di desktop) dan `aria-label` untuk pembaca layar; tombol tetap membuka Akun dan sinkron, area ketuk tetap ≥ 40 px.
+- **Bilah ringkas saat gulir** (HP dan tablet) ikut memakai ikon awan yang sama menggantikan titik 10 px.
+- Label teks di Setelan → Akun dan sinkron tidak berubah.
+- `js/sinkron.js` (`ikon`, `lencana`), `js/ringkas.js` (`segar` menyalin ikon), `css/style.css`, `docs/AKUN.md`, `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `README.md`, `VERSION`, `js/app.js` (versi).
+
+### Catatan
+- Diuji di Chromium pada lebar 390 dan 1280 px untuk keenam keadaan (terang dan gelap untuk warna); keadaan selain mode lokal disimulasikan lewat `Sinkron.ikon`, belum lewat akun cloud sungguhan. Belum diuji di HP sungguhan.
+
+## v0.1.144 — 2026-11-15
+Pencarian dan Zona berbahaya di halaman Setelan.
+
+### Ditambah
+- **Kotak "Cari setelan"** di atas halaman Setelan. Mengetik menyaring baris (judul dan deskripsi) di semua bagian, termasuk Cadangan dan Akun dan sinkron; bagian yang cocok terbuka sementara, bagian tanpa hasil disembunyikan, dan bila tidak ada yang cocok tampil "Tidak ada setelan yang cocok." Kata kunci tetap saat saklar diketuk (halaman digambar ulang) dan dikosongkan bila Setelan dibuka lagi dari halaman lain. Status lipat bagian dipulihkan saat kotak dikosongkan.
+- **Bagian "Zona berbahaya"** di paling bawah (terlipat, bingkai merah): **Hapus semua foto** (dipindah dari bagian Data) dan **Hapus semua data** (dipindah dari bagian Data). Tetap dua langkah: ketuk, lalu ketuk lagi dalam 4 detik. Tindakan lanjutan sinkron cloud (Timpa, Ambil, Hapus data cloud) tetap di Akun dan sinkron.
+- `js/setelan.js` (`saring`, `kueri`, bagian bahaya), `css/style.css`, `docs/SETELAN.md`, `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `README.md`, `VERSION`, `js/app.js` (versi).
+
+### Catatan
+- Diuji di Chromium pada lebar 390 dan 1280 px (cari, kosong, saklar saat mencari, pemulihan status lipat, ketuk pertama tombol hapus). Belum diuji di HP sungguhan.
+
+## v0.1.143 — 2026-11-15
+Optimasi UI/UX halaman Setelan.
+
+### Diubah
+- **Saklar rata kanan di HP.** Baris dengan saklar (Efek kaca, Angka untung saat dibuka, Pintasan keyboard, Sinkron otomatis) tidak lagi menumpuk di bawah teks: teks di kiri, saklar di kanan, status (Mati/Nyala/Tampil/Tersembunyi) tepat di bawah saklar sehingga deskripsi mendapat lebih banyak lebar. Di desktop status tetap di kiri saklar.
+- **Pilihan sama lebar di HP.** Kelompok pilihan (Mode, Skema warna, Ukuran tampilan, Format tanggal, Ingatkan catatan jurnal) memenuhi satu baris dengan tombol sama lebar.
+- **Target margin** tetap sejajar di kanan dengan tanda %; **Versi** juga di kanan.
+- **Pintasan keyboard:** saklar di kanan; tombol "Lihat daftar" menjadi tautan "Lihat daftar pintasan" di bawah teks.
+- **Desktop (≥1100 px): semua bagian Setelan terbuka tetap**, tanpa panah dan tanpa perlu dilipat atau dibuka. Di HP dan tablet tetap bisa dilipat; berpindah melewati batas 1100 px menggambar ulang halaman otomatis dan tidak mengubah status lipat HP.
+- `js/setelan.js`, `css/style.css`, `docs/SETELAN.md`, `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `README.md`, `VERSION`, `js/app.js` (versi).
+
+### Catatan
+- Gaya sebaris `min-width` pada status saklar diganti kelas `sw-lebar` (hanya desktop).
+- Diuji di Chromium pada lebar 390 dan 1280 px; belum diuji di HP sungguhan.
+
+## v0.1.142 — 2026-11-15
+Cache agregat bulanan (butir roadmap "Cache agregat bulanan").
+
+### Diubah
+- **Satu agregat bulanan bersama** (`Analisa.agg()`): seluruh transaksi aktif dilintasi satu kali untuk menjumlah modal, hasil, dan banyaknya transaksi per bulan. Sebelumnya hero, Beranda, dan Laporan masing-masing menyaring seluruh daftar berulang-ulang (±15 kali lintas per render Beranda).
+- `Analisa.bulanN`, `Beranda.per`, hitungan bulan ini di hero (`App.heroIsi`), dan dua fungsi `per` lokal di `js/analisa.js` kini membaca agregat yang sama; hasilnya identik dengan hitungan lama.
+- **Pembatalan memo:** terikat pada larik `App.aktif()`. Larik itu dibuat ulang (`App._ak = null`) setiap kali data berubah lewat `App.simpan()` dan setiap pindah halaman, sehingga agregat ikut dihitung ulang; pergantian bulan juga membatalkannya.
+- Hasil ukur (Chromium, data acak, render Beranda): 5.000 transaksi 17,8 → 10,1 ms; 20.000 transaksi 20,4 → 17,6 ms; 100.000 transaksi 155 → 72 ms. `bulanN(6)` pada 100.000 transaksi 20 → 9 ms.
+- `tools/uji-agregat.py` (baru): hasil sama dengan hitungan lama (0, 1, dan 3.000 transaksi acak, termasuk jenis lain dan yang terhapus), memo batal setelah tambah/ubah/hapus lewat `App.simpan`, dan kecepatan.
+- `js/analisa.js`, `js/beranda.js`, `js/app.js` (`heroIsi`, versi), `docs/HERO.md`, `tools/uji-agregat.py`, `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Aturan bagi kode baru: ubah data transaksi selalu diikuti `App.simpan()` (aturan yang sudah berlaku); mengubah isian transaksi di tempat tanpa menyimpan tidak akan terlihat di angka bulanan sampai pindah halaman.
+- Penyaringan berdasarkan rentang tanggal (`App.periodeSetara`) dan daftar Transaksi tidak memakai agregat bulanan, karena memerlukan batas tanggal yang bukan awal dan akhir bulan.
+- `tools/audit-css.py` masih melaporkan dua pelanggaran lama (`:hover` di luar `@media (hover:hover)` dan `z-index` angka mentah); tidak terkait perubahan ini.
+
+## v0.1.141 — 2026-11-15
+Angka utama hero mengikuti bulan yang disentuh di sparkline.
+
+### Diubah
+- **Menyentuh atau menggeser kurva kini mengganti angka utama hero** (bukan lagi memunculkan petunjuk melayang di atas kurva). Yang ikut berganti: label ("Untung Okt" / "Rugi Okt"; tahun ditambahkan bila bukan tahun ini), angka untung bulan itu, baris margin, ringkasan Modal, Hasil, dan R/C, serta baris selisih (dibanding bulan sebelumnya; bulan paling awal: "Bulan paling awal pada grafik"). Titik penanda tetap menunjukkan bulan yang dipilih.
+- Setelah jari dilepas, hero kembali ke bulan ini setelah 3,5 detik (sebelumnya 1,8 detik untuk petunjuk); di desktop kembali saat mouse meninggalkan kurva, atau saat Esc ditekan. Menyentuh bulan ini sendiri menampilkan keadaan normal.
+- Tinggi blok teks hero dikunci selama pratinjau supaya kurva tidak bergeser dari bawah jari ketika teks di atasnya berganti panjang.
+- Mode Tersembunyi: semua angka pratinjau tetap tersamar ("Rp ••••••"), termasuk selisih.
+- `aria-valuetext` kurva tetap membacakan bulan dan nilainya untuk pembaca layar.
+- Elemen dan gaya petunjuk (`.hs-tip`) dihapus.
+- `js/app.js` (`App.heroLihat`, `_heroKini`, versi), `js/spark.js`, `css/style.css`, `docs/HERO.md`, `tools/uji-hero.py`, `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Penjelasan R/C (tombol ?) tetap menjelaskan bulan ini saja dan tidak ikut berganti saat pratinjau.
+- Jumlah transaksi per bulan tidak ditampilkan saat pratinjau (baris tersebut diganti margin bulan itu).
+- Diuji di Chromium dengan ketukan sentuh pada lebar 360, 390, 1440 px dan Ukuran tampilan 90%, 100%, 120%; `tools/uji-hero.py` lulus. Belum diuji di HP sungguhan.
+
+## v0.1.140 — 2026-11-15
+Perbaikan sparkline hero: kotak saat ditap dan titik penanda yang melenceng.
+
+### Diperbaiki
+- **Kotak putih di sekeliling kurva saat ditap** hilang. Garis tren bisa difokus (untuk keyboard dan pembaca layar), tetapi di HP ketukan ikut memunculkan cincin fokus. Kini cincin hanya tampil bila garis difokus lewat keyboard (kelas `kb`); ketukan dan klik mouse tidak lagi memunculkannya. Keyboard dan pembaca layar tetap bekerja seperti sebelumnya.
+- **Titik penanda melenceng dari garis** bila Setelan → Ukuran tampilan bukan 100% (mis. 90%: titik bergeser ke kiri-atas dan tampak melayang di atas garis; 110–120%: bergeser ke kanan-bawah). Penyebab: ukuran tampilan memakai `body{zoom}`, sedangkan posisi titik dihitung dari koordinat layar. Kini dibagi faktor zoom, dan lebar garis tepi kartu (4 px di kiri) ikut diperhitungkan sehingga titik tepat di atas garis juga pada 100%.
+- Petunjuk bulan dan nilai ikut tertata benar (tidak keluar dari kartu) pada ukuran tampilan 90–120%.
+- `js/spark.js` (`Spark.zoom`, posisi titik, fokus), `css/style.css`, `docs/HERO.md`, `tools/uji-hero.py`, `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `README.md`, `roadmap.md`, `VERSION`, `js/app.js` (versi).
+
+### Catatan
+- Diuji di Chromium (sentuh) pada lebar 360, 390, 1440 px dan Ukuran tampilan 90%, 100%, 110%, 120%: titik tepat di garis untuk bulan pertama, tengah, dan terakhir; `tools/uji-hero.py` lulus. Belum diuji di HP sungguhan.
+
+## v0.1.139 — 2026-11-15
+Perbaikan: tombol mata di hero Beranda tidak bekerja saat setelan "Angka untung saat dibuka" = Tampil.
+
+### Diperbaiki
+- **Tombol mata ◉ kini selalu bisa menyamarkan angka**, apa pun setelannya. Sebelumnya tombol hanya membalik status "buka sementara" yang baru berpengaruh bila setelan = Tersembunyi, sehingga saat setelan = Tampil, ketukan tidak mengubah apa pun.
+- Perilaku kini: tombol mata membalik kondisi angka (tampil ⇄ tersamar) hanya untuk sesi ini; setelan tetap menentukan kondisi awal saat aplikasi dibuka. Mengubah atau mengatur ulang setelan "Angka untung saat dibuka" menghapus balikan sementara itu dan kembali mengikuti setelan.
+- Tombol mata kedua di header halaman selain Beranda juga muncul saat angka sedang disamarkan lewat tombol mata (sebelumnya hanya bila setelan = Tersembunyi), agar angka bisa ditampilkan lagi di halaman mana pun.
+- Teks setelan dan `docs/SETELAN.md` diperjelas; `tools/uji-hero.py` memuat uji baru untuk kasus ini (setelan Tampil: ketuk mata menyamarkan, ketuk lagi menampilkan).
+- `js/app.js` (`App.ovr` menggantikan `App.buka`, `App.samarSekarang`, `App.matakan`, `Samar.aktif`, hook setelan, versi), `js/setelan.js`, `docs/SETELAN.md`, `docs/HERO.md`, `tools/uji-hero.py`, `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Cakupan penyamaran sama dengan mode Tersembunyi: semua nominal rupiah, petunjuk sparkline, dan foto nota; angka tetap tampil saat mencetak.
+- Balikan sementara tidak disimpan: dimuat ulang = kembali mengikuti setelan.
+
+## v0.1.138 — 2026-11-15
+Sparkline hero interaktif (butir roadmap "Sparkline interaktif").
+
+### Ditambahkan
+- **Titik bulan ini** pada ujung kanan garis tren di kartu hero. Ketuk atau geser jari (HP), arahkan atau seret mouse (desktop) di sepanjang garis: titik berpindah ke bulan terdekat dan petunjuk menampilkan bulan dan untung bersihnya, mis. "Jul · Rp 3.795.000". Di HP petunjuk hilang 1,8 detik setelah jari dilepas; geser vertikal tetap menggulir halaman.
+- **Keyboard dan pembaca layar:** garis tren kini bisa difokus (penggeser): panah kiri/kanan, Home, End berpindah bulan, Esc menyembunyikan petunjuk; nilai dibacakan lewat `aria-valuetext` ("Jun: −Rp 1.195.000", bulan terakhir ditambah "(bulan ini)").
+- **Mode Tersembunyi:** nilai pada petunjuk dan `aria-valuetext` menjadi "Rp ••••••".
+- **Label bulan awal/tengah/akhir** di bawah garis kini juga tampil di HP (sebelumnya hanya desktop).
+- Titik dan petunjuk berupa elemen HTML di atas kartu (bukan di dalam SVG yang diregangkan), sehingga titik tetap bulat; tidak ikut tercetak.
+- `js/spark.js` (baru), `js/app.js` (`Spark.pasang`, `Spark.init`, versi), `index.dev.html`, `css/style.css`, `docs/HERO.md`, `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Diuji di Chromium 390 px (sentuh) dan 1440 px (mouse, keyboard, mode Tersembunyi) dengan data contoh; `tools/uji-hero.py` lulus 41/41; tanpa galat JS. Belum diuji di HP sungguhan dan pembaca layar.
+- Tinggi kartu hero di HP bertambah ±18 px karena baris label bulan.
+- Petunjuk menimpa baris selisih periode sesaat saat disentuh; sengaja, karena hanya tampil selama interaksi.
+
+## v0.1.137 — 2026-11-15
+Pencarian cepat mencakup jadwal kegiatan.
+
+### Ditambahkan
+- Kelompok hasil **Jadwal kegiatan** (nama kegiatan, siklus, tanggal, status: terlambat / hari ini / dalam N hari / selesai). Yang belum selesai tampil lebih dulu menurut tanggal terdekat. Mengetuk hasil membuka detail siklus beserta modal detail kegiatan.
+- `js/cari.js`, `docs/CARI.md`, `js/app.js` (versi), `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Diuji di Chromium 390 px dengan data contoh, tanpa galat JS. Belum diuji di HP sungguhan.
+- Seluruh data utama kini terjangkau pencarian; yang belum: foto jurnal dan nota (hanya teks yang dicari).
+
+## v0.1.136 — 2026-11-15
+Pencarian cepat menoleransi salah ketik.
+
+### Ditambahkan
+- Bila pencarian persis tidak menemukan apa pun, dicoba ulang dengan pencocokan mirip: kata ≥4 huruf boleh berbeda 1 huruf (≥7 huruf: 2 huruf), mis. "cabay" menemukan "Cabai", "plybag" menemukan "Polybag". Angka dan kata pendek tetap persis. Hasil diberi keterangan "Tidak ada yang persis sama; ini hasil yang mirip."; bila ada hasil persis, pencocokan mirip tidak dipakai.
+- `js/cari.js`, `docs/CARI.md`, `js/app.js` (versi), `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Diuji di Chromium 390 px dengan data contoh, tanpa galat JS. Belum diuji di HP sungguhan.
+- Jadwal kegiatan belum ikut dicari (hanya catatan jurnal hasil jadwal).
+
+## v0.1.135 — 2026-11-15
+Pencarian cepat: Unit & komoditas, dan angka berformat.
+
+### Ditambahkan
+- Kelompok hasil **Unit & komoditas** (nama, jenis unit atau satuan, status arsip). Mengetuk hasil membuka halaman Unit pada tab yang sesuai beserta modal detailnya.
+- **Angka berformat** cocok dengan nominal: mengetik `552.500` (atau `552,500`) menemukan transaksi Rp 552.500. Hanya angka berpemisah ribuan yang dinormalkan; kata lain tidak berubah.
+- `js/cari.js`, `docs/CARI.md`, `js/app.js` (versi), `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Diuji di Chromium 390 px dengan data contoh (unit, komoditas, angka berformat), tanpa galat JS. Belum diuji di HP sungguhan.
+- Belum dikerjakan: toleransi salah ketik.
+
+## v0.1.134 — 2026-11-15
+Pencarian cepat kini mencakup panen, utang/piutang, aset, dan harga pasar.
+
+### Ditambahkan
+- Empat kelompok hasil baru: **Panen** (siklus, pembeli, tanggal, satuan), **Utang / piutang** (pihak, jenis, status lunas, jatuh tempo, jumlah), **Aset** (nama, tanggal, harga beli), dan **Harga pasar** (komoditas, sumber, tanggal, harga). Tiap kelompok dibatasi 5 hasil terbaru.
+- Membuka hasil: panen → detail siklus + detail panen; utang/aset/harga → halaman Rencana pada sub-tab yang sesuai + modal detailnya.
+- `js/cari.js`, `docs/CARI.md`, `js/app.js` (versi), `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Diuji di Chromium 390 px dengan data contoh: kelima jenis hasil terbuka ke halaman dan modal yang benar, tanpa galat JS. Belum diuji di HP sungguhan.
+- Belum dikerjakan: toleransi salah ketik dan pencarian Unit/Komoditas.
+
+## v0.1.133 — 2026-11-15
+Pencarian cepat di header (butir roadmap Fase 6G Tahap 3).
+
+### Ditambahkan
+- **Ikon pencarian** di header (sebelum tombol tema) dan di bilah ringkas HP. Membuka dialog yang mencari **siklus, transaksi, dan entri jurnal** sekaligus; setiap kata harus cocok (mis. "cabai pupuk"), hasil dikelompokkan dan dibatasi 5 per kelompok dengan tombol *Lihat semua di Transaksi / Jurnal* yang membawa kata kunci ke saringan halaman tujuan.
+- Hasil dibuka satu ketukan: siklus → detail siklus, transaksi → formulir Ubah (panel kanan di desktop), jurnal → detail catatan. Panah atas/bawah berpindah antar hasil, Enter membuka, Esc dan tombol Kembali menutup; nominal ikut disamarkan pada mode Tersembunyi.
+- **Pencarian terakhir:** 5 kata kunci terakhir (disimpan di perangkat, kunci `tani.cari`).
+- Dialog menempel di atas layar (bukan dari bawah) agar hasil tidak tertutup papan ketik HP.
+- `js/cari.js` (baru), `docs/CARI.md` (baru), `index.dev.html`, `css/style.css`, `js/app.js` (`Cari.init()`, versi), `js/desktop.js`, `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `README.md`, `roadmap.md`, `VERSION`.
+
+### Diubah
+- Pintasan `/` kini membuka pencarian cepat di semua halaman (sebelumnya memfokuskan kolom cari Transaksi/Jurnal); daftar pintasan diperbarui. Kolom cari lokal tidak berubah.
+
+### Catatan
+- Diuji di Chromium 390 dan 1440 px dengan data contoh: hasil siklus/transaksi/jurnal terbuka benar, panah dan Enter, *Lihat semua*, pintasan `/`, dan tombol di bilah ringkas; tanpa galat JS (satu galat jaringan hanyalah font web yang tidak termuat di lingkungan uji).
+- Belum diuji di HP sungguhan dan pembaca layar. Panen, aset, utang, dan harga pasar belum ikut dicari.
+
+## v0.1.132 — 2026-11-15
+Titik "perlu perhatian" pada ikon Beranda di bilah bawah HP (butir roadmap Fase 6G).
+
+### Ditambahkan
+- **Titik 9 px** di sudut ikon Beranda pada bilah bawah (<1100 px) bila kartu *Perlu perhatian* berisi butir: **merah** bila ada yang sudah lewat (⚠), **emas** bila hanya yang akan datang (⏰/jurnal); hilang bila tidak ada butir. Daftar sama dengan kartu (`Beranda.daftar()`); `title` dan `aria-label` tombol tetap memuat jumlahnya ("Beranda, 5 perlu perhatian"), titiknya sendiri `aria-hidden`. Di desktop (rail) tetap lencana angka seperti sebelumnya.
+- `js/app.js` (`lencana()` memakai satu kali `Beranda.daftar()` dan menandai kelas `lewat`, versi), `css/style.css`, `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Diperiksa di Chromium 390 px: titik merah (Hijau terang, Hijau gelap + kaca), emas (Emas terang), dan tanpa titik (Emas gelap, tanpa butir); tanpa galat JS.
+- Belum diuji di HP sungguhan dan pembaca layar.
+
+## v0.1.131 — 2026-11-15
+Banner Data contoh satu baris di HP.
+
+### Diubah
+- Keterangan banner di layar <600 px dipersingkat menjadi "Tiruan, bukan catatan Anda." sehingga banner satu baris (sebelumnya tiga baris di 390 px); keterangan lengkap ("catatan Anda tidak ikut terhapus") tetap di layar ≥600 px (`js/contoh.js`, `css/style.css`).
+- `js/app.js` (versi), `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Audit HP sentuh (390 dan 320 px, v0.1.130): tidak ada target ketuk <40 px, jarak akhir halaman ke navigasi 105 px, tanpa overflow atau galat JS. FAB saat halaman diam di puncak menutupi sisi kanan baris Perlu perhatian (area panah); sengaja tidak diubah.
+
+## v0.1.130 — 2026-11-15
+Beranda desktop: kartu Siklus berjalan mengisi lebar penuh.
+
+### Diperbaiki
+- Sejak Siklus berjalan selebar penuh (v0.1.128), kartu hanya memakai ±60% lebar karena kolom `auto-fill` (220 px) menyisakan kolom kosong di kanan. Kini `auto-fit` dengan lebar minimal 260 px sehingga 2–3 siklus membagi lebar penuh sama rata; satu siklus dibatasi 420 px agar tidak melebar.
+- `css/style.css`, `js/app.js` (versi), `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Diperiksa di Chromium: Beranda tanpa peringatan (1200, 1440 px), Beranda kosong, dan tema Hijau gelap + kaca, Emas gelap (HP), Emas terang + kaca: grid tidak bertumpuk, tanpa overflow atau galat JS. Daun latar mode kaca di desktop kadang menimpa teks kartu paling kanan; itu perilaku latar yang sudah ada sejak v0.1.123, tidak diubah.
+
+## v0.1.129 — 2026-11-15
+Beranda: ikon seragam, arah perubahan terbaca jelas, banner Data contoh lebih ringkas.
+
+### Diubah
+- **Ikon Perlu perhatian** berupa SVG (segitiga peringatan, jam, pensil) menggantikan emoji ⚠ ⏰ ✎ yang tampilannya berbeda di tiap HP Android. Warna menurut kedesakan: merah (terlambat), emas (segera), redup (jurnal). Teks bantu pembaca layar "Terlambat:", "Segera:", "Jurnal:" menggantikan arti emoji; urutan ⚠ dulu tetap (`Beranda.ik()`).
+- **Kartu Ringkasan uang:** selisih kini ditulis "▲ naik Rp …" atau "▼ turun Rp …" (kata terlihat, panah hanya hiasan), sehingga Modal yang naik tidak lagi tampak "buruk tanpa penjelasan".
+- **Banner Data contoh** jadi satu blok ringkas (judul dan keterangan sebaris, padding dan tombol lebih kecil, jarak bawah desktop 20→14 px): ±6 px lebih rendah di desktop; di HP tinggi hampir sama karena teks tetap membungkus.
+- `js/beranda.js`, `js/contoh.js`, `js/app.js` (versi), `css/style.css`, `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `README.md`, `roadmap.md`, `docs/HERO.md`, `VERSION`.
+
+### Catatan
+- Diuji di Chromium (320, 390, 1200, 1440 px): tiga ikon tampil, tidak ada sisa emoji di Perlu perhatian, tanpa overflow atau galat JS. Belum diuji di HP sungguhan dan pembaca layar.
+- Emoji di tempat lain (mis. ☀ pada tombol tema) tidak diubah.
+
+## v0.1.128 — 2026-11-15
+Beranda: Perlu perhatian lebih terlihat, diurutkan menurut kedesakan, dan kartu uang digabung.
+
+### Diubah
+- **Perlu perhatian di desktop** kini pita selebar penuh di atas hero (sebelumnya di baris bawah, di luar layar 900 px). Butir tersusun tiga kolom; hero, Ringkasan uang, dan Transaksi terakhir tetap muat di layar 900 px.
+- **Urutan butir menurut kedesakan:** yang sudah lewat (⚠: utang lewat jatuh tempo, anggaran terlampaui, panen terlewat, jadwal terlambat) di atas, lalu yang akan datang (⏰); urutan di dalam tiap kelompok tetap (`Beranda.daftar()`, pengurutan stabil).
+- **Kartu Ringkasan uang** (`data-bx="uang"`, `Beranda.uang()`) menggabungkan *Dibanding bulan lalu* dan *Posisi kas* menjadi satu kartu dengan dua subjudul; label "Saldo kas (semua waktu)" dipersingkat menjadi "Saldo kas" dengan subjudul "Posisi kas · semua waktu". Di HP menghemat satu kartu.
+- Grid desktop (`css/style.css`): baris perhatian 4, hero/uang/transaksi baris 5–6, siklus 7, grafik 8 (≥1360 px); 1100–1359 px: hero 7 kolom dengan Ringkasan uang di kanan, Transaksi terakhir selebar penuh.
+- `js/beranda.js`, `js/app.js` (versi), `css/style.css`, `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `docs/DESKTOP.md`, `docs/HERO.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Atribut `data-bx` `kas` dan `banding` pada Beranda diganti `uang`; `banding` di halaman Laporan tidak berubah.
+- Diuji di Chromium (320, 390, 1200, 1440 px): urutan bagian, butir ⚠ di atas, tanpa overflow atau galat JS; `tools/uji-hero.py` lulus. Belum diuji di HP sungguhan.
+- Belum dikerjakan dari daftar usulan: ikon SVG pengganti emoji, kata "naik/turun" di samping panah Modal, banner Data contoh lebih tipis.
+
+## v0.1.127 — 2026-11-15
+Optimasi ringkasan dan Beranda: angka pembanding konsisten, urutan kartu di HP, nilai Rp tidak putus baris.
+
+### Diperbaiki
+- **Dua angka "dibanding bulan lalu" yang berbeda.** Hero memakai periode setara (tanggal 1 sampai tanggal yang sama), sedangkan kartu *Dibanding bulan lalu* membandingkan bulan berjalan dengan bulan penuh sebelumnya, sehingga selisih Untung/Modal/Hasil tampak bertentangan (mis. ▲ 1.006.500 di hero vs ▲ 1.217.700 di kartu). Kartu kini memakai periode setara yang sama dengan hero lewat satu fungsi bersama `App.periodeSetara()`, dengan catatan "Periode setara: tanggal 1–N di kedua bulan". Selisih Untung di kartu sama persis dengan hero.
+- **Nilai Rp putus baris** di kartu Posisi kas dan Dibanding (mis. "Rp" di satu baris, angka di baris berikutnya pada label panjang). Nilai kini tidak dibungkus dan rata kanan; label yang membungkus.
+
+### Diubah
+- **Urutan Beranda di HP:** Perlu perhatian → **Siklus berjalan** → Dibanding bulan lalu → Posisi kas → Grafik → Transaksi terakhir. Siklus berjalan naik di atas dua kartu perbandingan (sebelumnya ±3 layar ke bawah). Desktop tidak berubah karena grid memakai `data-bx`.
+- `Beranda.atas()` kini hanya Perlu perhatian; kartu Dibanding dan Posisi kas pindah ke `Beranda.uang()`.
+- `js/app.js` (`periodeSetara`, `heroIsi`, `vBeranda`, versi), `js/beranda.js`, `css/style.css`, `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `docs/HERO.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Diukur dengan 6.000 transaksi: render Beranda 1,7 ms; tidak ada masalah performa, jadi tidak ada perubahan di sisi itu.
+- Diuji di Chromium (320, 390, 1440 px): hero dan kartu menunjukkan selisih sama, urutan bagian, tanpa overflow atau galat JS; `tools/uji-hero.py` 41/41 lulus.
+- Belum diubah: di desktop, Perlu perhatian masih berada di baris di bawah hero (di bawah lipatan layar 900 px); lencana di rail tetap menampilkan jumlahnya. Bisa dipindah bila diinginkan.
+
+## v0.1.126 — 2026-11-13
+Fase 6G Tahap 2: bilah ringkas saat gulir (HP dan tablet <1100 px).
+
+### Ditambahkan
+- **Bilah ringkas** (`js/ringkas.js`, elemen `#hdrRingkas`, 53 px): tombol kembali (hanya di halaman turunan), judul halaman terpotong dengan elipsis (ketuk untuk kembali ke puncak), titik status sinkron berlabel, dan tombol Setelan. Muncul saat menggulir **ke atas** setelah melewati header; tersembunyi saat menggulir ke bawah, di dekat puncak halaman, saat modal terbuka, dan saat berpindah halaman.
+- Latar solid tanpa blur (aman dan ringan di efek kaca); mengikuti tema (terang, gelap, Emas); `env(safe-area-inset-top)`; `scroll-padding-top: 64px` agar fokus dan anchor tidak tertutup.
+- Hanya <1100 px; tidak tampil di desktop dan saat cetak; transisi dimatikan pada `prefers-reduced-motion`. Saat tersembunyi memakai `visibility:hidden` sehingga tombolnya tidak ikut urutan Tab.
+
+### Diubah
+- `index.dev.html` (elemen bilah, skrip), `js/app.js` (memanggil `Ringkas.init/segar/sembunyi`, versi), `css/style.css`, `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `README.md`, `roadmap.md` (Fase 6G Tahap 2 selesai), `VERSION`.
+
+### Catatan
+- Keputusan perilaku: bilah muncul saat gulir ke atas (hemat ruang). Untuk selalu tampil setelah melewati header, ubah `geser()` di `js/ringkas.js`.
+- Diuji di Chromium: gulir naik/turun di Beranda, ketuk judul dan Setelan, tombol kembali di detail siklus, Tab (tersembunyi tidak terjangkau; terlihat dapat difokus), modal tidak memunculkan bilah, pergeseran tata letak (CLS) 0 dan tinggi dokumen tetap, lima keadaan titik sinkron, batas 1099/1100 px, cetak, gerak berkurang, tema terang/gelap+kaca/Emas, serta regresi semua halaman tanpa galat JavaScript atau overflow. Belum diuji di perangkat sungguhan (gulir sentuh, PWA terpasang dengan takik layar).
+
+## v0.1.125 — 2026-11-13
+Fase 6G Tahap 1: penyempurnaan header yang ringan.
+
+### Diubah
+- **Tombol tema:** `aria-label` dan `title` dinamis ("Tema terang, ketuk untuk gelap") yang ikut berubah saat tema diganti dari Setelan; mengetuk tombol menampilkan toast "Tema gelap" atau "Tema terang".
+- **Tanggal di Beranda:** baris di bawah judul menjadi "Jumat, 13/11 · Manajemen pertanian" (format ISO: "Jumat, 11-13"). Di layar ≤430 px nama hari disingkat ("Jum, 13/11"); di ≤379 px tagline disembunyikan agar header tetap satu baris. Tanggal diperbarui saat aplikasi kembali terlihat setelah pergantian hari. Halaman lain tetap menampilkan "Buku Kebun".
+- **Chip status sinkron:** titik berdenyut pelan saat "Menyinkronkan…" (nonaktif bila `prefers-reduced-motion`).
+- **Header HP lebih rendah:** padding 30/20 px menjadi 20/14 px di <1100 px. Tinggi header turun dari 125 ke 107 px (detail siklus 135 ke 117 px) di lebar 320–1099 px. Desktop (≥1100 px) tidak berubah.
+- Butir "judul panjang" ternyata sudah terpenuhi (`title` pada judul), sehingga tidak ada perubahan.
+- `js/app.js` (`hariIniPendek`, `judulHal`, tombol tema, pendengar `visibilitychange`, versi), `js/setelan.js` (label tema), `css/style.css`, `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `README.md`, `roadmap.md` (Fase 6G ditambahkan), `VERSION`.
+
+### Catatan
+- Tinggi header HP 107 px; target akhir Fase 6G (≤105 px) dicapai bersama bilah ringkas Tahap 2.
+- Diuji di Chromium: tinggi header di 6 lebar (320–1100 px), label dan toast tema, tanggal (dmy dan ISO, jam dipalsukan, pergantian hari), animasi chip dan gerak berkurang, serta regresi semua halaman di HP dan desktop (tanpa overflow atau galat JavaScript).
+- Berikutnya: Tahap 2 (bilah ringkas saat gulir) menunggu keputusan: muncul hanya saat gulir ke atas atau selalu setelah melewati header.
+
+## v0.1.124 — 2026-11-13
+Perbaikan kontras dari audit CSS (`docs/AUDIT-CSS.md`). Tanpa perubahan fungsi atau tata letak.
+
+### Diperbaiki
+- **Aksen Emas terang:** `--gold` dari `#9C7526` ke `#7E5F1F`. Rasio terhadap `--ink-raised` naik dari 3,20:1 menjadi 4,51:1 dan terhadap `--ink` dari 3,61:1 menjadi 5,08:1, sehingga teks kecil beraksen (`.badge.live`, `.btn.on`, `.cx-opt.sel`, `.sk-mata`) memenuhi 4,5:1. Skema Hijau dan Emas gelap tidak berubah.
+- **Batas kolom isian:** token baru `--line-strong` (Hijau terang `#9C8D3C`, Hijau gelap `#5D764B`, Emas terang `#917E49`, Emas gelap `#77664E`; rasio 3,0–3,4:1) dipakai pada batas `input`, `select`, `textarea`, `.cx-btn` (pilihan kustom), `.sk-f input`, dan kotak centang persetujuan, agar batas kontrol terlihat (syarat 3:1 untuk komponen UI). Garis dekoratif tetap memakai `--line`.
+- Properti usang `-webkit-overflow-scrolling: touch` dihapus (`.dm-isi`, `.rc-chips`; tidak berpengaruh sejak iOS 13).
+
+### Diubah
+- `css/style.css` (token `--line-strong`, nilai `--gold` Emas terang, 4 aturan batas isian, 2 properti usang), `js/app.js` (versi), `sw.js`, `index.html` dan `buku-kebun.html` (hasil build), `docs/STYLE.md` (tabel token), `docs/AUDIT-CSS.md` (status), `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Batas kolom isian kini sedikit lebih tegas di semua tema (disengaja); mode kaca dan `prefers-contrast: more` tidak diubah.
+- Diuji di Chromium: seluruh halaman di 4 konfigurasi tanpa galat JavaScript atau overflow, dan perbandingan tampilan formulir sebelum dan sesudah di Hijau dan Emas, terang dan gelap.
+- Temuan baru yang belum diperbaiki: angka `+Rp` hijau pada baris transaksi terpilih di desktop terang berkontras 4,44:1 (sedikit di bawah 4,5:1).
+- Temuan audit lain (blok ganda, spesifisitas, gaya inline di JS, satuan rem, breakpoint) belum dikerjakan; lihat `docs/AUDIT-CSS.md`.
+
+## v0.1.123
+Latar mode kaca: **bentuk geometri diganti ilustrasi dedaunan tropis**. Hanya terlihat saat Efek kaca Nyala; mode biasa tidak berubah.
+
+### Ditambahkan
+- Ilustrasi **botanical tropis** berupa SVG inline di `.gbg`: daun monstera (bercelah), pelepah palem, daun pisang, pakis, dan bunga kamboja. Tiap jenis didefinisikan sekali di `<defs>` (`bt-palm`, `bt-fern`, `bt-mo`, `bt-ba`, `bt-fl`) lalu dipakai ulang dengan `<use>` pada **empat gugus di tepi layar** (kanan atas, kiri bawah, kanan bawah, kiri tengah); bagian tengah dibiarkan lapang. Pelepah palem dan pakis dihasilkan secara program (poros melengkung dengan anak daun berpasangan), jadi bentuknya bisa disetel ulang.
+- Warna dari token yang sudah ada (`--fill-hi`, `--fill`, `--gold-dim`, `--gold`): otomatis mengikuti **terang/gelap** dan skema **Hijau Padi** (hijau) maupun **Emas Klasik** (dedaunan keemasan). Mode gelap dibuat lebih redup.
+- Ukuran memakai `clamp()` dan `aspect-ratio`, diperiksa pada lebar 320, 390, 430, 768, 1440, dan 1920 px.
+
+### Diubah
+- `index.dev.html` (isi `.gbg`), `css/style.css` (11 aturan bentuk geometri `.gs`/`.g1`–`.g9` dihapus, diganti blok dedaunan), `js/setelan.js` (keterangan Efek kaca: "latar dedaunan tropis"), `docs/STYLE.md` (bagian latar dan token lapisan), `index.html` dan `buku-kebun.html`/`tani-keuangan.html` (hasil build), `README.md`, `roadmap.md`, `VERSION`, `js/app.js` dan `sw.js` (versi, cache `buku-kebun-v0_1_123`).
+- Tetap sama: `.gbg` hanya `aria-hidden`, tidak menerima klik, `position: fixed`, `contain: strict`, `z-index` lewat `--z-latar`, tidak tercetak, **tanpa animasi dan tanpa filter** (agar blur kaca di atasnya tetap ringan).
+
+### Catatan
+- **Keterbacaan diukur, bukan ditebak.** Teks disembunyikan, latar di belakang tiap teks diambil dari tangkapan layar, lalu kontras terburuknya dihitung terhadap warna teks (8 kondisi: HP dan desktop × terang/gelap × Hijau Padi/Emas Klasik, 12–60 teks tiap kondisi). Kontras terendah **sama atau lebih baik** daripada latar geometris lama pada semua kondisi (mis. HP terang Hijau Padi 4,30 → 4,88; desktop terang 4,12 → 4,48; gelap tidak berubah), dan jumlah teks di bawah 4,5:1 tidak bertambah. Median turun sedikit di mode terang (HP 10,05 → 9,27) karena urat daun, masih jauh di atas 4,5:1. Penyetelan opasitas dilakukan setelah ukuran awal menemukan satu teks tanggal transaksi (4,37) tertimpa daun di mode gelap.
+- Pemeriksaan lain di Chromium: semua 11 halaman × lebar 390/768/1440 px × kaca Nyala/Mati tanpa overflow, NaN, atau galat; `display: none` pada media cetak; tidak ada sisa elemen `.gs`.
+- Ukuran bertambah ±14 KB (`index.html` 530.818 → 545.332 byte).
+- Belum diuji: Firefox dan Safari (WebKit), dan perangkat sungguhan. Teks berkontras rendah yang sudah ada sejak sebelumnya (mis. judul kartu siklus pada tema gelap, 3,57:1) tidak berubah karena bukan akibat latar.
+
+## v0.1.122
+Fase 6D (desktop) Tahap 3: **cetak langsung halaman Transaksi** (Ctrl+P) kini rapi di kertas A4. Dokumen: `docs/DESKTOP.md`.
+
+### Penyebab
+- Mencetak halaman Transaksi sebelumnya berupa daftar baris tiga baris per transaksi (tampilan HP) karena lebar kertas di bawah 1100 px, kartu filter memenuhi halaman pertama, dan kartu hasil yang tidak boleh terbelah membuat seluruh daftar pindah ke halaman kedua. Hanya 100 baris pertama yang tercetak tanpa keterangan.
+
+### Diubah
+- **Cetak selalu berupa tabel** ringkas (Tanggal, Kategori, Siklus, Catatan, Jumlah), baik dari layar desktop maupun HP. Kotak centang, ikon hapus, dan bilah pilihan tidak tercetak. Teks catatan panjang **dibungkus**, tidak dipotong dengan "…".
+- **Semua baris tercetak**, bukan hanya 100 pertama; tampilan layar dikembalikan (jumlah baris dan mode daftar/tabel) sesudah cetak.
+- **Keterangan filter di atas tabel**: "Periode: … · Jenis: … · Kategori/Siklus/Cari bila dipakai · N transaksi", supaya kertas menjelaskan datanya. Kartu filter interaktif disembunyikan saat cetak.
+- **Judul kolom berulang di setiap halaman.** Pengujian menemukan tombol (`<button>`) di dalam judul kolom mencegah Chromium mengulang header; saat cetak judul kolom dibuat teks biasa. Baris tidak terbelah di tengah antar halaman.
+- Kartu hasil Transaksi boleh terbelah antar halaman dan dicetak tanpa latar/bingkai kartu.
+- `js/app.js` (`ringkasFilter`, `tabelTx` mengenal mode cetak, judul kolom saat cetak, versi), `js/desktop.js` (`beforeprint`/`afterprint`), `css/style.css`, `sw.js` (`buku-kebun-v0_1_122`), `index.html`, `buku-kebun.html`, `docs/DESKTOP.md`, `README.md`, `roadmap.md`, `VERSION`.
+
+### Catatan
+- Diperiksa dengan PDF A4 dari Chromium (Playwright `page.pdf`, 145 transaksi): 10 halaman, nomor "Halaman n dari 10" cocok, judul kolom terlihat di ke-10 halaman, seluruh 70 catatan uji tercetak utuh tanpa "…", dan UI filter tidak tercetak; hasilnya sama untuk lebar 1440 dan 390 px. Pengujian memicu `beforeprint`/`afterprint` secara manual karena `page.pdf` tidak memicunya; perilaku di dialog cetak browser sungguhan belum diuji.
+- Halaman lain yang dicetak langsung dengan Ctrl+P (Beranda, detail Siklus, Rencana) belum dioptimalkan; dokumen Laporan dan Jurnal sudah punya format cetak sendiri. Pada uji awal, Beranda menjadi 6 halaman dan detail Siklus 4 halaman.
+- Firefox dan Safari belum diuji (dukungan `@page` margin box seperti "Halaman n dari m" berbeda-beda).
+
 ## v0.1.121
 Fase 6D (desktop) Tahap 2: **master–detail** — form catat/ubah transaksi di **panel kanan** pada halaman Transaksi. Dokumen: `docs/DESKTOP.md`.
 

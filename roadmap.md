@@ -1,6 +1,6 @@
 # Roadmap — Web App Keuangan Pertanian Rumahan
 
-> Status dokumen: draf v0.1 · Terakhir diperbarui: 5 November 2026 · Fase 5 selesai; Fase 6 berjalan: cadangan otomatis + dasar PWA; FAB kontekstual; chart di Beranda; data contoh otomatis; sinkron Supabase (v0.1.023); penyempurnaan UX (v0.1.024); kartu hero Beranda (v0.1.025); judul halaman (v0.1.026); foto nota lokal (v0.1.037); optimasi performa/aksesibilitas bagian 1 (v0.1.038); pembayaran utang/piutang tahap 1 (v0.1.048) dan tahap 2: tombol Bayar + cicilan (v0.1.049); Catat panen vs Catat hasil (v0.1.050); jadwal kegiatan per siklus (v0.1.051); katalog harga pasar (v0.1.052); kalkulator kelayakan usaha (v0.1.053); ekspor Excel (v0.1.054); isian Rencana keuangan lewat modal FAB (v0.1.055); ringkasan, sub-tab geser, ubah aset/utang (v0.1.056); daftar anggaran dengan detail (v0.1.057); daftar aset dan utang dengan detail (v0.1.058); grafik arus kas, saringan utang, simpan & tambah lagi, tren harga (v0.1.059); Jadwal dan Panen lewat modal detail (v0.1.060); modal bersama, tombol kembali, hapus seragam (v0.1.061); detail siklus dipadatkan (v0.1.066); duplikat FAB dibersihkan (v0.1.067); layout desktop dashboard tahap A–C (v0.1.081); Fase 6E Jurnal Siklus direncanakan, 8 tahap (v0.1.086); Tahap 0 selesai: docs/JURNAL.md dan wireframe, menunggu konfirmasi keputusan (v0.1.087); Fase 6E Tahap 4 foto jurnal (v0.1.092); Jurnal Tahap 7: Catat cepat (v0.1.100); keamanan data multi-tab (v0.1.101); performa 1.000+ entri dan aksesibilitas Jurnal diaudit (v0.1.105); cetak laporan diperbarui (v0.1.111)
+> Status dokumen: draf v0.1 · Terakhir diperbarui: 5 November 2026 · Fase 5 selesai; Fase 6 berjalan: cadangan otomatis + dasar PWA; FAB kontekstual; chart di Beranda; data contoh otomatis; sinkron Supabase (v0.1.023); penyempurnaan UX (v0.1.024); kartu hero Beranda (v0.1.025); judul halaman (v0.1.026); foto nota lokal (v0.1.037); optimasi performa/aksesibilitas bagian 1 (v0.1.038); pembayaran utang/piutang tahap 1 (v0.1.048) dan tahap 2: tombol Bayar + cicilan (v0.1.049); Catat panen vs Catat hasil (v0.1.050); jadwal kegiatan per siklus (v0.1.051); katalog harga pasar (v0.1.052); kalkulator kelayakan usaha (v0.1.053); ekspor Excel (v0.1.054); isian Rencana keuangan lewat modal FAB (v0.1.055); ringkasan, sub-tab geser, ubah aset/utang (v0.1.056); daftar anggaran dengan detail (v0.1.057); daftar aset dan utang dengan detail (v0.1.058); grafik arus kas, saringan utang, simpan & tambah lagi, tren harga (v0.1.059); Jadwal dan Panen lewat modal detail (v0.1.060); modal bersama, tombol kembali, hapus seragam (v0.1.061); detail siklus dipadatkan (v0.1.066); duplikat FAB dibersihkan (v0.1.067); layout desktop dashboard tahap A–C (v0.1.081); Fase 6E Jurnal Siklus direncanakan, 8 tahap (v0.1.086); Tahap 0 selesai: docs/JURNAL.md dan wireframe, menunggu konfirmasi keputusan (v0.1.087); Fase 6E Tahap 4 foto jurnal (v0.1.092); Jurnal Tahap 7: Catat cepat (v0.1.100); keamanan data multi-tab (v0.1.101); performa 1.000+ entri dan aksesibilitas Jurnal diaudit (v0.1.105); cetak laporan diperbarui (v0.1.111); latar kaca dedaunan tropis (v0.1.123)
 
 ## 1. Visi & Tujuan
 
@@ -150,7 +150,7 @@ Aturan: hanya tata letak untuk layar ≥1100 px; token warna, font, dan gaya kar
 
 **Tahap 3 — pelengkap**
 - [ ] Cadangan ke folder pilihan (File System Access API, Chromium) dan seret-dan-lepas berkas untuk impor
-- [ ] Cetak: `@page` A4 (margin, nomor halaman, `break-inside: avoid`)
+- [x] *(v0.1.122: cetak langsung halaman Transaksi; dokumen Laporan/Jurnal sudah punya format sendiri; Beranda dan detail Siklus belum)* Cetak: `@page` A4 (margin, nomor halaman, `break-inside: avoid`)
 - [ ] PWA desktop: manifest dengan `display_override`, jendela mandiri; tema otomatis mengikuti `prefers-color-scheme`
 - [ ] Aksesibilitas desktop: landmark `nav`/`main`, `aria-current` menu aktif, cek kontras AA tema terang, uji zoom 200% dan skala Windows 125–150%
 - [ ] Uji otomatis di lebar 1024/1280/1440/1920 pada Chromium, Firefox, WebKit, dengan tangkapan layar pembanding
@@ -293,6 +293,33 @@ Prioritas dari tinggi ke rendah. Berkas terkait: `js/linimasa.js` (`cetakDoc`), 
 - [ ] **Tahap 5 — Uji pada proyek Supabase sungguhan:** konfirmasi email, kode OTP, batas kecepatan, sesi habis, dua perangkat, uji kamera/PWA terpasang.
 - [ ] **Tahap 6 — Multi-pengguna (pemilik dan pencatat):** tabel kebun, anggota, dan RLS berbasis peran; skema satu baris per pengguna (`tani_data`) perlu diganti. Dikerjakan setelah alur akun stabil.
 
+### Fase 6G — Penyempurnaan Header (ringan) — Tahap 1–3 selesai (v0.1.134)
+**Latar (diukur pada v0.1.121, HP 390 px).** Tinggi header 125–135 px (±16% layar 800 px) dan tidak lengket: setelah gulir, judul halaman, tombol kembali, dan status sinkron ikut hilang dari layar. Tombol tema berlabel tetap "Ganti tema" tanpa `title`; tanggal hari ini tidak tampil; judul panjang (misalnya detail siklus) membungkus dua baris.
+**Sudah baik, tidak diubah:** warna bilah browser mengikuti tema dan skema (`theme-color`); tombol 40×40 px; tombol mata muncul kontekstual saat mode Tersembunyi; label status sinkron (Fase 6F); header desktop (breadcrumb, judul, pil tombol).
+**Prinsip:** perubahan kecil, hanya HP kecuali disebut lain, tanpa mengubah palet, huruf, atau layout desktop Fase 6D; semua animasi menghormati `prefers-reduced-motion`.
+
+**Tahap 1 — Rapi dan informatif (kecil, risiko rendah) — selesai v0.1.125**
+- [x] **Tombol tema:** `aria-label` dan `title` dinamis ("Tema terang, ketuk untuk gelap"), ikut berubah saat tema diganti dari Setelan; toast singkat "Tema gelap" saat diketuk. Mode Otomatis tetap diatur di Setelan.
+- [x] **Tanggal di Beranda:** baris di bawah judul menjadi "Jumat, 13/11 · Manajemen pertanian" (format ISO: "Jumat, 11-13"). Di layar ≤430 px nama hari disingkat tiga huruf ("Jum, 13/11") dan di ≤379 px tagline disembunyikan agar tetap satu baris; tanggal diperbarui saat aplikasi kembali terlihat setelah ganti hari. Halaman lain tetap "Buku Kebun".
+- [x] **Judul panjang:** sudah terpenuhi sejak sebelumnya (h1 memuat `title` berisi teks lengkap dan terpotong dua baris); tidak ada perubahan.
+- [x] **Chip sinkron:** titik berdenyut pelan saat "Menyinkronkan…"; nonaktif pada `prefers-reduced-motion`; area ketuk tetap ≥40 px.
+- [x] **Header HP lebih rendah:** padding atas 30→20 px dan bawah 20→14 px di <1100 px: tinggi 125→107 px (Beranda, Transaksi, dan halaman lain), detail siklus 135→117 px; desktop (≥1100 px) tidak berubah.
+
+**Tahap 2 — Header ringkas saat gulir (kecil–sedang, HP saja) — selesai v0.1.126**
+- [x] Bilah ramping (53 px) `Ringkas` (`js/ringkas.js`): tombol kembali (halaman turunan), judul terpotong dengan elipsis (ketuk = ke puncak halaman), titik status sinkron (Mode lokal, Tersinkron, Menyinkronkan, Gagal, Menunggu internet; berlabel untuk pembaca layar), dan tombol Setelan. Muncul saat menggulir **ke atas** setelah melewati header, tersembunyi saat menggulir ke bawah, di dekat puncak halaman, saat modal terbuka, dan saat berpindah halaman. Latar solid tanpa blur.
+- [x] `scroll-padding-top: 64px` (<1100 px) agar fokus dan anchor tidak tertutup; tidak bertabrakan dengan FAB, modal (z-index lebih tinggi), toast, dan bilah bawah; memakai `env(safe-area-inset-top)`.
+- [x] Tidak aktif di desktop (≥1100 px; `display:none`) dan saat cetak; transisi dimatikan pada `prefers-reduced-motion`.
+- *Kriteria selesai:* tidak ada lompatan tata letak saat bilah muncul; Tab dan Shift+Tab tidak terjebak; tombol kembali bisa dicapai dengan satu ketukan di halaman mana pun setelah gulir; lolos uji tema terang, gelap, Emas, efek kaca, dan mode Tersembunyi.
+
+**Tahap 3 — Pelengkap (opsional, ukur manfaatnya dulu)**
+- [x] **Penanda "perlu perhatian"** (titik kecil; selesai v0.1.132: titik merah/emas di bilah bawah HP, lencana angka tetap di rail desktop) pada ikon Beranda di bilah bawah dan rail bila ada jatuh tempo lewat atau anggaran ≥90%, memakai daftar yang sama dengan kartu "Perlu perhatian".
+- [x] **Pencarian cepat** (selesai v0.1.133, docs/CARI.md): ikon kaca pembesar di header dan bilah ringkas membuka dialog yang mencari transaksi, siklus, dan jurnal; pintasan `/` di desktop; kata kunci terakhir; *Lihat semua* ke saringan Transaksi/Jurnal. Sejak v0.1.134 juga mencakup panen, utang/piutang, aset, dan harga pasar.
+- *Sengaja tidak dimasukkan:* salam atau avatar besar (tidak relevan untuk mode lokal), notifikasi push, dan spanduk pasang aplikasi (sudah ada di Setelan).
+
+**Risiko dan mitigasi.** Bilah lengket bisa menutupi judul bagian saat tautan atau fokus melompat → `scroll-padding-top`; bilah lengket di atas efek kaca bisa mahal di HP lama → latar solid; header berubah tinggi bisa membuat konten melompat → ruang disediakan tetap (CLS 0).
+**Ukuran keberhasilan.** Tinggi header HP ≤105 px (Tahap 1: 107 px; sisanya dicapai bilah ringkas Tahap 2), tanpa regresi tata letak desktop (uji 1100, 1280, 1440 px) dan tanpa galat JavaScript.
+**Keputusan untuk Anda.** (1) Diputuskan: bilah muncul saat gulir ke atas (hemat ruang); bila ingin selalu tampil setelah melewati header, ubah `geser()` di `js/ringkas.js`. (2) Tanggal di Beranda sudah memakai bentuk ringkas "Jumat, 13/11"; ubah ke "Jumat, 13 Nov" bila lebih disukai.
+
 ### Fase 7 — Rilis v1.0 (Minggu 17–18)
 - [ ] Pengujian dengan data nyata (minimal 1–2 siklus)
 - [ ] Perbaikan UX berdasarkan umpan balik
@@ -367,11 +394,11 @@ Prioritas dari tinggi ke rendah. Berkas terkait: `js/linimasa.js` (`cetakDoc`), 
 
 ### Saran optimasi kartu hero (diusulkan di v0.1.099; sebagian dikerjakan di v0.1.110)
 - [x] **Bandingkan periode setara** (v0.1.110): selisih terhadap "sampai tanggal yang sama bulan lalu" (atau proyeksi akhir bulan) agar tidak membandingkan bulan berjalan dengan bulan penuh. Kecil; dampak: angka lebih adil.
-- [ ] **Sparkline interaktif:** ketuk atau geser untuk melihat bulan dan nilainya (tersamar bila Tersembunyi), titik penanda bulan ini (lapisan HTML agar tidak lonjong akibat `preserveAspectRatio="none"`), dan label awal/akhir bulan juga di HP. Sedang.
+- [x] *(selesai v0.1.138)* **Sparkline interaktif:** ketuk atau geser untuk mengganti angka utama hero ke bulan itu (v0.1.141, tanpa petunjuk melayang; tersamar bila Tersembunyi), titik penanda bulan ini (lapisan HTML agar tidak lonjong akibat `preserveAspectRatio="none"`), dan label awal/akhir bulan juga di HP. Sedang.
 - [x] **Notasi ringkas untuk miliaran** (v0.1.110) ("Rp 12,3 M") dengan nilai penuh di `title`/ketuk, sebagai ganti sekadar mengecilkan huruf. Kecil.
 - [x] ~~**Pilihan periode hero**~~ — **dibatalkan** atas permintaan pengguna (hero cukup angka utama): chip kecil Bulan ini / 3 bulan / Tahun ini / Siklus berjalan. Sedang.
 - [x] ~~**Anggaran terpakai di hero**~~ — **dibatalkan** atas permintaan pengguna; anggaran tetap di kartu Siklus berjalan: batang kemajuan "sisa anggaran bulan ini" bila anggaran diisi. Sedang.
-- [ ] **Cache agregat bulanan:** memo `Analisa.bulanN` dan `Beranda.per` yang dibatalkan saat `App._ak` direset, dipakai bersama Beranda, Laporan, dan hero; relevan di atas ±5.000 transaksi. Sedang.
+- [x] *(selesai v0.1.142)* **Cache agregat bulanan:** `Analisa.agg()` satu lintasan, dipakai bersama `Analisa.bulanN`, `Beranda.per`, dan hero; memo dibatalkan saat `App._ak` direset. Render Beranda pada 100.000 transaksi 155 → 72 ms (`tools/uji-agregat.py`). Sedang.
 - [x] **Penjelasan R/C untuk pemula** (v0.1.110): ketuk "R/C ratio" membuka penjelasan satu kalimat dan status (mis. ≥ 1,3 sehat). Kecil.
 - [x] **Uji tangkapan layar otomatis** (v0.1.110, `tools/uji-hero.py`): kartu hero di 320/360/390/1440 px agar regresi terlihat sebelum rilis. Kecil.
 
@@ -532,3 +559,24 @@ Prioritas dari tinggi ke rendah. Berkas terkait: `js/linimasa.js` (`cetakDoc`), 
 | 0.1.119 | 2026-11-10 | Desktop Tahap 2: Transaksi sebagai tabel (urut per kolom, header lengket, keyboard) di layar ≥1100 px |
 | 0.1.120 | 2026-11-10 | Desktop Tahap 2: pilih banyak, hapus massal (Urungkan), ikon hapus per baris di tabel Transaksi |
 | 0.1.121 | 2026-11-10 | Desktop Tahap 2: master–detail Transaksi (formulir catat/ubah di panel kanan, penjaga perubahan, Esc) |
+| 0.1.122 | 2026-11-10 | Cetak langsung halaman Transaksi: tabel A4, semua baris, keterangan filter, judul kolom berulang |
+| 0.1.123 | 2026-11-10 | Latar kaca dedaunan tropis (monstera, palem, pisang, pakis, kamboja) menggantikan bentuk geometri |
+| 0.1.124 | 2026-11-13 | Kontras dari audit CSS: aksen Emas terang lebih gelap, token --line-strong untuk batas kolom isian, hapus properti usang |
+| 0.1.125 | 2026-11-13 | Fase 6G Tahap 1: label tombol tema dinamis, tanggal di Beranda, chip sinkron berdenyut, header HP lebih rendah (125→107 px) |
+| 0.1.126 | 2026-11-13 | Fase 6G Tahap 2: bilah ringkas saat gulir ke atas (kembali, judul, status sinkron, Setelan) di HP dan tablet <1100 px |
+| 0.1.127 | 2026-11-15 | Optimasi Beranda: pembanding periode setara konsisten antara hero dan kartu Dibanding, Siklus berjalan naik di HP, nilai Rp tidak putus baris |
+| 0.1.128 | 2026-11-15 | Beranda: Perlu perhatian jadi pita di atas hero (desktop) dan diurutkan menurut kedesakan; Dibanding dan Posisi kas digabung jadi Ringkasan uang |
+| 0.1.129 | 2026-11-15 | Beranda: ikon SVG Perlu perhatian, kata naik/turun di Ringkasan uang, banner Data contoh lebih ringkas |
+| 0.1.130 | 2026-11-15 | Beranda desktop: kartu Siklus berjalan mengisi lebar penuh |
+| 0.1.131 | 2026-11-15 | Banner Data contoh satu baris di HP |
+| 0.1.132 | 2026-11-15 | Titik perlu perhatian (merah/emas) pada ikon Beranda di bilah bawah HP |
+| 0.1.133 | 2026-11-15 | Pencarian cepat di header (siklus, transaksi, jurnal), pintasan `/`, kata kunci terakhir (docs/CARI.md) |
+| 0.1.134 | 2026-11-15 | Pencarian cepat mencakup panen, utang/piutang, aset, dan harga pasar |
+| 0.1.135 | 2026-11-15 | Pencarian cepat mencakup Unit & komoditas; angka berformat (552.500) cocok dengan nominal |
+| 0.1.136 | 2026-11-15 | Pencarian cepat menoleransi salah ketik (hanya bila hasil persis kosong) |
+| 0.1.137 | 2026-11-15 | Pencarian cepat mencakup jadwal kegiatan |
+| 0.1.138 | 2026-11-15 | Sparkline hero interaktif: titik bulan ini, ketuk/geser/keyboard, label bulan di HP (docs/HERO.md) |
+| 0.1.139 | 2026-11-15 | Perbaikan: tombol mata hero bekerja juga saat setelan Angka untung = Tampil (docs/HERO.md, docs/SETELAN.md) |
+| 0.1.140 | 2026-11-15 | Perbaikan sparkline hero: tanpa kotak fokus saat ditap, titik tepat di garis pada Ukuran tampilan selain 100% (docs/HERO.md) |
+| 0.1.141 | 2026-11-15 | Angka utama hero mengikuti bulan yang disentuh di sparkline, tanpa petunjuk melayang (docs/HERO.md) |
+| 0.1.142 | 2026-11-15 | Cache agregat bulanan bersama untuk hero, Beranda, dan Laporan; `tools/uji-agregat.py` (docs/HERO.md) |

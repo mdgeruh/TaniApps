@@ -1,12 +1,12 @@
 /* Buku Kebun — Beranda yang lebih berguna (v0.1.018): perlu perhatian, kas, banding bulan lalu */
 const Beranda = {
   m(n) { return '<span data-mask data-val="' + rp(n) + '">' + rp(n) + '</span>'; },
-  per(k) { const tx = App.aktif().filter((t) => t.tanggal.slice(0, 7) === k); const m = App.jumlah(tx, 'keluar'), h = App.jumlah(tx, 'masuk'); return { m, h, u: h - m, n: tx.length }; },
+  per(k) { const a = Analisa.agg()[k] || { m: 0, h: 0, n: 0 }; return { m: a.m, h: a.h, u: a.h - a.m, n: a.n }; }, /* dari agregat bulanan bersama (Analisa.agg) */
   delta(a, b, baikNaik) {
     if (!b && !a) return '<span class="mu">—</span>';
     const d = a - b; if (!d) return '<span class="mu">sama</span>';
     const baik = (d > 0) === baikNaik;
-    return '<span class="' + (baik ? 'up' : 'down') + '">' + (d > 0 ? '▲ ' : '▼ ') + Beranda.m(Math.abs(d)) + '</span>';
+    return '<span class="' + (baik ? 'up' : 'down') + '">' + '<span aria-hidden="true">' + (d > 0 ? '▲ ' : '▼ ') + '</span>' + (d > 0 ? 'naik ' : 'turun ') + Beranda.m(Math.abs(d)) + '</span>';
   },
   daftar() {
     const out = [], hari = isoHari(), d7 = isoHari(new Date(Date.now() + 7 * 864e5));
@@ -27,25 +27,30 @@ const Beranda = {
     if (ij) Siklus.daftar().filter((s) => s.status === 'berjalan').forEach((s) => { const L = Jurnal.of(s.id), n = Jurnal.hariKe(s, hari) - Jurnal.hariKe(s, L.length ? L[0].tanggal : s.mulai);
       if (n >= ij) out.push(ke('✎ ' + esc(Siklus.nama(s.id)) + ': belum ada catatan jurnal ' + n + ' hari', 'data-do="buka-siklus" data-id="' + s.id + '" aria-label="Buka siklus ' + esc(Siklus.nama(s.id)) + '"')); });
     out.unshift(...pn.sort((x, y) => x[0] - y[0]).map((x) => x[1])); // pengingat panen paling atas
-    return out;
+    return out.sort((x, y) => (x.t.charAt(0) === '⚠' ? 0 : 1) - (y.t.charAt(0) === '⚠' ? 0 : 1)); // yang sudah lewat (⚠) paling atas; urutan lain tetap (sort stabil)
   },
   jumlah() { return this.daftar().length; },
+  /* Ikon SVG seragam pengganti emoji (v0.1.129); teks bantu pembaca layar menggantikan arti emoji */
+  ik(t) {
+    const M = { '⚠': ['lewat', 'Terlambat: ', '<path d="M12 4l9 16H3zM12 10v4M12 17v.5"/>'], '⏰': ['dekat', 'Segera: ', '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'], '✎': ['jurnal', 'Jurnal: ', '<path d="M4 20l1-4L16 5l3 3L8 19zM14 7l3 3"/>'] }[t.charAt(0)];
+    return M ? '<svg class="pi ' + M[0] + '" viewBox="0 0 24 24" aria-hidden="true">' + M[2] + '</svg><span class="sr-only">' + M[1] + '</span>' + t.slice(2) : t;
+  },
   perhatian() {
     const out = this.daftar();
     const tampil = this.semua ? out : out.slice(0, 3);
-    return out.length ? '<section data-bx="perhatian"><h2>Perlu perhatian</h2>' + tampil.map((x) => '<div class="row row-tuju" role="button" tabindex="0" ' + x.a + '><span>' + x.t + '</span><span class="mu" aria-hidden="true">›</span></div>').join('') +
+    return out.length ? '<section data-bx="perhatian"><h2>Perlu perhatian</h2>' + tampil.map((x) => '<div class="row row-tuju" role="button" tabindex="0" ' + x.a + '><span>' + this.ik(x.t) + '</span><span class="mu" aria-hidden="true">›</span></div>').join('') +
       (out.length > 3 ? '<button type="button" class="btn" data-bp="1" style="width:100%;margin-top:10px">' + (this.semua ? 'Ringkas' : 'Lihat semua (' + out.length + ')') + '</button>' : '') + '</section>' : '';
   },
-  atas() {
-    const ini = bulanIni(), lalu = bulanLalu(), a = this.per(ini), b = this.per(lalu);
+  atas() { return App.aktif().length ? this.perhatian() : ''; },
+  /* Dibanding periode setara (sama dengan hero) dan Posisi kas; diletakkan sesudah Siklus berjalan (v0.1.127) */
+  uang() {
+    const P = App.periodeSetara(), a = P.kini, b = P.lalu;
     const saldo = Utang.saldo();
     const U = App.data.utang.filter((u) => !u.terhapus && !u.lunas), tot = (j) => U.filter((u) => u.jenis === j).reduce((s, u) => s + Utang.sisa(u), 0);
     const row = (x, y) => '<div class="row"><span class="mu">' + x + '</span><span>' + y + '</span></div>';
     if (!App.aktif().length) return '';
-    return this.perhatian() +
-      '<section data-bx="banding"><h2>Dibanding bulan lalu</h2>' + row('Untung', this.delta(a.u, b.u, true)) + row('Modal', this.delta(a.m, b.m, false)) + row('Hasil', this.delta(a.h, b.h, true)) +
-      (b.n ? '' : '<p class="note">Belum ada transaksi bulan lalu sebagai pembanding.</p>') + '</section>' +
-      '<section data-bx="kas"><h2>Posisi kas</h2>' + row('Saldo kas (semua waktu)', '<strong class="' + (saldo >= 0 ? 'up' : 'down') + '">' + this.m(saldo) + '</strong>') +
+    return '<section data-bx="uang"><h2>Ringkasan uang</h2><h3>Dibanding bulan lalu</h3>' + row('Untung', this.delta(a.u, b.u, true)) + row('Modal', this.delta(a.m, b.m, false)) + row('Hasil', this.delta(a.h, b.h, true)) +
+      (b.n ? '<p class="note">Periode setara: tanggal 1–' + P.a2.slice(8) + ' di kedua bulan.</p>' : '<p class="note">Belum ada transaksi di periode sama bulan lalu sebagai pembanding.</p>') + '<h3>Posisi kas · semua waktu</h3>' + row('Saldo kas', '<strong class="' + (saldo >= 0 ? 'up' : 'down') + '">' + this.m(saldo) + '</strong>') +
       (U.length ? row('Utang belum lunas', '<span class="down">' + this.m(tot('utang')) + '</span>') + row('Piutang belum lunas', '<span class="up">' + this.m(tot('piutang')) + '</span>') : '') + '</section>';
   },
   /* ---------- grafik di Beranda (v0.1.021) ---------- */
