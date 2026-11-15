@@ -61,7 +61,7 @@ const Analisa = {
   },
   vBanding() {
     const ke = (n) => { const x = new Date(); x.setDate(1); x.setMonth(x.getMonth() + n); return isoHari(x).slice(0, 7); };
-    const per = (k) => { const tx = App.aktif().filter((t) => t.tanggal.slice(0, 7) === k), m = App.jumlah(tx, 'keluar'), h = App.jumlah(tx, 'masuk'); return { m, h, u: h - m, n: tx.length }; };
+    const per = (k) => Beranda.per(k);
     const lalu = [-3, -2, -1].map((n) => per(ke(n))).filter((r) => r.n), ini = per(ke(0));
     if (!lalu.length) return '<section data-bx="banding"><h2>Bulan ini vs rata-rata 3 bulan</h2><p class="note">Belum ada transaksi di 3 bulan sebelumnya sebagai pembanding.</p></section>';
     const avg = (f) => lalu.reduce((s, r) => s + r[f], 0) / lalu.length;
@@ -171,7 +171,7 @@ const Analisa = {
   },
   cetakBanding() {
     const ke = (n) => { const x = new Date(); x.setDate(1); x.setMonth(x.getMonth() + n); return isoHari(x).slice(0, 7); };
-    const per = (k) => { const tx = App.aktif().filter((t) => t.tanggal.slice(0, 7) === k), m = App.jumlah(tx, 'keluar'), h = App.jumlah(tx, 'masuk'); return { m, h, u: h - m, n: tx.length }; };
+    const per = (k) => Beranda.per(k);
     const lalu = [-3, -2, -1].map((n) => per(ke(n))).filter((r) => r.n), ini = per(ke(0));
     if (!lalu.length) return '<div class="ct-bag"><h2>Bulan ini vs rata-rata 3 bulan</h2><p class="ct-cat">Belum ada transaksi di 3 bulan sebelumnya sebagai pembanding.</p></div>';
     const avg = (f) => lalu.reduce((a, r) => a + r[f], 0) / lalu.length;
@@ -253,12 +253,26 @@ const Analisa = {
   },
   /* ---------- grafik garis halus + tooltip (v0.1.014) ---------- */
   rentang: (window.matchMedia && matchMedia('(min-width:1100px)').matches) ? 12 : 6, _pts: [], /* 12 bulan bawaan di desktop (v0.1.118) */
+  /* Agregat bulanan (v0.1.142): satu kali lintas seluruh transaksi aktif, dipakai bersama hero, Beranda, dan Laporan.
+     Memo terikat pada larik App.aktif(); larik itu dibuat ulang (App._ak = null) setiap data berubah (App.simpan) dan setiap pindah halaman,
+     sehingga memo ikut batal. Bulan berganti (tengah malam) juga membatalkan agar label bulan tidak basi. */
+  _agg: null,
+  agg() {
+    const L = App.aktif(), d = new Date(), kb = d.getFullYear() * 12 + d.getMonth(), M = this._agg;
+    if (M && M.L === L && M.kb === kb) return M.per;
+    const per = Object.create(null);
+    for (let i = 0; i < L.length; i++) {
+      const t = L[i], k = t.tanggal.slice(0, 7), a = per[k] || (per[k] = { m: 0, h: 0, n: 0 });
+      a.n++; if (t.jenis === 'keluar') a.m += t.jumlah; else if (t.jenis === 'masuk') a.h += t.jumlah;
+    }
+    this._agg = { L: L, kb: kb, per: per };
+    return per;
+  },
   bulanN(n) {
-    const d = new Date(), B = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'], out = [];
+    const d = new Date(), B = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'], out = [], per = this.agg();
     for (let i = n - 1; i >= 0; i--) {
-      const x = new Date(d.getFullYear(), d.getMonth() - i, 1), k = isoHari(x).slice(0, 7);
-      const tx = App.aktif().filter((t) => t.tanggal.slice(0, 7) === k);
-      out.push({ n: B[x.getMonth()], thn: x.getFullYear(), m: App.jumlah(tx, 'keluar'), h: App.jumlah(tx, 'masuk') });
+      const x = new Date(d.getFullYear(), d.getMonth() - i, 1), a = per[isoHari(x).slice(0, 7)];
+      out.push({ n: B[x.getMonth()], thn: x.getFullYear(), m: a ? a.m : 0, h: a ? a.h : 0 });
     }
     return out;
   },

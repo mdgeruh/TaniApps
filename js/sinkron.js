@@ -33,10 +33,24 @@ var Sinkron = (function () {
     var d = new Date(c.terakhir);
     return { k: c.terakhir ? 'ok' : 'baru', t: c.terakhir ? 'Tersinkron ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) : 'Belum sinkron' };
   }
+  /* ikon awan di header (v0.1.145): bentuk awan sama, lapisan kecil di dalamnya menandai keadaan; teks lengkap ada di title dan aria-label */
+  var AWAN = 'M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z';
+  var LAPIS = {
+    ok: '<path d="m9.5 13 2 2 3.5-4"/>',
+    sibuk: '<path d="M12 16v-5m0 0-2 2m2-2 2 2"/>',
+    baru: '<path d="M12 16v-5m0 0-2 2m2-2 2 2"/>',
+    gagal: '<path d="M12 9.5v3.5M12 16h.01"/>',
+    offline: '<path d="M9 13h.01M12 13h.01M15 13h.01"/>',
+    lokal: '<path d="M4 4l16 16"/>'
+  };
+  function ikon(k, t) {
+    return '<button type="button" class="sk-chip sk-ikon sk-' + k + '" data-sk="akun" aria-label="Akun dan sinkron: ' + t + '" title="' + t + '">' +
+      '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="' + AWAN + '"' + (k === 'offline' || k === 'lokal' ? ' stroke-dasharray="3 2.5"' : '') + '/>' + (LAPIS[k] || '') + '</svg></button>';
+  }
   function lencana() {
     var e = document.getElementById('skDot'); if (!e) return;
     var s = keadaan();
-    e.innerHTML = '<button type="button" class="sk-chip sk-' + s.k + '" data-sk="akun" aria-label="Akun dan sinkron: ' + s.t + '">' + s.t + '</button>';
+    e.innerHTML = ikon(s.k, s.t);
   }
   function kabar(t) { status = t || ''; var e = document.getElementById('skMsg'); if (e) e.textContent = status; lencana(); }
 
@@ -356,5 +370,5 @@ var Sinkron = (function () {
     window.addEventListener('offline', lencana);
     if (c.sesi && c.auto) setTimeout(function () { jalan('gabung', true).catch(function () {}); }, 2000);
   }
-  return { init: init, html: html, tandai: tandai, aktif: function () { return !!c.sesi; }, gabung: gabung, buka: akunBuka, galatId: galatId };
+  return { init: init, ikon: ikon, html: html, tandai: tandai, aktif: function () { return !!c.sesi; }, gabung: gabung, buka: akunBuka, galatId: galatId };
 })();

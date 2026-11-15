@@ -1,5 +1,5 @@
 /* Buku Kebun — Fase 1: pencatatan transaksi + efek kaca (v0.1.039) */
-const VERSI = '0.1.121';
+const VERSI = '0.1.146';
 const KUNCI = 'tani.v1';
 const IKON = {
   master: '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><path d="M16.5 13v7M13 16.5h7"/>',
@@ -154,7 +154,7 @@ const Store = {
 const Samar = {
   asli: new WeakMap(), ada: new Set(), mo: null, cetakan: false,
   RE: /[−-]?Rp[\s\u00a0]?\d[\d.,]*(?:[\s\u00a0]?(?:juta|jt|miliar|rb))?/g,
-  aktif() { return !this.cetakan && !!Setelan.get('sembunyi') && !App.buka; },
+  aktif() { return !this.cetakan && App.samarSekarang(); },
   samarkan(n) {
     const v = n.nodeValue; this.RE.lastIndex = 0;
     if (!this.RE.test(v)) return; this.RE.lastIndex = 0;
@@ -181,7 +181,7 @@ const Samar = {
 };
 
 const App = {
-  data: null, tab: 'beranda', buka: false, balik: 'beranda', hapusMinta: null,
+  data: null, tab: 'beranda', ovr: null, balik: 'beranda', hapusMinta: null,
   filter: { periode: 'bulan', jenis: 'semua', kat: 'semua', siklus: 'semua', dari: '', sampai: '', cari: '', lain: false },
   draft: null, lastKat: {}, batasTx: 100, sortTx: { k: 'tanggal', a: -1 }, selTx: new Set(), selTerakhir: null, tampilTx: [], panel: false, panelSnap: '', lastEdit: null,
 
@@ -241,7 +241,7 @@ const App = {
       ambil: () => this.data,
       pasang: (o) => this.pasangData(o),
       hapus: () => { Cadangan.catat('Sebelum hapus', true); this.data = Store.kosong(); this.simpan(true); this.go(this.tab, true); },
-      ubah: () => { this.ringkas(); if (this.tab === 'setelan' || this.tab === 'transaksi' || this.tab === 'beranda') this.go(this.tab, true); }
+      ubah: (k) => { if (k === 'sembunyi' || k === 'reset') this.ovr = null; this.ringkas(); if (this.tab === 'setelan' || this.tab === 'transaksi' || this.tab === 'beranda') this.go(this.tab, true); }
     });
     Cadangan.init({
       ambil: () => this.data,
@@ -274,7 +274,7 @@ const App = {
       if (!n && /\S/.test(teks) && !/^\s*(rp\.?\s*)?0+\s*$/i.test(teks)) { this.toast('Angka tidak dikenali'); return; }
       t.value = fmtInput(n); t.dispatchEvent(new Event('input', { bubbles: true })); if (t.dataset.rp !== undefined) t.dispatchEvent(new Event('change', { bubbles: true }));
     });
-    $('eye2').addEventListener('click', () => { this.buka = !this.buka; this.ringkas(); });
+    $('eye2').addEventListener('click', () => this.matakan());
     window.addEventListener('beforeprint', () => { Samar.cetak(true); if (typeof Analisa !== 'undefined') Analisa.cetakPasang(); });
     window.addEventListener('afterprint', () => { if (typeof Analisa !== 'undefined') Analisa.cetakLepas(); Samar.cetak(false); });
     Samar.pasang($('app'));
@@ -288,11 +288,12 @@ const App = {
         this._tc = setTimeout(() => { const el = $('txHasil'); if (el) el.innerHTML = this.hasilTx(); }, 150);
       }
     });
-    $('theme').addEventListener('click', () => Setelan.ubah('mode', Setelan.efektif() === 'light' ? 'dark' : 'light'));
+    $('theme').addEventListener('click', () => { Setelan.ubah('mode', Setelan.efektif() === 'light' ? 'dark' : 'light'); this.toast('Tema ' + (Setelan.efektif() === 'light' ? 'terang' : 'gelap')); });
     $('gear').addEventListener('click', () => this.go('setelan'));
-    Fab.init();
+    Fab.init(); if (typeof Ringkas !== 'undefined') Ringkas.init(); if (typeof Cari !== 'undefined') Cari.init(); if (typeof Spark !== 'undefined') Spark.init();
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && this.tab === 'beranda') this.judulHal('beranda'); });
     Panduan.init();
-    $('eye').addEventListener('click', () => { this.buka = !this.buka; this.ringkas(); });
+    $('eye').addEventListener('click', () => this.matakan());
     Rute.awal(); Rute.pasang();
     if (pertama) Panduan.otomatis();
     if (window.ResizeObserver && $('heroCard')) { let lebar = 0; new ResizeObserver((es) => { const w = Math.round(es[0].contentRect.width); if (w !== lebar) { lebar = w; this.fitHero(); } }).observe($('heroCard')); }
@@ -350,11 +351,11 @@ const App = {
   /* Lencana jumlah "Perlu perhatian" pada item Beranda (terlihat di rail desktop) */
   lencana() {
     const b = document.querySelector('#bnav [data-go="beranda"]'); if (!b) return;
-    let n = 0; try { n = Beranda.jumlah(); } catch (e) { n = 0; }
+    let n = 0, lewat = false; try { const L = Beranda.daftar(); n = L.length; lewat = L.some((x) => x.t.charAt(0) === '⚠'); } catch (e) { n = 0; }
     let el = b.querySelector('.rail-badge');
     if (!n) { if (el) el.remove(); b.title = 'Beranda'; b.removeAttribute('aria-label'); return; }
     if (!el) { el = document.createElement('b'); el.className = 'rail-badge'; el.setAttribute('aria-hidden', 'true'); b.appendChild(el); }
-    el.textContent = n > 9 ? '9+' : String(n);
+    el.textContent = n > 9 ? '9+' : String(n); el.classList.toggle('lewat', lewat); // HP: titik emas (ada butir) atau merah (ada yang sudah lewat)
     b.title = 'Beranda · ' + n + ' perlu perhatian'; b.setAttribute('aria-label', 'Beranda, ' + n + ' perlu perhatian');
   },
   /* Kartu hero Beranda (v0.1.099): hanya dihitung bila kartu terlihat; deret 6 bulan dihitung sekali */
@@ -364,10 +365,18 @@ const App = {
     const [v, s] = a >= 1e12 ? [a / 1e12, ' T'] : [a / 1e9, ' M'];
     return (n < 0 ? '−' : '') + 'Rp ' + (v >= 100 ? Math.round(v) : v.toFixed(1)).toString().replace('.', ',').replace(/,0$/, '') + s;
   },
+  /* Periode setara (v0.1.127): tanggal 1 sampai tanggal yang sama bulan lalu (dipotong ke akhir bulan). Dipakai hero dan kartu Dibanding agar angkanya sama. */
+  periodeSetara() {
+    const h = new Date(), x = new Date(h.getFullYear(), h.getMonth() - 1, 1);
+    x.setDate(Math.min(h.getDate(), new Date(x.getFullYear(), x.getMonth() + 1, 0).getDate()));
+    const a1 = isoHari(new Date(h.getFullYear(), h.getMonth() - 1, 1)), a2 = isoHari(x), b1 = bulanIni() + '-01', b2 = bulanIni() + '-31'; // bulan ini penuh, sama dengan angka hero
+    const dlm = (u, v) => this.aktif().filter((t) => { const d = t.tanggal.slice(0, 10); return d >= u && d <= v; });
+    const ukur = (L) => { const m = this.jumlah(L, 'keluar'), s = this.jumlah(L, 'masuk'); return { m, h: s, u: s - m, n: L.length }; };
+    return { a1, a2, b1, b2, kini: ukur(dlm(b1, b2)), lalu: ukur(dlm(a1, a2)), tgl: h.getDate() };
+  },
   heroIsi() {
     const bi = bulanIni(), h = new Date();
-    const semua = this.aktif(), bln = semua.filter((t) => t.tanggal.slice(0, 7) === bi);
-    const modal = this.jumlah(bln, 'keluar'), hasil = this.jumlah(bln, 'masuk'), untung = hasil - modal;
+    const bm = Beranda.per(bi), bln = { length: bm.n }, modal = bm.m, hasil = bm.h, untung = hasil - modal; // agregat bulanan bersama (Analisa.agg)
     const set = (id, v) => { const el = $(id); if (!el) return; el.dataset.val = this.rpRingkas(v); if (this.rpRingkas(v) !== rp(v)) el.dataset.full = rp(v); else delete el.dataset.full; };
     set('heroNum', untung); set('stModal', modal); set('stHasil', hasil);
     $('heroNum').className = 'hero-number' + (untung < 0 ? ' rugi' : '');
@@ -389,22 +398,22 @@ const App = {
     if (dl) {
       let html = '', tip = '';
       if (bln.length) {
-        const x = new Date(h.getFullYear(), h.getMonth() - 1, 1);
-        x.setDate(Math.min(h.getDate(), new Date(x.getFullYear(), x.getMonth() + 1, 0).getDate()));
-        const a1 = isoHari(new Date(h.getFullYear(), h.getMonth() - 1, 1)), a2 = isoHari(x);
-        const lama = semua.filter((t) => { const d = t.tanggal.slice(0, 10); return d >= a1 && d <= a2; });
-        if (lama.length) {
-          const d = untung - (this.jumlah(lama, 'masuk') - this.jumlah(lama, 'keluar'));
-          tip = 'Dibanding ' + a1 + ' sampai ' + a2;
+        const P = this.periodeSetara();
+        if (P.lalu.n) {
+          const d = untung - P.lalu.u;
+          tip = 'Dibanding ' + P.a1 + ' sampai ' + P.a2;
           html = d === 0 ? 'Sama dengan periode sama bulan lalu' : '<span class="' + (d > 0 ? 'up' : 'down') + '"><span aria-hidden="true">' + (d > 0 ? '▲ ' : '▼ ') + '</span><span class="sr-only">' + (d > 0 ? 'naik ' : 'turun ') + '</span><span data-mask data-val="' + rp(Math.abs(d)) + '">' + rp(Math.abs(d)) + '</span></span> dibanding periode sama bulan lalu';
         }
       }
       dl.innerHTML = html; if (tip && html) dl.title = tip; else dl.removeAttribute('title');
     }
+    this._heroKini = { untung, modal, hasil, rc, lbl: $('heroLbl').textContent, sub: $('heroSub').textContent, dHtml: dl ? dl.innerHTML : '', dTip: dl ? dl.title : '' }; // kondisi bulan ini, dipulihkan setelah pratinjau sparkline
+    this._lihat = false; this._lihatI = -1; { const hr = document.querySelector('#heroCard .hero'); if (hr) hr.style.minHeight = ''; }
     const sp = $('heroSpark');
     if (sp && typeof Analisa !== 'undefined') {
       const nb = Analisa.bulanN(6), T = nb.map((x) => x.h - x.m), ada = T.some((x) => x), LB = $('heroSparkLbl');
       sp.toggleAttribute('hidden', !ada);
+      if (typeof Spark !== 'undefined') Spark.pasang(ada ? nb : null, T, Math.max(1, ...T.map(Math.abs)));
       if (LB) LB.hidden = !ada;
       if (ada) {
         const mx = Math.max(1, ...T.map(Math.abs)), W = 300, H = 40, mg2 = 5, N = T.length;
@@ -433,13 +442,55 @@ const App = {
     while (!muat('.stat-val') && sv > 14) { sv--; st.style.setProperty('--sv', sv + 'px'); }
     if (!muat('.stat-val')) { st.style.removeProperty('--sv'); st.classList.add('tumpuk'); }
   },
+  /* Angka tersamar sekarang? Mengikuti setelan "Angka untung saat dibuka" kecuali tombol mata menimpanya (ovr, hanya sesi ini). */
+  samarSekarang() { return this.ovr === null ? !!Setelan.get('sembunyi') : this.ovr; },
+  matakan() { // tombol mata: balik tampil/tersamar sementara, apa pun setelannya
+    const n = !this.samarSekarang();
+    this.ovr = n === !!Setelan.get('sembunyi') ? null : n;
+    this.ringkas();
+  },
+  /* Pratinjau bulan dari sparkline (v0.1.141): angka utama, label, margin, Modal/Hasil/R/C, dan selisih mengikuti bulan yang disentuh; i = null memulihkan bulan ini. */
+  heroLihat(i) {
+    const K = this._heroKini, d = typeof Spark !== 'undefined' ? Spark.d : null; if (!K) return;
+    const ya = i !== null && i !== undefined && d && d.nb[i];
+    if (!ya && !this._lihat) return;
+    if (ya && this._lihat && this._lihatI === i) return;
+    let v = K;
+    const hr = document.querySelector('#heroCard .hero');
+    if (hr && ya && !this._lihat) hr.style.minHeight = hr.getBoundingClientRect().height / Spark.zoom() + 'px'; // tinggi teks hero dikunci selama pratinjau agar sparkline tidak bergeser dari bawah jari
+    if (hr && !ya) hr.style.minHeight = '';
+    if (ya) {
+      const b = d.nb[i], u = b.h - b.m, thn = new Date().getFullYear();
+      let mg = '';
+      if (b.m > 0) { if (b.h <= 0) mg = 'Belum ada hasil'; else { const m = Math.round(u / b.h * 100); mg = 'Margin ' + (m < -999 ? '< −999' : m > 999 ? '> 999' : String(m).replace('-', '−')) + '%'; } }
+      let dh = '';
+      if (K.dHtml) { // baris selisih tetap ada agar tinggi kartu tidak melompat saat disentuh
+        if (i > 0) { const p = d.nb[i - 1], dd = u - (p.h - p.m);
+          dh = dd === 0 ? 'Sama dengan bulan sebelumnya' : '<span class="' + (dd > 0 ? 'up' : 'down') + '"><span aria-hidden="true">' + (dd > 0 ? '▲ ' : '▼ ') + '</span><span class="sr-only">' + (dd > 0 ? 'naik ' : 'turun ') + '</span><span data-mask data-val="' + rp(Math.abs(dd)) + '">' + rp(Math.abs(dd)) + '</span></span> dibanding bulan sebelumnya';
+        } else dh = 'Bulan paling awal pada grafik';
+      }
+      v = { untung: u, modal: b.m, hasil: b.h, rc: b.m > 0 ? b.h / b.m : null, lbl: (u < 0 ? 'Rugi ' : 'Untung ') + b.n + (b.thn !== thn ? ' ' + b.thn : ''),
+        sub: !b.h && !b.m ? 'Tidak ada transaksi' : (mg || 'Tanpa modal tercatat'), dHtml: dh, dTip: '' };
+      this._lihat = true; this._lihatI = i;
+    } else { this._lihat = false; this._lihatI = -1; }
+    const set = (id, x) => { const el = $(id); if (!el) return; el.dataset.val = this.rpRingkas(x); if (this.rpRingkas(x) !== rp(x)) el.dataset.full = rp(x); else delete el.dataset.full; };
+    set('heroNum', v.untung); set('stModal', v.modal); set('stHasil', v.hasil);
+    $('heroNum').className = 'hero-number' + (v.untung < 0 ? ' rugi' : '');
+    $('heroLbl').textContent = v.lbl; $('heroSub').textContent = v.sub;
+    $('stRC').textContent = v.rc !== null ? v.rc.toFixed(2).replace('.', ',') : '—';
+    const dl = $('heroDelta'); if (dl) { dl.innerHTML = v.dHtml; if (v.dTip && v.dHtml) dl.title = v.dTip; else dl.removeAttribute('title'); }
+    const sembunyi = this.samarSekarang();
+    document.querySelectorAll('#heroCard [data-mask]').forEach((el) => { el.textContent = sembunyi ? 'Rp ••••••' : el.dataset.val; });
+    document.querySelectorAll('#heroCard [data-full]').forEach((el) => { if (sembunyi) el.removeAttribute('title'); else el.title = el.dataset.full; });
+    this.fitHero();
+  },
   ringkas() {
     if (this.tab === 'beranda') this.heroIsi();
-    const sembunyi = Setelan.get('sembunyi') && !this.buka;
+    const sembunyi = this.samarSekarang();
     document.querySelectorAll('[data-mask]').forEach((el) => { el.textContent = sembunyi ? 'Rp ••••••' : el.dataset.val; });
     document.querySelectorAll('[data-full]').forEach((el) => { if (sembunyi) el.removeAttribute('title'); else el.title = el.dataset.full; });
     $('eye').textContent = sembunyi ? '○' : '◉'; $('eye').setAttribute('aria-pressed', String(!sembunyi)); $('eye').title = sembunyi ? 'Tampilkan angka' : 'Sembunyikan angka';
-    const e2 = $('eye2'); if (e2) { e2.hidden = !(Setelan.get('sembunyi') && this.tab !== 'beranda'); e2.textContent = sembunyi ? '○' : '◉'; e2.setAttribute('aria-pressed', String(!sembunyi)); }
+    const e2 = $('eye2'); if (e2) { e2.hidden = !((Setelan.get('sembunyi') || this.ovr === true) && this.tab !== 'beranda'); e2.textContent = sembunyi ? '○' : '◉'; e2.setAttribute('aria-pressed', String(!sembunyi)); }
     Samar.terapkan();
     this.lencana();
     this.fitHero();
@@ -526,6 +577,11 @@ const App = {
     const el = $('srHal'); if (!el || this._umum === teks) return; this._umum = teks;
     el.textContent = ''; setTimeout(() => { el.textContent = teks; }, 60);
   },
+  /* "Kamis, 13/11" (atau "Kamis, 11-13" bila format tanggal ISO) untuk baris di bawah judul Beranda */
+  hariIniPendek() {
+    const d = new Date(), H = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'], dd = String(d.getDate()).padStart(2, '0'), mm = String(d.getMonth() + 1).padStart(2, '0');
+    return [H[d.getDay()], (Setelan.get('tanggal') === 'iso' ? mm + '-' + dd : dd + '/' + mm)];
+  },
   judulHal(t) {
     const sid = typeof Siklus !== 'undefined' ? Siklus.cari(Siklus.sid) : null;
     const J = {
@@ -540,9 +596,9 @@ const App = {
     }[t];
     const h1 = $('hdrJudul'), bk = $('hdrBack'), tag = $('hdrTag');
     if (!J) {
-      h1.innerHTML = 'Buku <em>Kebun</em>'; h1.removeAttribute('title'); tag.textContent = 'Manajemen pertanian';
+      h1.innerHTML = 'Buku <em>Kebun</em>'; h1.removeAttribute('title'); const hp = this.hariIniPendek(); tag.innerHTML = '<span class="tg-hl">' + hp[0] + '</span><span class="tg-hs">' + hp[0].slice(0, 3) + '</span>, ' + hp[1] + '<span class="tg-ket"> · Manajemen pertanian</span>';
       bk.hidden = true; bk.removeAttribute('data-go');
-      document.title = 'Buku Kebun'; this.umumkan('Beranda'); return;
+      document.title = 'Buku Kebun'; this.umumkan('Beranda'); if (typeof Ringkas !== 'undefined') { Ringkas.segar(); Ringkas.sembunyi(); } return;
     }
     h1.textContent = J[0]; h1.title = J[0]; tag.textContent = 'Buku Kebun';
     bk.hidden = !J[1];
@@ -550,6 +606,7 @@ const App = {
     else { bk.removeAttribute('data-go'); bk.removeAttribute('title'); }
     document.title = J[0] + ' · Buku Kebun';
     this.umumkan(J[0]);
+    if (typeof Ringkas !== 'undefined') { Ringkas.segar(); Ringkas.sembunyi(); }
   },
 
   /* ---------- tampilan: transaksi ---------- */
@@ -560,8 +617,18 @@ const App = {
       '<div class="note">' + Setelan.tgl(t.tanggal) + (t.siklusId && this.tab !== 'siklus-detail' && Siklus.cari(t.siklusId) ? ' · ' + esc(Siklus.nama(t.siklusId).split(' · ')[0]) : '') + (t.catatan ? ' · ' + esc(t.catatan) : '') + (() => { const u = Utang.tertaut(t), s = u && Utang.sisa(u); return s ? ' · <span class="' + (u.jenis === 'utang' ? 'down' : 'up') + '">' + u.jenis + ' ' + rp(s) + '</span>' : ''; })() + '</div></div>' +
       '<div class="tx-a ' + (m ? 'up' : 'down') + '">' + (m ? '+' : '−') + rp(t.jumlah).replace('Rp ', 'Rp\u00a0') + '</div></div>';
   },
-  /* tabel transaksi di desktop (≥1100 px, halaman Transaksi); HP tetap daftar baris (v0.1.121) */
-  tabelTx() { return this.tab === 'transaksi' && window.matchMedia && matchMedia('(min-width:1100px)').matches; },
+  /* tabel transaksi di desktop (≥1100 px, halaman Transaksi); HP tetap daftar baris (v0.1.122) */
+  tabelTx() { return this.tab === 'transaksi' && (this.cetakTabel || (window.matchMedia && matchMedia('(min-width:1100px)').matches)); },
+  /* ringkasan filter untuk kertas (v0.1.122): periode, jenis, kategori, siklus, pencarian, jumlah catatan */
+  ringkasFilter(n) {
+    const f = this.filter, opsi = (id) => { const e = document.getElementById(id); return e && e.selectedOptions && e.selectedOptions[0] ? e.selectedOptions[0].textContent.trim() : ''; };
+    const per = f.periode === 'rentang' ? (f.dari ? Setelan.tgl(f.dari) : '…') + ' – ' + (f.sampai ? Setelan.tgl(f.sampai) : '…') : (opsi('f_periode') || ({ bulan: 'Bulan ini', semua: 'Semua' }[f.periode] || f.periode));
+    const p = ['Periode: ' + per, 'Jenis: ' + ({ semua: 'Semua', keluar: 'Modal', masuk: 'Hasil' }[f.jenis] || f.jenis)];
+    if (f.kat !== 'semua') p.push('Kategori: ' + (opsi('f_kat') || this.namaKat(f.kat)));
+    if (f.siklus !== 'semua') p.push('Siklus: ' + (opsi('f_sik') || (f.siklus === 'none' ? 'Tanpa siklus' : Siklus.nama(f.siklus))));
+    if (f.cari) p.push('Cari: “' + f.cari + '”');
+    p.push(n.toLocaleString('id-ID') + ' transaksi'); return esc(p.join(' · '));
+  },
   daftarTx(list) {
     if (!this.tabelTx()) return list.slice(0, this.batasTx).map((t) => this.barisTx(t)).join('');
     const s = this.sortTx, nilai = {
@@ -572,7 +639,7 @@ const App = {
     const tampil = U.slice(0, this.batasTx); this.tampilTx = tampil.map((t) => t.id);
     const nPilih = tampil.filter((t) => this.selTx.has(t.id)).length, bersih = this.data.transaksi.filter((t) => this.selTx.has(t.id) && !t.terhapus).reduce((a, t) => a + (t.jenis === 'masuk' ? t.jumlah : -t.jumlah), 0);
     const kol = [['tanggal', 'Tanggal', ''], ['kategori', 'Kategori', ''], ['siklus', 'Siklus', ''], ['catatan', 'Catatan', ''], ['jumlah', 'Jumlah', ' tt-a']];
-    const th = kol.map((k) => '<th scope="col" class="' + k[0] + k[2] + '" aria-sort="' + (s.k === k[0] ? (s.a > 0 ? 'ascending' : 'descending') : 'none') + '"><button type="button" class="tt-th" data-ts="' + k[0] + '">' + k[1] + '<span aria-hidden="true">' + (s.k === k[0] ? (s.a > 0 ? ' ▲' : ' ▼') : '') + '</span></button></th>').join('');
+    const th = kol.map((k) => '<th scope="col" class="' + k[0] + k[2] + '" aria-sort="' + (s.k === k[0] ? (s.a > 0 ? 'ascending' : 'descending') : 'none') + '">' + (this.cetakTabel ? '<span class="tt-th">' + k[1] + '</span>' : '<button type="button" class="tt-th" data-ts="' + k[0] + '">' + k[1] + '<span aria-hidden="true">' + (s.k === k[0] ? (s.a > 0 ? ' ▲' : ' ▼') : '') + '</span></button>') + '</th>').join(''); /* saat cetak: teks biasa, karena tombol di judul kolom mencegah header berulang di tiap halaman */
     const tr = U.slice(0, this.batasTx).map((t) => {
       const ket = esc(this.namaKat(t.kategoriId)) + ' ' + Setelan.tgl(t.tanggal), pilih = this.selTx.has(t.id);
       const m = t.jenis === 'masuk', u = Utang.tertaut(t), sisa = u && Utang.sisa(u), sk = t.siklusId && Siklus.cari(t.siklusId) ? Siklus.nama(t.siklusId).split(' · ')[0] : '';
@@ -586,7 +653,7 @@ const App = {
     setTimeout(() => this.pilihUi(), 0);
     return bulk + '<table class="tt" aria-label="Daftar transaksi, ' + list.length + ' catatan"><thead><tr><th scope="col" class="pilih tt-c"><input type="checkbox" data-tpa aria-label="Pilih semua transaksi yang tampil"' + (nPilih && nPilih === tampil.length ? ' checked' : '') + (nPilih && nPilih < tampil.length ? ' data-ind="1"' : '') + '></th>' + th + '<th scope="col" class="aksi"><span class="sr-only">Aksi</span></th></tr></thead><tbody>' + tr + '</tbody></table>'; // tombol "Tampilkan lebih banyak" ditambahkan oleh hasilTx
   },
-  /* pilih banyak (v0.1.121) */
+  /* pilih banyak (v0.1.122) */
   pilihUi() { const a = document.querySelector('[data-tpa][data-ind]'); if (a) a.indeterminate = true; },
   segarTx(fokus) { const el = $('txHasil'); if (el) el.innerHTML = this.hasilTx(); if (fokus) { const b = document.querySelector(fokus); if (b) b.focus(); } },
   pilihTx(id, on, rentang) {
@@ -630,7 +697,7 @@ const App = {
         (u ? '<div class="sk-meta"><span>Umur siklus</span><b>' + pct + '%</b></div><div class="sk-bar" aria-hidden="true"><i style="width:' + pct + '%"></i></div>' : '') +
         '<div class="sk-foot"><span>Hari ' + h + (u ? ' / ' + u : '') + '</span>' + (u ? '<span class="sk-pil' + (sisa < 0 ? ' lewat' : '') + '">' + (sisa < 0 ? 'lewat ' + (-sisa) + ' hari' : sisa === 0 ? 'panen hari ini' : sisa + ' hari lagi') + '</span>' : '') + '</div></div>';
     }).join('') + '</div></section>' : '';
-    return Contoh.banner() + Beranda.atas() + jalan + this.grafikLipat(bln) + '<section data-bx="tx"><h2>Transaksi terakhir</h2>' + daftar + '</section>';
+    return Contoh.banner() + Beranda.atas() + jalan + Beranda.uang() + this.grafikLipat(bln) + '<section data-bx="tx"><h2>Transaksi terakhir</h2>' + daftar + '</section>';
   },
   vTransaksi() {
     const f = this.filter;
@@ -662,6 +729,7 @@ const App = {
     return '<div class="sum"><div><span class="note">Modal</span><strong class="down">' + rp(modal) + '</strong></div>' +
       '<div><span class="note">Hasil</span><strong class="up">' + rp(hasil) + '</strong></div>' +
       '<div><span class="note">' + (hasil - modal < 0 ? 'Rugi' : 'Untung') + '</span><strong class="' + (hasil - modal < 0 ? 'down' : 'up') + '">' + rp(hasil - modal) + '</strong></div></div>' +
+      '<p class="cetak-saja">' + this.ringkasFilter(list.length) + '</p>' +
       (terbalik ? '<p class="note down" role="alert" style="margin-top:14px">Tanggal "Dari" setelah "Sampai", jadi tidak ada hasil.</p><button type="button" class="btn" data-do="tukar-tgl" style="width:100%;margin-top:8px">Tukar tanggal</button>' :
        list.length ? this.daftarTx(list) +
          (list.length > this.batasTx ? '<button type="button" class="btn" data-do="tx-lagi" style="width:100%;margin-top:12px;min-height:44px">Tampilkan lebih banyak (sisa ' + (list.length - this.batasTx).toLocaleString('id-ID') + ')</button>' : '') :
@@ -684,7 +752,7 @@ const App = {
     this.hapusMinta = null; this.lastEdit = id;
     this.bukaForm();
   },
-  /* master–detail di desktop (v0.1.121): form catat/ubah di panel kanan pada halaman Transaksi; selain itu halaman penuh seperti biasa */
+  /* master–detail di desktop (v0.1.122): form catat/ubah di panel kanan pada halaman Transaksi; selain itu halaman penuh seperti biasa */
   bukaForm() { if (this.tabelTx()) { this.panel = true; this.balik = 'transaksi'; this.renderPanel(true); } else this.go('catat'); },
   snapPanel() { return [...document.querySelectorAll('#txPanelIsi input,#txPanelIsi select,#txPanelIsi textarea')].map((e) => (e.type === 'checkbox' ? e.checked : e.value)).join('\u0001'); },
   kotor() { return this.panel && this.snapPanel() !== this.panelSnap; },

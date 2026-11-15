@@ -93,7 +93,7 @@ const Contoh = {
   },
   banner() {
     if (!this.ada()) return '';
-    return '<section class="info-contoh"><div class="ic-row"><div><strong>Data contoh</strong><div class="note">Tiruan untuk mencoba fitur. Catatan Anda tidak ikut terhapus.</div></div>' +
+    return '<section class="info-contoh"><div class="ic-row"><div><strong>Data contoh</strong> <span class="note ic-p">· Tiruan untuk mencoba; catatan Anda tidak ikut terhapus.</span><span class="note ic-s">· Tiruan, bukan catatan Anda.</span></div>' +
       '<button type="button" class="btn" data-do="hapus-contoh">Hapus</button></div></section>';
   },
   hapus(el) {
