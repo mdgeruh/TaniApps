@@ -66,8 +66,8 @@ const GrafikFont = {
     window.addEventListener('resize', () => this.tunda()); this.tunda();
   }
 };
-/* daftar Transaksi ⇄ tabel saat lebar layar melewati 1100 px */
-if (window.matchMedia) matchMedia('(min-width:1100px)').addEventListener('change', (e) => { if (!e.matches && App.panel) App.tutupPanel(true); if (App.tab === 'transaksi') { const el = document.getElementById('txHasil'); if (el) el.innerHTML = App.hasilTx(); } });
+/* daftar Transaksi ⇄ tabel saat lebar layar melewati 1024 px */
+if (window.matchMedia) matchMedia('(min-width:1024px)').addEventListener('change', (e) => { if (!e.matches && App.panel) App.tutupPanel(true); if (App.tab === 'transaksi') { const el = document.getElementById('txHasil'); if (el) el.innerHTML = App.hasilTx(); } });
 /* Esc menutup panel transaksi (setelah dropdown/dialog menanganinya lebih dulu) */
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape' || e.defaultPrevented || !App.panel || Modal.m || document.querySelector('.toast-pop')) return;

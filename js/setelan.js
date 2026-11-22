@@ -21,7 +21,7 @@ document.addEventListener('toggle', function (e) { var d = e.target; if (d && d.
 /* Buku Kebun — halaman setelan (dipakai aplikasi dan pratinjau) */
 var Setelan = (function () {
   var KUNCI = 'tani.setelan';
-  var BAWAAN = { mode: 'light', skema: 'hijau', ukuran: 100, kaca: false, tanggal: 'dmy', sembunyi: false, margin: 30, ingatJurnal: 0, pintasan: true };
+  var BAWAAN = { mode: 'light', skema: 'hijau', ukuran: 100, kaca: false, tanggal: 'dmy', sembunyi: false, margin: 30, ingatJurnal: 0, pintasan: true, nama: '', foto: '', usaha: '', lokasi: '', cadTerakhir: 0 };
   var s = Object.assign({}, BAWAAN);
   var h = { versi: '', ambil: function () { return {}; }, pasang: function () {}, hapus: function () {}, ubah: function () {} };
   var konfirmasi = null, konfirmasi2 = null, kueri = '', sedangCari = false;
@@ -85,7 +85,7 @@ var Setelan = (function () {
       row('Ingatkan catatan jurnal', 'Beranda mengingatkan bila siklus berjalan belum dicatat selama sekian hari. Hanya tampil saat aplikasi dibuka; bawaan mati.', seg('ingatJurnal', [[0, 'Mati'], [3, '3 hari'], [7, '7 hari'], [14, '14 hari']])) +
       row('Pintasan keyboard', 'Tombol tunggal untuk berpindah halaman dan mencatat tanpa mouse: N, /, G lalu huruf, ?. Matikan bila bentrok dengan alat bantu. Tekan ? untuk daftar.', saklar('pintasan', 'Pintasan keyboard', s.pintasan !== false, ['Mati', 'Nyala']), '<button type="button" class="btn-teks" data-act="pintasan">Lihat daftar pintasan</button>');
     var data = head('Data', 'Cadangan dan pemulihan. Data tersimpan di browser ini.') +
-      '<div class="settings-row"><div class="settings-desc"><strong>Ekspor dan impor</strong><span>Ekspor mengisi kotak di bawah dengan JSON. Untuk impor, tempel JSON ke kotak atau pilih berkas; pratinjau tampil dulu sebelum data diganti.</span></div>' +
+      '<div class="settings-row"><div class="settings-desc"><strong>Ekspor dan impor</strong><span>Ekspor mengisi kotak di bawah dengan JSON. Untuk impor, tempel JSON ke kotak atau pilih berkas; pratinjau tampil dulu sebelum data diganti. Cadangan manual terakhir: ' + (typeof Profil !== 'undefined' ? Profil.jam(s.cadTerakhir) : '-') + '.</span></div>' +
       '<div class="seg sm"><button type="button" class="btn" data-act="ekspor">Ekspor</button><button type="button" class="btn" data-act="impor">Impor</button><button type="button" class="btn" data-act="berkas">Pilih berkas</button></div></div>' +
       '<input type="file" id="fileImp" accept=".json,application/json" hidden>' +
       '<textarea id="dataBox" class="settings-text" rows="5" aria-label="Data JSON" placeholder="Hasil ekspor muncul di sini"></textarea>' +
@@ -95,14 +95,13 @@ var Setelan = (function () {
         (navigator.storage && navigator.storage.persist ? row('Penyimpanan tetap', 'Minta browser agar tidak membuang foto saat ruang penyimpanan menipis. Browser menentukan sendiri apakah permintaan dikabulkan.', '<button type="button" class="btn" data-act="foto-tetap">Minta penyimpanan tetap</button>') : '') : '');
     var bahaya = head('Zona berbahaya', 'Tindakan di sini menghapus data di browser ini dan tidak bisa diurungkan. Ekspor atau cadangkan dulu.') +
       (typeof Nota !== 'undefined' && Nota.tersedia() ? row('Hapus semua foto', 'Menghapus semua foto nota dan jurnal di browser ini. Cadangkan ke ZIP dulu bila perlu.', '<button type="button" class="btn danger" data-act="nota-hapus">Hapus semua foto</button>') : '') +
-      row('Hapus semua data', 'Menghapus transaksi dan siklus di browser ini. Salinan cadangan otomatis dan data cloud tidak ikut terhapus. Bila sinkron cloud aktif, data akan kembali dari cloud: hapus juga data cloud di bagian Akun dan sinkron.', '<button type="button" class="btn danger" data-act="hapus">Hapus semua data</button>');
+      row('Hapus semua data', 'Menghapus transaksi dan siklus di browser ini. Salinan cadangan otomatis dan data cloud tidak ikut terhapus. Bila sinkron cloud aktif, data akan kembali dari cloud: hapus juga data cloud di halaman Profil, bagian Akun dan sinkron.', '<button type="button" class="btn danger" data-act="hapus">Hapus semua data</button>');
     var tentang = head('Tentang', '') +
       row('Versi', 'Buku Kebun, manajemen pertanian.', '<strong class="nilai">v' + h.versi + '</strong>', '', 'baris') +
       (typeof Panduan !== 'undefined' ? Panduan.html() : '') +
       (typeof Pwa !== 'undefined' ? Pwa.html() : '');
     var cad = typeof Cadangan !== 'undefined' ? '<section>' + Cadangan.html() + '</section>' : '';
-    var sink = typeof Sinkron !== 'undefined' ? '<section>' + Sinkron.html() + '</section>' : '';
-    var desk = !!(window.matchMedia && matchMedia('(min-width:1100px)').matches); /* desktop: semua bagian terbuka tetap (v0.1.143) */
+    var desk = !!(window.matchMedia && matchMedia('(min-width:1024px)').matches); /* desktop: semua bagian terbuka tetap (v0.1.143) */
     function lipat(k, s, def) {
       var m = s.match(/^<section>([\s\S]*?)<div class="sec-head"><h2>([\s\S]*?)<\/h2>(<div class="note"[^>]*>[\s\S]*?<\/div>)<\/div>([\s\S]*)<\/section>$/);
       if (!m) return s;
@@ -110,7 +109,7 @@ var Setelan = (function () {
     }
     var kotak = '<div class="st-cari"><input type="search" id="stCari" placeholder="Cari setelan" aria-label="Cari setelan" autocomplete="off" value="' + kueri.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;') + '"></div><p class="note st-kosong" role="status">Tidak ada setelan yang cocok.</p>';
     var hasil = kotak + lipat('tampil', '<section>' + tampil + '</section>', true) + lipat('pref', '<section>' + pref + '</section>', true) + lipat('data', '<section>' + data + '</section>', false) +
-      (cad ? lipat('cad', cad, false) : '') + (sink ? lipat('sink', sink, false) : '') + lipat('tentang', '<section>' + tentang + '</section>', false) +
+      (cad ? lipat('cad', cad, false) : '') + lipat('tentang', '<section>' + tentang + '</section>', false) +
       lipat('bahaya', '<section>' + bahaya + '</section>', false).replace('<section>', '<section class="bahaya">');
     if (kueri) { var tp = document.createElement('template'); tp.innerHTML = hasil; saring(tp.content, kueri); hasil = tp.innerHTML; }
     return hasil;
@@ -129,7 +128,7 @@ var Setelan = (function () {
       });
       sc.classList.toggle('st-sb', !!q && n === 0);
       if (q && n) d.open = true;
-      else if (!q && sedangCari) d.open = !!(window.matchMedia && matchMedia('(min-width:1100px)').matches) || Lipat.buka(d.dataset.lipat, d.dataset.def === '1');
+      else if (!q && sedangCari) d.open = !!(window.matchMedia && matchMedia('(min-width:1024px)').matches) || Lipat.buka(d.dataset.lipat, d.dataset.def === '1');
       total += n;
     });
     var kosong = root.querySelector('.st-kosong'); if (kosong) kosong.classList.toggle('on', !!q && total === 0);
@@ -144,6 +143,7 @@ var Setelan = (function () {
       a.href = URL.createObjectURL(new Blob([j], { type: 'application/json' }));
       a.download = 'buku-kebun-' + new Date().toISOString().slice(0, 10) + '.json';
       document.body.appendChild(a); a.click(); a.remove();
+      s.cadTerakhir = Date.now(); simpan();
     } catch (e) {}
     pesan('Data ditampilkan di kotak. Jika unduhan tidak mulai, salin teksnya.');
   }
@@ -162,7 +162,7 @@ var Setelan = (function () {
       var a = e.target.closest('[data-act]');
       if (!a) return;
       var x = a.dataset.act;
-      if (x === 'reset') { s = Object.assign({}, BAWAAN); simpan(); terapkan(); h.ubah('reset'); }
+      if (x === 'reset') { var pr = { nama: s.nama, foto: s.foto, usaha: s.usaha, lokasi: s.lokasi, cadTerakhir: s.cadTerakhir }; s = Object.assign({}, BAWAAN, pr); simpan(); terapkan(); h.ubah('reset'); }
       else if (x === 'ekspor') ekspor();
       else if (x === 'impor') impor();
       else if (x === 'berkas') document.getElementById('fileImp').click();
@@ -210,9 +210,9 @@ var Setelan = (function () {
       var mq = matchMedia('(prefers-color-scheme: dark)');
       var f = function () { if (s.mode === 'auto') { terapkan(); h.ubah('mode'); } };
       if (mq.addEventListener) mq.addEventListener('change', f);
-      var dk = matchMedia('(min-width:1100px)'); /* lintas batas desktop: gambar ulang agar bagian terlipat/terbuka sesuai */
+      var dk = matchMedia('(min-width:1024px)'); /* lintas batas desktop: gambar ulang agar bagian terlipat/terbuka sesuai */
       if (dk.addEventListener) dk.addEventListener('change', function () { h.ubah('layout'); });
     }
   }
-  return { init: init, render: render, bind: bind, ubah: ubah, tgl: tgl, get: function (k) { return s[k]; }, efektif: efektif };
+  return { init: init, render: render, bind: bind, ubah: ubah, ekspor: ekspor, tgl: tgl, get: function (k) { return s[k]; }, efektif: efektif };
 })();

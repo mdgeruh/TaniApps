@@ -1,8 +1,8 @@
-/* Buku Kebun — bilah ringkas saat gulir (HP/tablet, <1100 px; Fase 6G Tahap 2, v0.1.126).
+/* Buku Kebun — bilah ringkas saat gulir (HP/tablet, <1024 px; Fase 6G Tahap 2, v0.1.126).
    Muncul saat menggulir ke atas setelah melewati header, tersembunyi saat menggulir ke bawah dan di dekat puncak halaman. */
 const Ringkas = {
   y: 0, tunggu: false, el: null,
-  aktif() { return !!(window.matchMedia && window.matchMedia('(max-width:1099px)').matches); },
+  aktif() { return !!(window.matchMedia && window.matchMedia('(max-width:1023px)').matches); },
   kurang() { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches); },
   init() {
     this.el = document.getElementById('hdrRingkas'); if (!this.el) return;
@@ -30,7 +30,7 @@ const Ringkas = {
   segar() {
     if (!this.el) return;
     const j = document.getElementById('hdrJudul'), bk = document.getElementById('hdrBack'), hb = document.getElementById('hrBack'), hj = document.getElementById('hrJudul'), hs = document.getElementById('hrSk'), chip = document.querySelector('#skDot .sk-chip');
-    if (j && hj) hj.textContent = (j.textContent || '').trim() || 'Buku Kebun';
+    if (j && hj) hj.textContent = document.body.dataset.hal === 'beranda' ? 'Buku Kebun' : (j.textContent || '').trim() || 'Buku Kebun';
     if (bk && hb) {
       hb.hidden = bk.hidden;
       if (bk.dataset.go) hb.dataset.go = bk.dataset.go; else hb.removeAttribute('data-go');

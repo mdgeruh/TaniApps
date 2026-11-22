@@ -32,10 +32,12 @@ const Xlsx = {
   sel(v, r, c, gaya) {
     const ref = this.kol(c) + r;
     if (v === null || v === undefined || v === '') return '';
-    if (typeof v === 'object' && v.f !== undefined) return '<c r="' + ref + '" s="' + (v.s || gaya || 0) + '"><f>' + this.x(v.f) + '</f><v>' + v.v + '</v></c>';
+    if (typeof v === 'object' && v.f !== undefined) return '<c r="' + ref + '" s="' + (v.s || gaya || 0) + '"><f>' + this.x(v.f) + '</f>' + (typeof v.v === 'number' && isFinite(v.v) ? '<v>' + v.v + '</v>' : '') + '</c>';
+    if (typeof v === 'object' && v.n !== undefined) return typeof v.n === 'number' && isFinite(v.n) ? '<c r="' + ref + '" s="' + (v.s || 0) + '"><v>' + v.n + '</v></c>' : '';
     if (typeof v === 'object' && v.t === 'tgl') return /^\d{4}-\d{2}-\d{2}$/.test(v.v || '') ? '<c r="' + ref + '" s="3"><v>' + this.seri(v.v) + '</v></c>' : '';
-    if (typeof v === 'number' && isFinite(v)) return '<c r="' + ref + '" s="' + (gaya || 0) + '"><v>' + v + '</v></c>';
-    return '<c r="' + ref + '" t="inlineStr"' + (gaya === 1 ? ' s="1"' : '') + '><is><t xml:space="preserve">' + this.x(v) + '</t></is></c>';
+    if (typeof v === 'number') return isFinite(v) ? '<c r="' + ref + '" s="' + (gaya || 0) + '"><v>' + v + '</v></c>' : '';
+    const t = String(v); let ix = this._mp[t]; if (ix === undefined) { ix = this._ss.length; this._ss.push(t); this._mp[t] = ix; } // tabel teks bersama (sharedStrings): bentuk yang dibaca semua penampil
+    return '<c r="' + ref + '" t="s"' + (gaya === 1 ? ' s="1"' : '') + '><v>' + ix + '</v></c>';
   },
   /* lembar: { nama, kolom: [{ h: judul, w: lebar, g: gaya }], baris: [[nilai...]] } */
   lembarXml(L) {
@@ -43,32 +45,37 @@ const Xlsx = {
     const cols = '<cols>' + L.kolom.map((k, i) => '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + (k.w || 14) + '" customWidth="1"/>').join('') + '</cols>';
     const kepala = '<row r="1">' + L.kolom.map((k, i) => this.sel(k.h, 1, i, 1)).join('') + '</row>';
     const isi = L.baris.map((b, j) => '<row r="' + (j + 2) + '">' + L.kolom.map((k, i) => this.sel(b[i], j + 2, i, k.g || 0)).join('') + '</row>').join('');
-    return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>' +
+    return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><dimension ref="A1:' + akhir + '"/><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="15"/>' +
       cols + '<sheetData>' + kepala + isi + '</sheetData>' + (L.baris.length ? '<autoFilter ref="A1:' + akhir + '"/>' : '') + '</worksheet>';
   },
   STYLES: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="1"><numFmt numFmtId="164" formatCode="yyyy\\-mm\\-dd"/></numFmts>' +
     '<fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts>' +
     '<fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFE8E2D0"/><bgColor indexed="64"/></patternFill></fill></fills>' +
     '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
-    '<cellXfs count="5"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/>' +
-    '<xf numFmtId="3" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="4" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs>' +
+    '<cellXfs count="6"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/>' +
+    '<xf numFmtId="3" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="4" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="10" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs>' +
     '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>',
   buat(lembar) {
-    const nm = (s, i) => (String(s).replace(/[\[\]:*?\/\\]/g, ' ').trim().slice(0, 31) || 'Lembar' + (i + 1));
+    const pakai = {}, nm = (s, i) => { let b = String(s).replace(/[\[\]:*?\/\\]/g, ' ').trim().replace(/^'+|'+$/g, '').slice(0, 31) || 'Lembar' + (i + 1), u = b, k = 2; while (pakai[u.toLowerCase()]) { const x = ' (' + k++ + ')'; u = b.slice(0, 31 - x.length) + x; } pakai[u.toLowerCase()] = 1; return u; };
     const n = lembar.length, ns = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+    this._ss = []; this._mp = Object.create(null);
+    const lx = lembar.map((l) => this.lembarXml(l)), nu = new Date().toISOString().slice(0, 19) + 'Z', H = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
     const f = [
-      { nama: '[Content_Types].xml', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' + lembar.map((l, i) => '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('') + '</Types>' },
-      { nama: '_rels/.rels', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="' + ns + '/officeDocument" Target="xl/workbook.xml"/></Relationships>' },
-      { nama: 'xl/workbook.xml', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="' + ns + '"><sheets>' + lembar.map((l, i) => '<sheet name="' + this.x(nm(l.nama, i)) + '" sheetId="' + (i + 1) + '" r:id="rId' + (i + 1) + '"/>').join('') + '</sheets></workbook>' },
-      { nama: 'xl/_rels/workbook.xml.rels', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + lembar.map((l, i) => '<Relationship Id="rId' + (i + 1) + '" Type="' + ns + '/worksheet" Target="worksheets/sheet' + (i + 1) + '.xml"/>').join('') + '<Relationship Id="rId' + (n + 1) + '" Type="' + ns + '/styles" Target="styles.xml"/></Relationships>' },
-      { nama: 'xl/styles.xml', data: this.STYLES }
-    ].concat(lembar.map((l, i) => ({ nama: 'xl/worksheets/sheet' + (i + 1) + '.xml', data: this.lembarXml(l) })));
+      { nama: '[Content_Types].xml', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/><Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>' + lembar.map((l, i) => '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('') + '</Types>' },
+      { nama: '_rels/.rels', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="' + ns + '/officeDocument" Target="xl/workbook.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/><Relationship Id="rId3" Type="' + ns + '/extended-properties" Target="docProps/app.xml"/></Relationships>' },
+      { nama: 'xl/workbook.xml', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="' + ns + '"><bookViews><workbookView/></bookViews><sheets>' + lembar.map((l, i) => '<sheet name="' + this.x(nm(l.nama, i)) + '" sheetId="' + (i + 1) + '" r:id="rId' + (i + 1) + '"/>').join('') + '</sheets></workbook>' },
+      { nama: 'xl/_rels/workbook.xml.rels', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + lembar.map((l, i) => '<Relationship Id="rId' + (i + 1) + '" Type="' + ns + '/worksheet" Target="worksheets/sheet' + (i + 1) + '.xml"/>').join('') + '<Relationship Id="rId' + (n + 1) + '" Type="' + ns + '/styles" Target="styles.xml"/><Relationship Id="rId' + (n + 2) + '" Type="' + ns + '/sharedStrings" Target="sharedStrings.xml"/></Relationships>' },
+      { nama: 'xl/styles.xml', data: this.STYLES },
+      { nama: 'xl/sharedStrings.xml', data: H + '<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="' + this._ss.length + '" uniqueCount="' + this._ss.length + '">' + this._ss.map((t) => '<si><t xml:space="preserve">' + this.x(t) + '</t></si>').join('') + '</sst>' },
+      { nama: 'docProps/core.xml', data: H + '<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:creator>Buku Kebun</dc:creator><dcterms:created xsi:type="dcterms:W3CDTF">' + nu + '</dcterms:created></cp:coreProperties>' },
+      { nama: 'docProps/app.xml', data: H + '<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"><Application>Buku Kebun</Application></Properties>' }
+    ].concat(lembar.map((l, i) => ({ nama: 'xl/worksheets/sheet' + (i + 1) + '.xml', data: lx[i] })));
     return this.zip(f);
   },
   /* ---------- isi ekspor: seluruh data aplikasi ---------- */
   lembar() {
     const D = App.data, tgl = (v) => ({ t: 'tgl', v: v || '' }), uang = 2, desi = 4;
-    const tx = App.aktif().slice().sort((a, b) => a.tanggal.localeCompare(b.tanggal));
+    const tx = App.semuaTx().slice().sort((a, b) => a.tanggal.localeCompare(b.tanggal));
     const sat = (kid) => { const k = Siklus.kom(kid); return k ? k.satuan : ''; };
     const siklus = Siklus.daftar().map((s, i) => {
       const r = Siklus.ringkas(s.id), alat = r.tx.filter((t) => t.jenis === 'keluar' && t.kategoriId === 'alat').reduce((a, t) => a + t.jumlah, 0),
@@ -80,25 +87,39 @@ const Xlsx = {
       const s = Siklus.cari(p.siklusId), b = Math.max(0, p.kuantitasKotor - p.susut);
       return [tgl(p.tanggal), Siklus.nama(p.siklusId), p.kuantitasKotor, p.susut || 0, b, sat(s.komoditasId), p.hargaPerSatuan || null, p.hargaPerSatuan ? Math.round(b * p.hargaPerSatuan) : null, p.pembeli || ''];
     });
+    const pembeli = typeof Pembeli !== 'undefined' ? Pembeli.daftar().map((x) => { const r = Pembeli.rekap(x.panen), tg = x.panen.map((p) => p.tanggal).sort(); return [x.nama, r.n, r.total, x.sisa, r.kom.map((k) => k.nama + ' ' + Pembeli.qTeks(k.qty) + ' ' + k.sat + (k.rata ? ' @ ' + k.rata : '')).join('; '), tg.length ? tgl(tg[tg.length - 1]) : '']; }).sort((a, b) => b[2] - a[2] || String(a[0]).localeCompare(String(b[0]), 'id')) : [];
     const dasar = (u) => { const t = D.transaksi.find((x) => x.id === u.transaksiId); return t ? App.namaKat(t.kategoriId) + ' · ' + t.tanggal : 'Manual'; };
     const utang = D.utang.filter((u) => !u.terhapus).sort((a, b) => (!!a.lunas - !!b.lunas) || String(a.jatuhTempo || '9').localeCompare(b.jatuhTempo || '9')).map((u) =>
       [u.jenis === 'utang' ? 'Utang' : 'Piutang', u.pihak, u.jumlah, Utang.dibayar(u), Utang.sisa(u), tgl(u.jatuhTempo), u.lunas ? 'Lunas' : 'Belum lunas', dasar(u)]);
-    const aset = D.aset.filter((a) => !a.terhapus).map((a) => { const per = Math.round(a.hargaBeli / a.umurBulan), m = Rencana.mulai(a); return [a.nama, a.hargaBeli, tgl(a.tanggalBeli), a.umurBulan, per, Math.max(0, a.hargaBeli - per * m)]; });
+    const aset = D.aset.filter((a) => !a.terhapus).map((a) => { const per = a.umurBulan > 0 ? Math.round(a.hargaBeli / a.umurBulan) : 0, m = Rencana.mulai(a); return [a.nama, a.hargaBeli, tgl(a.tanggalBeli), a.umurBulan, per, Math.max(0, a.hargaBeli - per * m)]; });
     const harga = []; Siklus.koms(true).forEach((k) => (k.hargaPasar || []).forEach((h) => harga.push([k.nama, tgl(h.tanggal), h.harga, k.satuan, h.sumber || ''])));
     harga.sort((a, b) => String(b[1].v).localeCompare(a[1].v) || String(a[0]).localeCompare(b[0]));
+    const Up = Upah.petaUtang(), upah = tx.filter((t) => t.pekerjaId).map((t) => [tgl(t.tanggal), Upah.nama(t), t.hari || 0, t.tarifHarian || 0, t.jumlah, t.siklusId && Siklus.cari(t.siklusId) ? Siklus.nama(t.siklusId) : '', Upah.sisa(t, Up) > 0 ? 'Belum dibayar' : 'Lunas', Upah.sisa(t, Up), t.catatanUpah || '']);
+    const SM = Stok.peta(), stok = Stok.barang().map((x) => [x.nama, Stok.jenisNama(x.jenis), x.satuan, Stok.sisa(x, SM), x.min || null, { habis: 'Habis', menipis: 'Menipis', ok: 'Cukup' }[Stok.status(x, SM)]]);
+    const mutasi = (D.mutasiStok || []).filter((m) => !m.terhapus && Stok.cari(m.saprodiId)).sort((a, b) => a.tanggal.localeCompare(b.tanggal)).map((m) => [tgl(m.tanggal), Stok.cari(m.saprodiId).nama, { masuk: 'Masuk', pakai: 'Pakai', koreksi: 'Koreksi' }[m.tipe], Stok.efek(m), Stok.cari(m.saprodiId).satuan, m.siklusId && Siklus.cari(m.siklusId) ? Siklus.nama(m.siklusId) : '', m.catatan || '']);
     const jurnal = Kejadian.barisJurnal().map((r) => [r[0], tgl(r[1]), r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9]]);
     const jadwal = []; Siklus.daftar().forEach((s) => (s.jadwal || []).forEach((j) => jadwal.push([Siklus.nama(s.id), j.nama, j.selesai ? 'Selesai' : 'Berjalan', j.selesai ? null : tgl(j.tanggal), j.ulang > 0 ? j.ulang : null, tgl(j.terakhir)])));
     return [
       { nama: 'Siklus', kolom: [{ h: 'Siklus', w: 28 }, { h: 'Status', w: 11 }, { h: 'Mulai', w: 12 }, { h: 'Selesai', w: 12 }, { h: 'Modal', w: 14, g: uang }, { h: 'Hasil', w: 14, g: uang }, { h: 'Untung', w: 14, g: uang }, { h: 'R/C', w: 8, g: desi }, { h: 'Panen bersih', w: 13, g: desi }, { h: 'Satuan', w: 9 }, { h: 'HPP per satuan', w: 15, g: uang }, { h: 'Harga rata-rata', w: 15, g: uang }], baris: siklus },
       { nama: 'Transaksi', kolom: [{ h: 'Tanggal', w: 12 }, { h: 'Jenis', w: 9 }, { h: 'Kategori', w: 22 }, { h: 'Siklus', w: 28 }, { h: 'Jumlah', w: 14, g: uang }, { h: 'Sifat biaya', w: 12 }, { h: 'Catatan', w: 34 }],
-        baris: tx.map((t) => [tgl(t.tanggal), t.jenis === 'keluar' ? 'Modal' : 'Hasil', App.namaKat(t.kategoriId), t.siklusId && Siklus.cari(t.siklusId) ? Siklus.nama(t.siklusId) : '', t.jumlah, t.jenis === 'keluar' ? (t.sifatBiaya === 'tetap' ? 'Tetap' : 'Variabel') : '', t.catatan || '']) },
+        baris: tx.map((t) => [tgl(t.tanggal), t.kategoriId === 'prive' ? 'Prive' : t.jenis === 'keluar' ? 'Modal' : 'Hasil', App.namaKat(t.kategoriId), t.siklusId && Siklus.cari(t.siklusId) ? Siklus.nama(t.siklusId) : '', t.jumlah, t.jenis === 'keluar' && t.kategoriId !== 'prive' ? (t.sifatBiaya === 'tetap' ? 'Tetap' : 'Variabel') : '', t.catatan || '']) },
       { nama: 'Panen', kolom: [{ h: 'Tanggal', w: 12 }, { h: 'Siklus', w: 28 }, { h: 'Hasil kotor', w: 12, g: desi }, { h: 'Susut', w: 9, g: desi }, { h: 'Hasil bersih', w: 12, g: desi }, { h: 'Satuan', w: 9 }, { h: 'Harga per satuan', w: 15, g: uang }, { h: 'Nilai jual', w: 14, g: uang }, { h: 'Pembeli', w: 20 }], baris: panen },
       { nama: 'Utang dan piutang', kolom: [{ h: 'Jenis', w: 10 }, { h: 'Pihak', w: 22 }, { h: 'Jumlah', w: 14, g: uang }, { h: 'Dibayar', w: 14, g: uang }, { h: 'Sisa', w: 14, g: uang }, { h: 'Jatuh tempo', w: 13 }, { h: 'Status', w: 12 }, { h: 'Asal', w: 30 }], baris: utang },
       { nama: 'Aset', kolom: [{ h: 'Aset', w: 26 }, { h: 'Harga beli', w: 14, g: uang }, { h: 'Tanggal beli', w: 13 }, { h: 'Umur (bulan)', w: 13, g: uang }, { h: 'Penyusutan per bulan', w: 20, g: uang }, { h: 'Nilai buku', w: 14, g: uang }], baris: aset },
       { nama: 'Harga pasar', kolom: [{ h: 'Komoditas', w: 22 }, { h: 'Tanggal', w: 12 }, { h: 'Harga per satuan', w: 16, g: uang }, { h: 'Satuan', w: 9 }, { h: 'Sumber', w: 24 }], baris: harga },
       { nama: 'Jadwal', kolom: [{ h: 'Siklus', w: 28 }, { h: 'Kegiatan', w: 26 }, { h: 'Status', w: 11 }, { h: 'Jadwal berikutnya', w: 17 }, { h: 'Ulang tiap (hari)', w: 16, g: uang }, { h: 'Terakhir dikerjakan', w: 19 }], baris: jadwal },
+      { nama: 'Pembeli', kolom: [{ h: 'Pembeli', w: 24 }, { h: 'Jumlah panen', w: 13 }, { h: 'Total penjualan', w: 16, g: uang }, { h: 'Piutang', w: 14, g: uang }, { h: 'Per komoditas (jumlah bersih, harga rata-rata)', w: 46 }, { h: 'Panen terakhir', w: 14 }], baris: pembeli },
+      { nama: 'Upah', kolom: [{ h: 'Tanggal', w: 12 }, { h: 'Pekerja', w: 22 }, { h: 'Hari kerja', w: 11, g: desi }, { h: 'Upah per hari', w: 14, g: uang }, { h: 'Jumlah', w: 14, g: uang }, { h: 'Siklus', w: 28 }, { h: 'Status', w: 14 }, { h: 'Sisa', w: 12, g: uang }, { h: 'Catatan', w: 28 }], baris: upah },
+      { nama: 'Stok', kolom: [{ h: 'Barang', w: 24 }, { h: 'Jenis', w: 18 }, { h: 'Satuan', w: 9 }, { h: 'Sisa', w: 11, g: desi }, { h: 'Batas peringatan', w: 16, g: desi }, { h: 'Status', w: 11 }], baris: stok },
+      { nama: 'Mutasi stok', kolom: [{ h: 'Tanggal', w: 12 }, { h: 'Barang', w: 24 }, { h: 'Jenis', w: 10 }, { h: 'Jumlah (+/−)', w: 13, g: desi }, { h: 'Satuan', w: 9 }, { h: 'Siklus', w: 28 }, { h: 'Catatan', w: 28 }], baris: mutasi },
       { nama: 'Jurnal', kolom: [{ h: 'Siklus', w: 28 }, { h: 'Tanggal', w: 12 }, { h: 'Hari ke', w: 8 }, { h: 'Jenis', w: 11 }, { h: 'Rincian', w: 14 }, { h: 'Judul', w: 28 }, { h: 'Isi', w: 60 }, { h: 'Nilai ukuran', w: 12, g: desi }, { h: 'Satuan', w: 9 }, { h: 'Foto', w: 7 }], baris: jurnal }
     ];
+  },
+  /* simpan sekumpulan lembar sebagai satu berkas .xlsx (dipakai Laporan) */
+  simpan(lembar, nama) {
+    const blob = new Blob([this.buat(lembar)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = nama;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   },
   /* unduh berkas; kembalikan jumlah lembar yang berisi data */
   unduh() {

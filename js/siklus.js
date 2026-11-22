@@ -155,7 +155,7 @@ const Siklus = {
       '<div class="two"><div><label for="p_kotor">Hasil kotor (' + esc(sat) + ')</label><input id="p_kotor" inputmode="decimal" value="' + (p.kotor || '') + '"></div>' +
       '<div><label for="p_susut">Susut / reject</label><input id="p_susut" inputmode="decimal" value="' + (p.susut || '') + '" placeholder="0"></div></div>' +
       '<label for="p_harga">Harga jual per ' + esc(sat) + ' (opsional)</label><input id="p_harga" inputmode="numeric" value="' + fmtInput(p.harga) + '" placeholder="0">' +
-      '<label for="p_pembeli">Pembeli (opsional)</label><input id="p_pembeli" maxlength="60" value="' + esc(p.pembeli) + '">' +
+      '<label for="p_pembeli">Pembeli (opsional)</label><input id="p_pembeli" maxlength="60" autocomplete="off" list="dl_pembeli" value="' + esc(p.pembeli) + '">' + (typeof Pembeli !== 'undefined' ? Pembeli.datalist() : '') +
       Utang.kotak(p, 'p', '', 'p_pembeli') +
       '<p class="note" style="margin-top:10px">Jika harga diisi, hasil penjualan otomatis dicatat sebagai transaksi Hasil siklus ini. Bila belum dibayar, pembeli wajib diisi dan sisanya masuk piutang.</p>' +
       '<button class="btn gold" data-do="simpan-panen">Simpan</button><button class="btn" data-go="siklus-detail" style="width:100%;margin-top:10px">Batal</button>' +
@@ -375,7 +375,7 @@ const Siklus = {
   },
   simpanPanen() {
     const D = this.d(), s = this.cari(this.sid), g = (id) => $(id).value;
-    const p = { id: this.pd.id, tanggal: g('p_tgl'), kotor: num(g('p_kotor')), susut: num(g('p_susut')), harga: angka(g('p_harga')), pembeli: g('p_pembeli').trim() };
+    const p = { id: this.pd.id, tanggal: g('p_tgl'), kotor: num(g('p_kotor')), susut: num(g('p_susut')), harga: angka(g('p_harga')), pembeli: typeof Pembeli !== 'undefined' ? Pembeli.baku(g('p_pembeli'), this.pd.id) : g('p_pembeli').trim() };
     if (!/^\d{4}-\d{2}-\d{2}$/.test(p.tanggal)) { App.toast('Isi tanggal'); return; }
     if (p.tanggal < s.mulai) { App.toast('Tanggal panen sebelum tanggal mulai siklus'); return; }
     if (p.kotor <= 0) { App.toast('Isi hasil kotor lebih dari 0'); return; }

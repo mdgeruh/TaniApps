@@ -115,7 +115,7 @@ const Utang = {
   /* ---------- kas: uang yang benar-benar bergerak ---------- */
   peristiwa() {
     const out = [];
-    App.aktif().forEach((t) => {
+    App.semuaTx().forEach((t) => { // termasuk Prive: uang tetap keluar dari kas
       const u = this.tertaut(t), tunai = t.jumlah - (u ? Math.min(u.jumlah, t.jumlah) : 0);
       out.push({ tgl: t.tanggal, n: (t.jenis === 'masuk' ? 1 : -1) * tunai });
       if (u) (u.bayar || []).forEach((p) => out.push({ tgl: p.tanggal, n: (u.jenis === 'piutang' ? 1 : -1) * p.jumlah }));
@@ -126,6 +126,8 @@ const Utang = {
   saldo() { return this.saldoAwal() + this.peristiwa().reduce((a, e) => a + e.n, 0); },
   saldoSd(k) { return this.saldoAwal() + this.peristiwa().filter((e) => e.tgl.slice(0, 7) <= k).reduce((a, e) => a + e.n, 0); },
   net(k) { return this.peristiwa().filter((e) => e.tgl.slice(0, 7) === k).reduce((a, e) => a + e.n, 0); },
+  /* v0.1.155: uang yang benar-benar masuk dan keluar pada bulan k ('YYYY-MM') */
+  bulan(k) { const E = this.peristiwa().filter((e) => e.tgl.slice(0, 7) === k); return { masuk: E.filter((e) => e.n > 0).reduce((a, e) => a + e.n, 0), keluar: -E.filter((e) => e.n < 0).reduce((a, e) => a + e.n, 0) }; },
 
   /* ---------- tampilan: kotak pembayaran di form ---------- */
   /* pre: awalan id ('f' atau 'p'); pihakId: id isian pihak yang sudah ada di form (panen: p_pembeli) atau '' bila perlu isian pihak sendiri */

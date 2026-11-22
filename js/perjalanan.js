@@ -13,8 +13,14 @@ const Perjalanan = {
   },
 
   hari(s, tgl) { const h = Jurnal.hariKe(s, tgl); return h >= 1 ? h : '—'; },
-  tab(kepala, baris, kls) {
-    return '<table class="ct-tab' + (kls ? ' ' + kls : '') + '"><thead><tr>' + kepala.map((k) => '<th' + (k[1] ? ' class="n"' : '') + '>' + k[0] + '</th>').join('') + '</tr></thead><tbody>' + baris.join('') + '</tbody></table>';
+  /* lebar = persentase tiap kolom (opsional): kolom tetap agar tabel seragam dan angka sejajar */
+  LEBAR: {
+    'Tahap|Tanggal|Hari ke|Lama (hari)': [38, 24, 16, 22], 'Tanggal|Hari|Catatan': [18, 8, 74], 'Tanggal|Hari|Jenis|Keterangan': [16, 8, 20, 56],
+    'Ukuran|Pengukuran|Pertama|Terakhir|Perubahan': [28, 16, 20, 20, 16], 'Tanggal|Hari|Kotor|Susut|Bersih|Harga|Pembeli': [15, 8, 10, 10, 10, 17, 30]
+  },
+  tab(kepala, baris, kls, lebar) {
+    lebar = lebar || this.LEBAR[kepala.map((k) => String(k[0]).replace(/^Harga\/.*/, 'Harga')).join('|')];
+    return '<table class="ct-tab' + (lebar ? ' ct-fix' : '') + (kls ? ' ' + kls : '') + '">' + (lebar ? '<colgroup>' + lebar.map((w) => '<col style="width:' + w + '%">').join('') + '</colgroup>' : '') + '<thead><tr>' + kepala.map((k) => '<th' + (k[1] ? ' class="n"' : '') + '>' + k[0] + '</th>').join('') + '</tr></thead><tbody>' + baris.join('') + '</tbody></table>';
   },
   bag(judul, isi) { return isi ? '<div class="ct-bag' + (judul === 'Ringkasan uang' ? '' : ' ct-lanjut') + '"><h2>' + judul + '</h2>' + isi + '</div>' : ''; },
   teks(j) { return esc(Jurnal.judul(j)) + (j.isi && j.judul ? '<br>' + esc(j.isi).replace(/\n/g, '<br>') : j.isi && !j.judul && String(j.isi).split('\n').length > 1 ? '<br>' + esc(String(j.isi).split('\n').slice(1).join('\n')).replace(/\n/g, '<br>') : ''); },
@@ -28,9 +34,11 @@ const Perjalanan = {
     /* uang */
     const kat = {}; r.tx.filter((t) => t.jenis === 'keluar').forEach((t) => { const n = App.namaKat(t.kategoriId); kat[n] = (kat[n] || 0) + t.jumlah; });
     const katBaris = Object.keys(kat).sort((a, b) => kat[b] - kat[a]).map((n) => '<tr><td>' + esc(n) + '</td><td class="n">' + rp(kat[n]) + '</td><td class="n">' + (r.modal ? Math.round(kat[n] / r.modal * 100) + '%' : '') + '</td></tr>');
-    const uang = '<table class="ct-tab ct-kv">' + kv(u < 0 ? 'Rugi' : 'Untung', '<b>' + rp(u) + '</b>') + kv('Modal', rp(r.modal)) + kv('Hasil', rp(r.hasil)) + kv('R/C ratio', r.modal ? fmtRC(r.hasil / r.modal) : '—') +
-      kv('Panen bersih', fmtN(r.bersih) + ' ' + esc(sat)) + (r.bersih > 0 && r.modal ? kv('Modal per ' + esc(sat), rp(Math.round(r.modal / r.bersih))) : '') + '</table>' +
-      (katBaris.length ? '<h2 style="margin-top:9pt">Modal per kategori</h2>' + this.tab([['Kategori'], ['Jumlah', 1], ['Bagian', 1]], katBaris) : '');
+    const kpi = (lb, v, sub) => '<td><span class="ct-kl">' + lb + '</span><span class="ct-kv2">' + v + '</span><span class="ct-ks">' + sub + '</span></td>', rc = r.modal ? r.hasil / r.modal : null;
+    const uang = '<table class="ct-kpi"><tr>' + kpi(u < 0 ? 'Rugi' : 'Untung', rp(u), r.hasil || r.modal ? (u < 0 ? 'Modal melebihi hasil' : 'Hasil melebihi modal') : 'Belum ada transaksi') + kpi('Hasil', rp(r.hasil), 'Pemasukan') + kpi('Modal', rp(r.modal), 'Pengeluaran') +
+      kpi('R/C ratio', rc === null ? '—' : fmtRC(rc), rc === null ? 'Belum ada modal' : (rc >= 1 ? 'Hasil menutup modal' : 'Hasil belum menutup modal')) + '</tr></table>' +
+      '<p class="ct-cat">Panen bersih ' + fmtN(r.bersih) + ' ' + esc(sat) + (r.bersih > 0 && r.modal ? ' · Modal per ' + esc(sat) + ' ' + rp(Math.round(r.modal / r.bersih)) : '') + '</p>' +
+      (katBaris.length ? '<h2 style="margin-top:10pt">Modal per kategori</h2>' + this.tab([['Kategori'], ['Jumlah', 1], ['Bagian', 1]], katBaris, '', [56, 26, 18]) : '');
     /* tahap */
     const T = J.filter((j) => j.jenis === 'tahap'), akhir = s.selesai || isoHari();
     const tahap = T.length ? this.tab([['Tahap'], ['Tanggal'], ['Hari ke', 1], ['Lama (hari)', 1]], T.map((j, i) => {
@@ -48,9 +56,9 @@ const Perjalanan = {
     /* ukuran: per nama, dari awal ke akhir */
     const Uk = J.filter((j) => j.jenis === 'ukuran' && j.ukuran);
     const per = {}; Uk.forEach((j) => { (per[j.ukuran.nama] = per[j.ukuran.nama] || []).push(j); });
-    const ukuran = Object.keys(per).length ? this.tab([['Ukuran'], ['Pengukuran', 1], ['Pertama'], ['Terakhir'], ['Perubahan', 1]], Object.keys(per).map((n) => {
+    const ukuran = Object.keys(per).length ? this.tab([['Ukuran'], ['Pengukuran', 1], ['Pertama', 1], ['Terakhir', 1], ['Perubahan', 1]], Object.keys(per).map((n) => {
       const L = per[n], a = L[0], b = L[L.length - 1], sa = a.ukuran.satuan ? ' ' + esc(a.ukuran.satuan) : '', d = b.ukuran.nilai - a.ukuran.nilai;
-      return '<tr><td>' + esc(n) + '</td><td class="n">' + L.length + '</td><td>' + Kejadian.fmt(a.ukuran.nilai) + sa + '<br><span class="ct-cat">hari ' + this.hari(s, a.tanggal) + '</span></td><td>' + Kejadian.fmt(b.ukuran.nilai) + sa + '<br><span class="ct-cat">hari ' + this.hari(s, b.tanggal) + '</span></td><td class="n">' + (L.length > 1 ? (d > 0 ? '+' : d < 0 ? '−' : '') + Kejadian.fmt(Math.abs(d)) + sa : '—') + '</td></tr>';
+      return '<tr><td>' + esc(n) + '</td><td class="n">' + L.length + '</td><td class="n">' + Kejadian.fmt(a.ukuran.nilai) + sa + '<br><span class="ct-cat">hari ' + this.hari(s, a.tanggal) + '</span></td><td class="n">' + Kejadian.fmt(b.ukuran.nilai) + sa + '<br><span class="ct-cat">hari ' + this.hari(s, b.tanggal) + '</span></td><td class="n">' + (L.length > 1 ? (d > 0 ? '+' : d < 0 ? '−' : '') + Kejadian.fmt(Math.abs(d)) + sa : '—') + '</td></tr>';
     })) : '';
     /* panen */
     const P = Siklus.panenOf(s.id).slice().reverse();

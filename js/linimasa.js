@@ -20,7 +20,7 @@ const Linimasa = {
     const mul = this.urut === 'lama' ? 1 : -1;
     return E.sort((a, b) => mul * (a.tgl.localeCompare(b.tgl) || a.rank - b.rank || a.dibuat.localeCompare(b.dibuat) || this.kunci(a).localeCompare(this.kunci(b))));
   },
-  lebar() { return window.matchMedia && window.matchMedia('(min-width:1100px)').matches; },
+  lebar() { return window.matchMedia && window.matchMedia('(min-width:1024px)').matches; },
   /* panel detail di kiri (desktop): catatan jurnal terpilih menggantikan Ringkasan, tanpa modal */
   panel(s, j) {
     const h = Jurnal.hariKe(s, j.tanggal), boleh = Jurnal.boleh(s, j);
@@ -94,8 +94,7 @@ const Linimasa = {
     const kiri = jp && jp.siklusId === s.id && this.lebar() ? this.panel(s, jp) : ringkas;
     const kanan = '<div class="dt-kanan"><section><div class="sc-head"><h2 style="margin:0">Linimasa</h2>' +
       '<div class="lap-aksi no-print" style="margin:0">' + (this.fotoAda(s) ? '<button type="button" class="ikon-btn" data-do="perjalanan-cetak" data-mode="linimasa" data-foto="1" aria-label="Cetak linimasa dengan foto atau simpan PDF">' + Analisa.IKON.cetak + '<span>Dengan foto</span></button>' : '') + '<button type="button" class="ikon-btn" data-an="cetak" aria-label="Cetak linimasa atau simpan PDF">' + Analisa.IKON.cetak + '<span>Cetak</span></button></div></div>' +
-      Cepat.chips(s) + '<div class="seg sm lm-filter no-print" role="group" aria-label="Saring linimasa">' + chip + '</div>' +
-      '<div class="seg sm lm-urut no-print" style="margin-top:8px"><button type="button" class="btn" data-do="lm-urut" aria-label="Urutan: ' + (this.urut === 'baru' ? 'terbaru dulu' : 'terlama dulu') + '. Ketuk untuk membalik">' + (this.urut === 'baru' ? '↓ Terbaru' : '↑ Terlama') + '</button></div>' +
+      Cepat.chips(s) + '<div class="seg sm lm-filter no-print" role="group" aria-label="Saring linimasa">' + chip + '<button type="button" class="btn lm-urut-btn" data-do="lm-urut" aria-label="Urutan: ' + (this.urut === 'baru' ? 'terbaru dulu' : 'terlama dulu') + '. Ketuk untuk membalik">' + (this.urut === 'baru' ? '↓ Terbaru' : '↑ Terlama') + '</button></div>' +
       (L.length ? this.daftar(s, L) + (L.length > this.n ? '<button type="button" class="btn" data-do="lm-lagi" style="width:100%;margin-top:12px;min-height:44px">Tampilkan lebih banyak (sisa ' + (L.length - this.n) + ')</button>' : '')
         : '<p class="note">Belum ada ' + (this.f === 'semua' ? 'peristiwa' : this.FILTER.find((c) => c[0] === this.f)[1].toLowerCase()) + '.</p>') +
       '<p class="note">Baris berikon redup berasal dari transaksi, panen, atau siklus; ketuk untuk membuka aslinya.' + (jalan ? ' Ketuk tombol + untuk mencatat jurnal<span class="hanya-lebar"> atau tekan J</span>.' : '') + '</p></section></div>';
@@ -119,14 +118,14 @@ const Linimasa = {
     E.forEach((e) => {
       const x = this.isi(s, e), h = Jurnal.hariKe(s, e.tgl), m = this.minggu(s, e.tgl);
       if (m !== last) { last = m; baris += '<tr class="ct-grup"><td colspan="5">' + (m === 0 ? 'Sebelum mulai' : 'Minggu ke-' + m + ' · ' + this.rentang(s, m)) + '</td></tr>'; }
-      baris += '<tr><td>' + Setelan.tgl(e.tgl) + '</td><td>' + (h >= 1 ? h : '—') + '</td><td>' + (x.label || (e.k === 'mulai' ? 'Mulai' : 'Selesai')) + '</td><td>' + esc(x.judul) + (e.j ? this.rinci(e.j, x.judul) : x.ket ? '<br>' + esc(x.ket) : '') + '</td><td class="n">' + (x.nilai || '') + '</td></tr>';
+      baris += '<tr><td>' + Setelan.tgl(e.tgl) + '</td><td class="n">' + (h >= 1 ? h : '—') + '</td><td>' + (x.label || (e.k === 'mulai' ? 'Mulai' : 'Selesai')) + '</td><td>' + esc(x.judul) + (e.j ? this.rinci(e.j, x.judul) : x.ket ? '<br>' + esc(x.ket) : '') + '</td><td class="n">' + (x.nilai || '') + '</td></tr>';
       const f = e.j && dgn ? Perjalanan.foto(e.j, true) : ''; if (f) baris += '<tr><td colspan="5">' + f + '</td></tr>';
     });
     return '<div class="ct-kop"><h1>Jurnal Siklus</h1><p class="ct-sub">' + esc(Siklus.nama(s.id)) + '</p><table class="ct-meta"><tr><th>Komoditas</th><td>' + esc(k.nama || '—') + '</td><th>Dicetak</th><td>' + Setelan.tgl(isoHari()) + '</td></tr>' +
       '<tr><th>Mulai</th><td>' + Setelan.tgl(s.mulai) + (s.status === 'selesai' && s.selesai ? ' – ' + Setelan.tgl(s.selesai) : '') + '</td><th>Status</th><td>' + (s.status === 'berjalan' ? 'Berjalan, hari ke-' + Siklus.hari(s) : 'Selesai, ' + Siklus.hari(s) + ' hari') + '</td></tr>' +
       '<tr><th>Peristiwa</th><td>' + E.length + (E.length !== semua.length ? ' dari ' + semua.length : '') + '</td><th>' + (u < 0 ? 'Rugi' : 'Untung') + '</th><td>' + rp(u) + '</td></tr>' +
       '<tr><th>Saringan</th><td>' + fl + ' · ' + urut + '</td><th>Aplikasi</th><td>Buku Kebun v' + VERSI + '</td></tr></table></div>' +
-      '<div class="ct-bag ct-lanjut"><table class="ct-tab"><thead><tr><th>Tanggal</th><th>Hari</th><th>Jenis</th><th>Keterangan</th><th class="n">Nilai</th></tr></thead><tbody>' + (baris || '<tr><td colspan="5">Tidak ada peristiwa untuk saringan ini.</td></tr>') + '</tbody></table></div>';
+      '<div class="ct-bag ct-lanjut"><table class="ct-tab"><thead><tr><th>Tanggal</th><th class="n">Hari</th><th>Jenis</th><th>Keterangan</th><th class="n">Nilai</th></tr></thead><tbody>' + (baris || '<tr><td colspan="5">Tidak ada peristiwa untuk saringan ini.</td></tr>') + '</tbody></table></div>';
   },
 
   pilihJ(id) { this.pilih = id; const y = window.scrollY; App.go('jurnal', true); window.scrollTo(0, y); const b = document.querySelector('[data-do="lm-tutup"]'); if (b) b.focus(); },

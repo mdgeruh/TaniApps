@@ -31,7 +31,7 @@ const Rute = {
   buka(h) {
     h = String(h || '').replace(/^#/, '');
     if (!h) return false;
-    const D = App.data, tetap = ['beranda', 'transaksi', 'lainnya', 'setelan', 'laporan'];
+    const D = App.data, tetap = ['beranda', 'transaksi', 'lainnya', 'setelan', 'laporan', 'profil'];
     if (tetap.includes(h)) { App.go(h); return true; }
     let m;
     if ((m = /^laporan-(grafik|rincian)$/.exec(h))) { App.go('laporan'); return true; } // alamat lama (sub-tab) → satu halaman

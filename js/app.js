@@ -1,5 +1,5 @@
 /* Buku Kebun — Fase 1: pencatatan transaksi + efek kaca (v0.1.039) */
-const VERSI = '0.1.146';
+const VERSI = '0.1.199';
 const KUNCI = 'tani.v1';
 const IKON = {
   master: '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><path d="M16.5 13v7M13 16.5h7"/>',
@@ -23,11 +23,13 @@ const SEED = {
     { id: 'pakan', nama: 'Pakan', sifatBiaya: 'variabel' },
     { id: 'media', nama: 'Media Tanam / Polybag', sifatBiaya: 'variabel' },
     { id: 'upah', nama: 'Tenaga Kerja', sifatBiaya: 'variabel' },
+    { id: 'gaji', nama: 'Gaji Pemilik', sifatBiaya: 'tetap' },
     { id: 'air-listrik', nama: 'Air / Listrik', sifatBiaya: 'tetap' },
     { id: 'alat', nama: 'Alat & Perlengkapan', sifatBiaya: 'tetap' },
     { id: 'sewa', nama: 'Sewa Lahan', sifatBiaya: 'tetap' },
     { id: 'kemasan', nama: 'Kemasan & Pengiriman', sifatBiaya: 'variabel' },
-    { id: 'lain-keluar', nama: 'Lainnya', sifatBiaya: 'variabel' }
+    { id: 'lain-keluar', nama: 'Lainnya', sifatBiaya: 'variabel' },
+    { id: 'prive', nama: 'Prive / Kebutuhan Pribadi', sifatBiaya: 'prive' }
   ],
   masuk: [
     { id: 'jual-panen', nama: 'Penjualan Hasil Panen' },
@@ -62,7 +64,7 @@ const nowIso = () => new Date().toISOString();
 
 const Store = {
   kosong() {
-    return { versi: 1, utang: [], unit: [], komoditas: [], siklus: [], transaksi: [], panen: [], aset: [], kategori: [], jurnal: [],
+    return { versi: 1, utang: [], unit: [], komoditas: [], siklus: [], transaksi: [], panen: [], aset: [], kategori: [], jurnal: [], pekerja: [], saprodi: [], mutasiStok: [],
              pengaturan: { mataUang: 'IDR', bulanMulai: 1 } };
   },
   /* ---------- keamanan multi-tab (v0.1.101, docs/MULTITAB.md) ----------
@@ -107,7 +109,7 @@ const Store = {
       return m ? this.dari(JSON.parse(m)).data : this.kosong();
     } catch (e) { console.error('Gagal memuat data', e); return this.kosong(); }
   },
-  KOLEKSI: ['utang', 'unit', 'komoditas', 'siklus', 'transaksi', 'panen', 'aset', 'kategori', 'jurnal'],
+  KOLEKSI: ['utang', 'unit', 'komoditas', 'siklus', 'transaksi', 'panen', 'aset', 'kategori', 'jurnal', 'pekerja', 'saprodi', 'mutasiStok'],
   /* Entri yang akan membuat tampilan gagal dibuang; koleksi yang bukan daftar dianggap kosong. */
   sah(k, x) {
     const n = Number.isFinite, s = (v) => typeof v === 'string' && v !== '';
@@ -118,6 +120,9 @@ const Store = {
     if (k === 'panen') return s(x.tanggal) && n(x.kuantitasKotor) && n(x.susut);
     if (k === 'aset') return n(x.hargaBeli) && n(x.umurBulan) && x.umurBulan > 0;
     if (k === 'utang') return n(x.jumlah);
+    if (k === 'pekerja') return s(x.nama) && n(x.tarif);
+    if (k === 'saprodi') return s(x.nama);
+    if (k === 'mutasiStok') return s(x.saprodiId) && s(x.tanggal) && n(x.qty) && ['masuk', 'pakai', 'koreksi'].includes(x.tipe);
     if (k === 'jurnal') return s(x.siklusId) && s(x.tanggal) && ['catatan', 'tahap', 'kejadian', 'ukuran', 'kegiatan'].includes(x.jenis) && (x.jenis !== 'catatan' || s(x.judul) || s(x.isi) || (Array.isArray(x.foto) && x.foto.length > 0));
     return true;
   },
@@ -186,14 +191,16 @@ const App = {
   draft: null, lastKat: {}, batasTx: 100, sortTx: { k: 'tanggal', a: -1 }, selTx: new Set(), selTerakhir: null, tampilTx: [], panel: false, panelSnap: '', lastEdit: null,
 
   /* ---------- data ---------- */
-  aktif() { return this._ak || (this._ak = this.data.transaksi.filter((t) => !t.terhapus)); },
+  /* aktif() = transaksi usaha (tanpa Prive): untung, HPP, laporan, siklus. semuaTx() = semua yang tidak dihapus, termasuk Prive: kas, daftar Transaksi, ekspor (v0.1.192, docs/PRIVE.md) */
+  semuaTx() { return this._sm || (this._sm = this.data.transaksi.filter((t) => !t.terhapus)); },
+  aktif() { return this._ak || (this._ak = this.data.transaksi.filter((t) => !t.terhapus && t.kategoriId !== 'prive')); }, // tidak bergantung pada memo semuaTx(): mengosongkan _ak saja tetap aman
   kategori(jenis) {
     return SEED[jenis].concat(this.data.kategori.filter((k) => k.jenis === jenis && !k.terhapus));
   },
   semuaKat() { return this.kategori('keluar').concat(this.kategori('masuk')); },
   namaKat(id) { const k = this.semuaKat().find((x) => x.id === id); return k ? k.nama : id; },
   simpan(timpa) {
-    this._ak = null; const r = Store.simpan(this.data, timpa === true);
+    Profil.salin(); this._ak = this._sm = null; const r = Store.simpan(this.data, timpa === true);
     if (r.digabung) { this.data = r.data; this.toast('Perubahan dari jendela lain digabung' + (r.n.konflik ? ' (' + r.n.konflik + ' bentrok, yang terbaru dipakai)' : '')); }
     Cadangan.otomatis(); Sinkron.tandai();
   },
@@ -202,7 +209,7 @@ const App = {
     if (Penyimpanan.terbatas) return;
     const kini = Penyimpanan.get(KUNCI); if (!kini || kini === Store._dasar) return;
     let g; try { g = Store.gabung3(JSON.parse(Store._dasar === null ? '{}' : Store._dasar), this.data, JSON.parse(kini)); } catch (e) { return; }
-    this.data = Store.dari(g.data).data; Store._dasar = kini; this._ak = null;
+    this.data = Store.dari(g.data).data; Store._dasar = kini; this._ak = this._sm = null;
     const el = document.activeElement, sibuk = (typeof Modal !== 'undefined' && Modal.m) || (el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) && $('app').contains(el));
     if (!sibuk) this.go(this.tab, true);
     this.toast('Data diperbarui dari jendela lain' + (sibuk ? '; tampilan menyusul setelah Anda selesai' : ''));
@@ -210,7 +217,7 @@ const App = {
   jumlah(list, jenis) { return list.filter((t) => t.jenis === jenis).reduce((a, t) => a + t.jumlah, 0); },
   saring() {
     const f = this.filter, bi = bulanIni(), bl = bulanLalu();
-    return this.aktif().filter((t) => {
+    return this.semuaTx().filter((t) => {
       if (f.periode === 'bulan' && t.tanggal.slice(0, 7) !== bi) return false;
       if (f.periode === 'lalu' && t.tanggal.slice(0, 7) !== bl) return false;
       if (f.periode === 'rentang') {
@@ -245,18 +252,18 @@ const App = {
     });
     Cadangan.init({
       ambil: () => this.data,
-      pulih: (o) => { this.data = Store.dari(o).data; this.simpan(true); this.go(this.tab, true); },
-      segar: () => { if (this.tab === 'setelan') this.go('setelan', true); }
+      pulih: (o) => { this.data = Store.dari(o).data; Profil.terap(); this.simpan(true); this.go(this.tab, true); },
+      segar: () => { if (this.tab === 'setelan' || this.tab === 'profil') this.go(this.tab, true); }
     });
     Sinkron.init({
       ambil: () => this.data,
       terapkan: (o, segarkan, timpa) => {
-        this.data = Store.dari(o).data; this._ak = null; const r = Store.simpan(this.data, timpa === true); if (r.digabung) this.data = r.data; Cadangan.otomatis();
+        this.data = Store.dari(o).data; this._ak = this._sm = null; const r = Store.simpan(this.data, timpa === true); if (r.digabung) this.data = r.data; Profil.terap(); Cadangan.otomatis();
         if (segarkan) this.go(this.tab, true); else this.ringkas();
       },
-      segar: () => { if (this.tab === 'setelan') this.go('setelan', true); }
+      segar: () => { if (this.tab === 'setelan' || this.tab === 'profil') this.go(this.tab, true); }
     });
-    Pwa.init({ segar: () => { if (this.tab === 'setelan') this.go('setelan', true); } });
+    Pwa.init({ segar: () => { if (this.tab === 'setelan' || this.tab === 'profil') this.go(this.tab, true); } });
     Setelan.bind($('app'));
     document.addEventListener('click', (e) => this.klik(e));
     window.addEventListener('storage', (e) => { if (e.key === KUNCI) this.dariLuar(); }); /* tab lain menyimpan */
@@ -267,6 +274,7 @@ const App = {
       if ((e.key === 'Enter' || e.key === ' ') && t && t.matches && t.matches('[role="button"][tabindex]')) { e.preventDefault(); t.click(); }
     });
     $('app').addEventListener('change', (e) => this.ubahField(e));
+    const pn = $('txPanel'); if (pn) pn.addEventListener('change', (e) => { if (['f_kat', 'f_siklus', 'f_bayar'].includes(e.target.id)) this.ubahField(e); }); // panel desktop berada di luar #app (v0.1.192)
     $('app').addEventListener('paste', (e) => {
       const t = e.target; if (!(t.id === 'f_jumlah' || t.id === 'p_harga' || (t.dataset && t.dataset.rp !== undefined))) return;
       const teks = (e.clipboardData || window.clipboardData).getData('text'); e.preventDefault();
@@ -290,7 +298,7 @@ const App = {
     });
     $('theme').addEventListener('click', () => { Setelan.ubah('mode', Setelan.efektif() === 'light' ? 'dark' : 'light'); this.toast('Tema ' + (Setelan.efektif() === 'light' ? 'terang' : 'gelap')); });
     $('gear').addEventListener('click', () => this.go('setelan'));
-    Fab.init(); if (typeof Ringkas !== 'undefined') Ringkas.init(); if (typeof Cari !== 'undefined') Cari.init(); if (typeof Spark !== 'undefined') Spark.init();
+    Fab.init(); if (typeof Ringkas !== 'undefined') Ringkas.init(); if (typeof Cari !== 'undefined') Cari.init(); if (typeof Spark !== 'undefined') Spark.init(); if (typeof Profil !== 'undefined') Profil.init();
     document.addEventListener('visibilitychange', () => { if (!document.hidden && this.tab === 'beranda') this.judulHal('beranda'); });
     Panduan.init();
     $('eye').addEventListener('click', () => this.matakan());
@@ -318,7 +326,11 @@ const App = {
     const ed = e.target.closest('[data-edit]');
     if (ed) { this.ubahTx(ed.dataset.edit); return; }
     if (e.target.closest('[data-bu]')) { Rencana.sub = 'utang'; this.go('rencana'); return; }
+    if (e.target.closest('[data-bpembeli]')) { Rencana.sub = 'pembeli'; this.go('rencana'); return; }
+    if (e.target.closest('[data-bupah]')) { Rencana.sub = 'upah'; this.go('rencana'); return; }
+    if (e.target.closest('[data-bstok]')) { Rencana.sub = 'stok'; this.go('rencana'); return; }
     const rcb = e.target.closest('#rcTanya'); if (rcb) { const w = $('rcInfo'); w.hidden = !w.hidden; rcb.setAttribute('aria-expanded', String(!w.hidden)); this.fitHero(); return; }
+    if (e.target.closest('[data-bb]')) { Beranda.buka = !Beranda.buka; this.go('beranda', true); return; }
     if (e.target.closest('[data-bp]')) { Beranda.semua = !Beranda.semua; this.go('beranda', true); return; }
     const fl = e.target.closest('[data-fl]');
     if (fl) { this.filter.lain = !this.filter.lain; this.go('transaksi', true); return; }
@@ -329,6 +341,7 @@ const App = {
   },
   ubahField(e) {
     if (e.target.dataset.sfl) { Siklus.saring(e.target.dataset.sfl, e.target.value); return; }
+    if (e.target.dataset.lt) { Analisa.atur(e.target.dataset.lt, e.target.value); return; }
     if (e.target.id === 'f_siklus' || e.target.id === 'f_kat') { this.bacaForm(); const i = $('f_info'); if (i) i.innerHTML = this.infoHasil(); return; }
     if (e.target.id === 'f_bayar') { this.bacaForm(); this.go('catat', true); return; }
     if (e.target.id === 'p_bayar') { Siklus.bacaPanen(); this.go('panen', true); return; }
@@ -387,7 +400,7 @@ const App = {
       if (hasil <= 0) mg = ' · belum ada hasil';
       else { const m = Math.round(untung / hasil * 100); mg = ' · margin ' + (m < -999 ? '< −999' : m > 999 ? '> 999' : String(m).replace('-', '−')) + '%'; }
     }
-    $('heroSub').textContent = bln.length ? bln.length + ' transaksi bulan ini' + mg : 'Belum ada transaksi bulan ini';
+    $('heroSub').textContent = bln.length ? bln.length + ' transaksi bulan ini' + mg : 'Belum ada transaksi bulan ini' + (App.aktif().length ? (Siklus.daftar().some((s) => s.status === 'berjalan') ? ' · lihat siklus berjalan di bawah' : ' · ketuk + untuk mencatat') : '');
     const rc = modal > 0 ? hasil / modal : null;
     $('stRC').textContent = rc !== null ? rc.toFixed(2).replace('.', ',') : '—';
     const info = $('rcInfo');
@@ -492,7 +505,7 @@ const App = {
     $('eye').textContent = sembunyi ? '○' : '◉'; $('eye').setAttribute('aria-pressed', String(!sembunyi)); $('eye').title = sembunyi ? 'Tampilkan angka' : 'Sembunyikan angka';
     const e2 = $('eye2'); if (e2) { e2.hidden = !((Setelan.get('sembunyi') || this.ovr === true) && this.tab !== 'beranda'); e2.textContent = sembunyi ? '○' : '◉'; e2.setAttribute('aria-pressed', String(!sembunyi)); }
     Samar.terapkan();
-    this.lencana();
+    this.lencana(); if (typeof Profil !== 'undefined') Profil.segar();
     this.fitHero();
   },
 
@@ -533,7 +546,7 @@ const App = {
       this.tutupPanel(true);
     }
     if (!tetap && !this._pop && this.rw && this.nav(t)) return;
-    this._ak = null;
+    this._ak = this._sm = null;
     if (typeof Siklus !== 'undefined') Siklus.pindah(t, this.tab);
     if (t !== 'catat' && t !== 'setelan' && this.tab !== t) this.hapusMinta = null;
     if ((t === 'catat' || t === 'setelan') && this.tab !== 'catat' && this.tab !== 'setelan') this.balik = this.tab;
@@ -541,6 +554,7 @@ const App = {
     document.body.dataset.hal = t; /* v0.1.080: dipakai CSS layout desktop */
     let h;
     if (t === 'setelan') h = Setelan.render();
+    else if (t === 'profil') h = Profil.halaman();
     else if (t === 'beranda') h = this.vBeranda();
     else if (t === 'transaksi') h = this.vTransaksi();
     else if (t === 'catat') h = this.vCatat();
@@ -585,7 +599,7 @@ const App = {
   judulHal(t) {
     const sid = typeof Siklus !== 'undefined' ? Siklus.cari(Siklus.sid) : null;
     const J = {
-      transaksi: ['Transaksi'], siklus: ['Siklus'], laporan: ['Laporan'], lainnya: ['Lainnya'], setelan: ['Setelan'],
+      transaksi: ['Transaksi'], siklus: ['Siklus'], laporan: ['Laporan'], lainnya: ['Lainnya'], setelan: ['Setelan'], profil: ['Profil', 'beranda', 'Beranda'],
       'siklus-form': Siklus.sf && Siklus.sf.id ? ['Ubah siklus', 'siklus-detail', 'Detail siklus'] : ['Siklus baru', 'siklus', 'Siklus'],
       'siklus-detail': [sid ? Siklus.nama(sid.id) : 'Detail siklus', 'siklus', 'Siklus'],
       jurnal: ['Jurnal · ' + (sid ? Siklus.nama(sid.id) : 'siklus'), 'siklus-detail', 'Detail siklus'],
@@ -596,9 +610,9 @@ const App = {
     }[t];
     const h1 = $('hdrJudul'), bk = $('hdrBack'), tag = $('hdrTag');
     if (!J) {
-      h1.innerHTML = 'Buku <em>Kebun</em>'; h1.removeAttribute('title'); const hp = this.hariIniPendek(); tag.innerHTML = '<span class="tg-hl">' + hp[0] + '</span><span class="tg-hs">' + hp[0].slice(0, 3) + '</span>, ' + hp[1] + '<span class="tg-ket"> · Manajemen pertanian</span>';
+      h1.innerHTML = typeof Profil !== 'undefined' ? Profil.sapaan() : 'Buku <em>Kebun</em>'; h1.removeAttribute('title'); const hp = this.hariIniPendek(); tag.innerHTML = '<svg class="tg-ik" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><span class="tg-hl">' + hp[0] + '</span><span class="tg-hs">' + hp[0].slice(0, 3) + '</span>, ' + hp[1] + '<span class="tg-ket"> · Manajemen pertanian</span>';
       bk.hidden = true; bk.removeAttribute('data-go');
-      document.title = 'Buku Kebun'; this.umumkan('Beranda'); if (typeof Ringkas !== 'undefined') { Ringkas.segar(); Ringkas.sembunyi(); } return;
+      document.title = 'Buku Kebun'; this.umumkan('Beranda'); if (typeof Profil !== 'undefined') Profil.segar(); if (typeof Ringkas !== 'undefined') { Ringkas.segar(); Ringkas.sembunyi(); } return;
     }
     h1.textContent = J[0]; h1.title = J[0]; tag.textContent = 'Buku Kebun';
     bk.hidden = !J[1];
@@ -617,8 +631,8 @@ const App = {
       '<div class="note">' + Setelan.tgl(t.tanggal) + (t.siklusId && this.tab !== 'siklus-detail' && Siklus.cari(t.siklusId) ? ' · ' + esc(Siklus.nama(t.siklusId).split(' · ')[0]) : '') + (t.catatan ? ' · ' + esc(t.catatan) : '') + (() => { const u = Utang.tertaut(t), s = u && Utang.sisa(u); return s ? ' · <span class="' + (u.jenis === 'utang' ? 'down' : 'up') + '">' + u.jenis + ' ' + rp(s) + '</span>' : ''; })() + '</div></div>' +
       '<div class="tx-a ' + (m ? 'up' : 'down') + '">' + (m ? '+' : '−') + rp(t.jumlah).replace('Rp ', 'Rp\u00a0') + '</div></div>';
   },
-  /* tabel transaksi di desktop (≥1100 px, halaman Transaksi); HP tetap daftar baris (v0.1.122) */
-  tabelTx() { return this.tab === 'transaksi' && (this.cetakTabel || (window.matchMedia && matchMedia('(min-width:1100px)').matches)); },
+  /* tabel transaksi di desktop (≥1024 px, halaman Transaksi); HP tetap daftar baris (v0.1.122) */
+  tabelTx() { return this.tab === 'transaksi' && (this.cetakTabel || (window.matchMedia && matchMedia('(min-width:1024px)').matches)); },
   /* ringkasan filter untuk kertas (v0.1.122): periode, jenis, kategori, siklus, pencarian, jumlah catatan */
   ringkasFilter(n) {
     const f = this.filter, opsi = (id) => { const e = document.getElementById(id); return e && e.selectedOptions && e.selectedOptions[0] ? e.selectedOptions[0].textContent.trim() : ''; };
@@ -675,14 +689,8 @@ const App = {
     const el = $('txHasil'); if (el) el.innerHTML = this.hasilTx();
     const b = document.querySelector('[data-ts="' + k + '"]'); if (b) b.focus();
   },
-  grafikLipat(bln) {
-    const g = Beranda.grafik(bln);
-    return g ? '<details class="lipat luar" data-lipat="grafik" data-bx="grafik"' + (Lipat.buka('grafik', window.innerWidth > 720) ? ' open' : '') + '><summary><h2>Grafik</h2></summary><div class="dash-grid">' + g + '</div></details>' : '';
-  },
   vBeranda() {
-    const bi = bulanIni();
-    const bln = this.aktif().filter((t) => t.tanggal.slice(0, 7) === bi);
-    const terakhir = this.aktif().slice().sort((a, b) => b.tanggal.localeCompare(a.tanggal) || b.dibuat.localeCompare(a.dibuat)).slice(0, 5);
+    const terakhir = this.semuaTx().slice().sort((a, b) => b.tanggal.localeCompare(a.tanggal) || b.dibuat.localeCompare(a.dibuat)).slice(0, 5);
     const daftar = terakhir.length
       ? terakhir.map((t) => this.barisTx(t)).join('') + '<button class="btn" data-go="transaksi" style="width:100%;margin-top:12px">Lihat semua transaksi</button>'
       : '<p class="note">Belum ada transaksi. Ketuk tombol + untuk mencatat modal atau hasil pertama.</p>' +
@@ -692,12 +700,13 @@ const App = {
       const k = Siklus.kom(s.komoditasId), h = Siklus.hari(s), u = k && k.umurPanenHari ? k.umurPanenHari : 0;
       const pct = u ? Math.min(100, Math.round(h / u * 100)) : null, sisa = u ? u - h : null;
       /* v0.1.081: ikon, meta, bilah, dan kaki hanya tampil sebagai kartu di desktop (CSS); di HP tetap baris seperti sebelumnya */
-      return '<div class="tx sk-kartu" data-do="buka-siklus" data-id="' + s.id + '" role="button" tabindex="0"><div class="sk-ik" aria-hidden="true">' + ikon('siklus', 'sk-svg') + '</div>' +
+      const jf = Jurnal.of(s.id).find((j) => j.foto && j.foto.length), ft = jf ? '<div class="sk-foto" aria-hidden="true"><img alt="" data-foto="' + jf.foto[0] + '"></div>' : ''; // v0.1.155: foto terbaru dari jurnal siklus
+      return '<div class="tx sk-kartu" data-do="buka-siklus" data-id="' + s.id + '" role="button" tabindex="0">' + ft + '<div class="sk-ik" aria-hidden="true">' + ikon('siklus', 'sk-svg') + '</div>' +
         '<div class="tx-l"><div class="tx-n">' + esc(Siklus.nama(s.id)) + '</div><div class="note">Hari ' + h + (u ? '/' + u : '') + ' · modal' + (Tahap.ringkas(s) ? ' · ' + esc(Tahap.ringkas(s)) : '') + '</div></div><div class="tx-a">' + rp(Siklus.ringkas(s.id).modal) + '</div>' +
         (u ? '<div class="sk-meta"><span>Umur siklus</span><b>' + pct + '%</b></div><div class="sk-bar" aria-hidden="true"><i style="width:' + pct + '%"></i></div>' : '') +
         '<div class="sk-foot"><span>Hari ' + h + (u ? ' / ' + u : '') + '</span>' + (u ? '<span class="sk-pil' + (sisa < 0 ? ' lewat' : '') + '">' + (sisa < 0 ? 'lewat ' + (-sisa) + ' hari' : sisa === 0 ? 'panen hari ini' : sisa + ' hari lagi') + '</span>' : '') + '</div></div>';
     }).join('') + '</div></section>' : '';
-    return Contoh.banner() + Beranda.atas() + jalan + Beranda.uang() + this.grafikLipat(bln) + '<section data-bx="tx"><h2>Transaksi terakhir</h2>' + daftar + '</section>';
+    return Contoh.banner() + Beranda.atas() + jalan + Beranda.uang() + '<section data-bx="tx"><h2>Transaksi terakhir</h2>' + daftar + '</section>';
   },
   vTransaksi() {
     const f = this.filter;
@@ -709,26 +718,27 @@ const App = {
     const nLain = (f.kat !== 'semua' ? 1 : 0) + (f.siklus !== 'semua' ? 1 : 0), bukaLain = f.lain || nLain > 0;
     return '<section>' +
       '<input type="search" id="f_cari" class="cari" placeholder="Cari catatan, kategori, siklus" aria-label="Cari transaksi" value="' + esc(f.cari) + '">' +
-      '<label for="f_periode">Periode</label><select id="f_periode" data-f="periode">' +
+      '<div class="tx-baris"><select id="f_periode" data-f="periode" aria-label="Periode">' +
       per.map((p) => '<option value="' + p[0] + '"' + (f.periode === p[0] ? ' selected' : '') + '>' + p[1] + '</option>').join('') + '</select>' +
+      '<button type="button" class="btn' + (nLain ? ' on' : '') + '" data-fl="1" aria-expanded="' + bukaLain + '">' + (bukaLain ? 'Tutup filter' : 'Filter' + (nLain ? ' (' + nLain + ')' : '')) + '</button></div>' +
       (f.periode === 'rentang'
         ? '<div class="two"><div><label for="f_dari">Dari</label><input type="date" id="f_dari" data-f="dari" value="' + f.dari + '"></div>' +
           '<div><label for="f_sampai">Sampai</label><input type="date" id="f_sampai" data-f="sampai" value="' + f.sampai + '"></div></div>' : '') +
-      '<label>Jenis</label><div class="seg">' +
+      '<div class="seg tx-jenis" role="group" aria-label="Jenis">' +
       [['semua', 'Semua'], ['keluar', 'Modal'], ['masuk', 'Hasil']].map((j) =>
         '<button type="button" class="btn' + (f.jenis === j[0] ? ' on' : '') + '" data-fj="' + j[0] + '">' + j[1] + '</button>').join('') + '</div>' +
-      '<div class="fl-bar"><button type="button" class="btn' + (nLain ? ' on' : '') + '" data-fl="1" aria-expanded="' + bukaLain + '">' + (bukaLain ? 'Sembunyikan filter lain' : 'Filter lain' + (nLain ? ' (' + nLain + ' aktif)' : '')) + '</button></div>' +
       (bukaLain ? '<label for="f_kat">Kategori</label><select id="f_kat" data-f="kat">' + opsiKat + '</select>' +
       '<label for="f_sik">Siklus</label><select id="f_sik" data-f="siklus"><option value="semua">Semua siklus</option><option value="none"' + (f.siklus === 'none' ? ' selected' : '') + '>Tanpa siklus</option>' +
       Siklus.opsi(Siklus.daftar(), f.siklus, (x) => Siklus.nama(x.id) + (x.status === 'selesai' ? ' (selesai)' : '')) + '</select>' : '') + '</section>' +
       '<section id="txHasil">' + this.hasilTx() + '</section>';
   },
   hasilTx() {
-    const list = this.saring(), modal = this.jumlah(list, 'keluar'), hasil = this.jumlah(list, 'masuk');
+    const list = this.saring(), usaha = list.filter((t) => t.kategoriId !== 'prive'), pv = this.jumlah(list.filter((t) => t.kategoriId === 'prive'), 'keluar'), modal = this.jumlah(usaha, 'keluar'), hasil = this.jumlah(usaha, 'masuk');
     const ff = this.filter, terbalik = ff.periode === 'rentang' && ff.dari && ff.sampai && ff.dari > ff.sampai;
     return '<div class="sum"><div><span class="note">Modal</span><strong class="down">' + rp(modal) + '</strong></div>' +
       '<div><span class="note">Hasil</span><strong class="up">' + rp(hasil) + '</strong></div>' +
       '<div><span class="note">' + (hasil - modal < 0 ? 'Rugi' : 'Untung') + '</span><strong class="' + (hasil - modal < 0 ? 'down' : 'up') + '">' + rp(hasil - modal) + '</strong></div></div>' +
+      (pv ? '<p class="note" style="margin:8px 0 0">Prive ' + rp(pv) + ' tidak dihitung sebagai modal atau untung usaha.</p>' : '') +
       '<p class="cetak-saja">' + this.ringkasFilter(list.length) + '</p>' +
       (terbalik ? '<p class="note down" role="alert" style="margin-top:14px">Tanggal "Dari" setelah "Sampai", jadi tidak ada hasil.</p><button type="button" class="btn" data-do="tukar-tgl" style="width:100%;margin-top:8px">Tukar tanggal</button>' :
        list.length ? this.daftarTx(list) +
@@ -748,6 +758,7 @@ const App = {
     if (!this.lanjutBuang()) return;
     const t = this.data.transaksi.find((x) => x.id === id);
     if (!t) return;
+    if (t.pekerjaId && !t.terhapus && typeof Upah !== 'undefined') { Rencana.sub = 'upah'; this.go('rencana', this.tab === 'rencana'); Rencana.dlgBuka('upahDetail', t.id); return; } // catatan upah diubah lewat modal Upah (hari dan tarif ikut)
     this.draft = { id: t.id, jenis: t.jenis, jumlah: t.jumlah, kat: t.kategoriId, tanggal: t.tanggal, catatan: t.catatan || '', siklus: t.siklusId || '', nota: t.notaId || null, notaLama: t.notaId || null, ...Utang.dari(t) };
     this.hapusMinta = null; this.lastEdit = id;
     this.bukaForm();
@@ -782,7 +793,9 @@ const App = {
   },
   /* v0.1.050: catatan di form Catat hasil agar penjualan panen tidak terhitung dua kali dan tetap masuk HPP/BEP */
   infoHasil() {
-    const d = this.draft; if (!d || d.jenis !== 'masuk' || !d.siklus || !Siklus.cari(d.siklus)) return '';
+    const d = this.draft;
+    if (d && d.jenis === 'keluar' && d.kat === 'prive') return '<p class="note" style="margin-top:10px">Prive = uang usaha yang diambil untuk kebutuhan pribadi atau rumah tangga. Mengurangi kas, tetapi tidak dihitung sebagai modal, HPP, atau pengurang untung usaha, dan tidak terkait siklus.</p>';
+    if (!d || d.jenis !== 'masuk' || !d.siklus || !Siklus.cari(d.siklus)) return '';
     const tx = (p) => p.transaksiId && this.data.transaksi.find((t) => t.id === p.transaksiId && !t.terhapus);
     const jual = Siklus.panenOf(d.siklus).filter(tx), nilai = jual.reduce((a, p) => a + tx(p).jumlah, 0);
     const catatan = (h) => '<p class="note" style="margin-top:10px">' + h + '</p>';
@@ -819,14 +832,19 @@ const App = {
   /* ---------- tampilan: lainnya ---------- */
   vLainnya() {
     const kustom = this.data.kategori.filter((k) => !k.terhapus);
-    return '<section><h2>Rencana keuangan</h2><p class="note">Anggaran per siklus, arus kas dan proyeksi, aset dan penyusutan, balik modal, utang/piutang.</p><button class="btn" data-go="rencana" style="width:100%;margin-top:12px">Buka rencana keuangan</button></section>' +
+    const m = (att, judul, ket) => '<button type="button" class="ang-baris lm-menu" ' + att + '><strong>' + judul + '</strong><span class="note">' + ket + '</span></button>';
+    return '<section class="lm-sec"><h2>Menu keuangan</h2>' +
+      m('data-go="rencana"', 'Rencana keuangan', 'Anggaran, arus kas, aset, utang/piutang') +
+      m('data-bpembeli="1"', 'Buku pembeli', 'Penjualan, rata-rata harga, piutang tiap pembeli') +
+      m('data-bupah="1"', 'Upah harian', 'Hari kerja dan upah tiap pekerja') +
+      m('data-bstok="1"', 'Stok saprodi', 'Sisa pupuk, benih, pestisida') + '</section>' +
       '<section><h2>Kategori sendiri</h2><p class="note">Kategori bawaan tidak bisa dihapus. Tambahkan yang khusus usaha Anda.</p>' +
       (kustom.length ? kustom.map((k) => '<div class="row"><span>' + esc(k.nama) + ' <span class="mu">· ' + (k.jenis === 'keluar' ? 'modal' : 'hasil') + '</span></span>' +
         '<button class="btn" data-do="hapus-kat" data-id="' + k.id + '" style="flex:0 0 auto;padding:4px 10px;font-size:12px">Hapus</button></div>').join('') : '') +
       '<label for="k_nama">Nama kategori</label><input id="k_nama" maxlength="40" placeholder="mis. Bambu penyangga">' +
       '<label for="k_jenis">Jenis</label><select id="k_jenis"><option value="keluar">Modal (keluar)</option><option value="masuk">Hasil (masuk)</option></select>' +
       '<button class="btn gold" data-do="tambah-kat">Tambah kategori</button></section>' +
-      '<section><h2>Ekspor Excel</h2><p class="note">Satu berkas .xlsx berisi lembar Siklus, Transaksi, Panen, Utang dan piutang, Aset, Harga pasar, Jadwal, dan Jurnal (catatan, tahap, kejadian, ukuran). Untung dan R/C memakai rumus Excel. Cadangan yang bisa dipulihkan tetap JSON di Setelan.</p>' +
+      '<section><h2>Ekspor Excel</h2><p class="note">Satu berkas .xlsx berisi lembar Siklus, Transaksi, Panen, Utang dan piutang, Aset, Harga pasar, Jadwal, Upah, Stok, dan Jurnal (catatan, tahap, kejadian, ukuran). Untung dan R/C memakai rumus Excel. Cadangan yang bisa dipulihkan tetap JSON di Setelan.</p>' +
       '<button class="btn" data-do="ekspor-xlsx" style="width:100%;margin-top:12px">Ekspor Excel (.xlsx)</button><button class="btn" data-do="ekspor-csv-jurnal" style="width:100%;margin-top:8px">Ekspor CSV jurnal</button><div class="note" id="xlsMsg" role="status" aria-live="polite" style="margin-top:8px"></div></section>' +
       '<section><h2>Ekspor &amp; impor CSV</h2><p class="note">Kolom: tanggal, jenis (keluar/masuk), kategori, siklus, jumlah, catatan. Cadangan penuh (JSON) ada di Setelan. Sebelum diimpor, pratinjau ditampilkan dulu.</p>' +
       '<div class="seg tiga" style="margin-top:12px"><button class="btn" data-do="ekspor-csv">Ekspor CSV</button><button class="btn" data-do="impor-csv">Impor teks</button>' +
@@ -886,13 +904,13 @@ const App = {
     const tLama = d.id && this.data.transaksi.find((x) => x.id === d.id), gal = Utang.cek(d.jumlah, d, tLama && Utang.tertaut(tLama));
     if (gal) { this.toast(gal); return; }
     const kat = this.semuaKat().find((k) => k.id === d.kat);
-    const sifat = d.jenis === 'keluar' ? (kat && kat.sifatBiaya) || 'variabel' : null;
+    const sifat = d.jenis === 'keluar' ? (kat && kat.sifatBiaya) || 'variabel' : null, sik = d.kat === 'prive' ? null : (d.siklus || null); // Prive tidak terkait siklus
     let tx;
     if (d.id) {
       const t = tx = this.data.transaksi.find((x) => x.id === d.id);
-      Object.assign(t, { tanggal: d.tanggal, jenis: d.jenis, kategoriId: d.kat, jumlah: d.jumlah, sifatBiaya: sifat, catatan: d.catatan, siklusId: d.siklus || null, notaId: d.nota || null, diubah: nowIso() });
+      Object.assign(t, { tanggal: d.tanggal, jenis: d.jenis, kategoriId: d.kat, jumlah: d.jumlah, sifatBiaya: sifat, catatan: d.catatan, siklusId: sik, notaId: d.nota || null, diubah: nowIso() });
     } else {
-      this.data.transaksi.push(tx = { id: uid('t'), tanggal: d.tanggal, jenis: d.jenis, kategoriId: d.kat, jumlah: d.jumlah, siklusId: d.siklus || null,
+      this.data.transaksi.push(tx = { id: uid('t'), tanggal: d.tanggal, jenis: d.jenis, kategoriId: d.kat, jumlah: d.jumlah, siklusId: sik,
         sifatBiaya: sifat, catatan: d.catatan, notaId: d.nota || null, dibuat: nowIso(), diubah: nowIso(), terhapus: false });
     }
     Utang.sinkron(tx, d);
@@ -917,17 +935,18 @@ const App = {
   eksporCsv() {
     const q = (s) => '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"';
     const baris = ['tanggal,jenis,kategori,siklus,jumlah,catatan'].concat(
-      this.aktif().slice().sort((a, b) => a.tanggal.localeCompare(b.tanggal)).map((t) =>
-        [t.tanggal, t.jenis, q(this.namaKat(t.kategoriId)), q(t.siklusId || ''), t.jumlah, q(t.catatan)].join(',')));
-    const csv = baris.join('\n');
+      this.semuaTx().slice().sort((a, b) => a.tanggal.localeCompare(b.tanggal)).map((t) =>
+        [t.tanggal, t.jenis, q(this.namaKat(t.kategoriId)), q(t.siklusId && Siklus.cari(t.siklusId) ? Siklus.nama(t.siklusId) : ''), t.jumlah, q(t.catatan)].join(',')));
+    const csv = baris.join('\r\n');
     $('csvBox').value = csv;
+    if (baris.length < 2) { $('csvMsg').textContent = 'Belum ada transaksi untuk diekspor.'; return; }
     try {
       const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv' }));
+      a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }));
       a.download = 'buku-kebun-transaksi-' + isoHari() + '.csv';
-      document.body.appendChild(a); a.click(); a.remove();
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
     } catch (e) {}
-    $('csvMsg').textContent = this.aktif().length + ' transaksi diekspor. Jika unduhan tidak mulai, salin teks di kotak.';
+    $('csvMsg').textContent = (baris.length - 1) + ' transaksi diekspor. Jika unduhan tidak mulai, salin teks di kotak.';
   },
   urai(teks) {
     const rows = []; let r = [], f = '', q = false;
@@ -944,7 +963,7 @@ const App = {
     return rows;
   },
   /* mengganti seluruh data dengan isi berkas (impor JSON, Urungkan impor); data lama dicadangkan otomatis */
-  pasangData(o) { const r = Store.dari(o); Cadangan.catat('Sebelum impor', true); this.data = r.data; this.simpan(true); this.go(this.tab, true); return r; },
+  pasangData(o) { const r = Store.dari(o); Cadangan.catat('Sebelum impor', true); this.data = r.data; Profil.terap(); this.simpan(true); this.go(this.tab, true); return r; },
   /* impor CSV (v0.1.102): analisa dulu tanpa mengubah data, tampilkan pratinjau (Impor.csv), baru terapkan */
   analisaCsv(teks) {
     const rows = this.urai(teks || '');
@@ -953,7 +972,7 @@ const App = {
     if (ix('tanggal') < 0 || ix('jenis') < 0 || ix('jumlah') < 0) return { galat: 'Kolom tanggal, jenis, dan jumlah wajib ada.' };
     const data = rows.slice(1).filter((r) => r.some((c) => String(c).trim()));
     const a = { baris: [], lewat: 0, total: data.length, masuk: 0, keluar: 0, dari: '', sampai: '', kategoriBaru: [], tanpaKategori: 0, kembar: 0 }, baru = {};
-    const ada = new Set(this.aktif().map((t) => [t.tanggal, t.jenis, t.jumlah, t.catatan || ''].join('|')));
+    const ada = new Set(this.semuaTx().map((t) => [t.tanggal, t.jenis, t.jumlah, t.catatan || ''].join('|')));
     data.forEach((r) => {
       const tgl = (r[ix('tanggal')] || '').trim(), jenis = (r[ix('jenis')] || '').trim().toLowerCase(), jml = angka(r[ix('jumlah')]);
       if (!/^\d{4}-\d{2}-\d{2}$/.test(tgl) || (jenis !== 'keluar' && jenis !== 'masuk') || jml <= 0) { a.lewat++; return; }

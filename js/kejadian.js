@@ -19,13 +19,13 @@ const Kejadian = {
       out.push([Siklus.nama(s.id), j.tanggal, Jurnal.hariKe(s, j.tanggal), this.label(j), this.rincian(j), Jurnal.judul(j), j.isi || '', j.jenis === 'ukuran' && j.ukuran ? j.ukuran.nilai : '', j.jenis === 'ukuran' && j.ukuran ? j.ukuran.satuan || '' : '', (j.foto || []).length])));
     return out;
   },
-  csvJurnal() {
+  csvJurnal(B) {
     const q = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
-    return ['siklus,tanggal,hari_ke,jenis,rincian,judul,isi,nilai,satuan,foto'].concat(this.barisJurnal().map((r) => [q(r[0]), r[1], r[2], q(r[3]), q(r[4]), q(r[5]), q(r[6]), r[7], q(r[8]), r[9]].join(','))).join('\n');
+    return ['siklus,tanggal,hari_ke,jenis,rincian,judul,isi,nilai,satuan,foto'].concat((B || this.barisJurnal()).map((r) => [q(r[0]), r[1], r[2], q(r[3]), q(r[4]), q(r[5]), q(r[6]), r[7], q(r[8]), r[9]].join(','))).join('\r\n');
   },
   eksporCsvJurnal() {
-    const csv = this.csvJurnal(), n = csv.split('\n').length - 1; if (!n) return 0;
-    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv' })); a.download = 'buku-kebun-jurnal-' + isoHari() + '.csv';
+    const B = this.barisJurnal(), n = B.length; if (!n) return 0;
+    const csv = this.csvJurnal(B), a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' })); a.download = 'buku-kebun-jurnal-' + isoHari() + '.csv';
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); return n;
   },
   daftar(s, jenis) { return Jurnal.of(s.id).filter((j) => j.jenis === jenis); },

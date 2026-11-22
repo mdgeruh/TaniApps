@@ -2,15 +2,23 @@
 const Fab = {
   c: null, terbuka: false,
   catat(jenis, sid) { App.draft = { id: null, jenis }; App.baru(sid); },
+  /* v0.1.155: dari Beranda, pilih siklus berjalan lebih dulu (langsung bila hanya satu) */
+  untukSiklus(judul, fn) {
+    const L = Siklus.daftar().filter((s) => s.status === 'berjalan');
+    if (L.length === 1) { fn(L[0].id); return; }
+    if (!L.length) return;
+    Modal.buka({ html: '<h2 id=\"fsT\">' + judul + '</h2>' + L.map((s) => '<button type=\"button\" class=\"btn\" data-fs=\"' + s.id + '\" style=\"width:100%;margin-top:8px\">' + esc(Siklus.nama(s.id)) + '</button>').join(''), judulId: 'fsT',
+      klik(e) { const b = e.target.closest('[data-fs]'); if (!b) return; const id = b.dataset.fs; Modal.tutup(true); setTimeout(() => fn(id), 250); } }); // tunda: penutupan modal memicu 'kembali' di riwayat browser, yang bisa membatalkan halaman/modal berikutnya
+  },
   /* null = FAB disembunyikan; { nama, aksi } = satu ketukan; { nama, pilih: [[label, fungsi]] } = pilihan melayang */
   cfg() {
     const t = App.tab, tx = (sid) => [['Catat modal', () => Fab.catat('keluar', sid)], ['Catat hasil', () => Fab.catat('masuk', sid)]];
-    if (t === 'beranda' || t === 'transaksi') return { nama: 'Catat transaksi', pilih: tx() };
+    if (t === 'beranda' || t === 'transaksi') return { nama: 'Catat transaksi', pilih: t === 'beranda' && Siklus.daftar().some((s) => s.status === 'berjalan') ? tx().concat([['Catat panen', () => Fab.untukSiklus('Catat panen untuk siklus', (id) => { Siklus.sid = id; Siklus.aksi('catat-panen', {}); })], ['Catat jurnal', () => Fab.untukSiklus('Catat jurnal untuk siklus', (id) => { Siklus.sid = id; Rencana.dlgBuka('jurnal'); })]]) : tx() };
     if (t === 'master') return { nama: 'Tambah unit atau komoditas', pilih: [['Tambah unit', () => Siklus.aksi('form-baru', { dataset: { j: 'unit' } })], ['Tambah komoditas', () => Siklus.aksi('form-baru', { dataset: { j: 'kom' } })]] };
     if (t === 'siklus') return { nama: 'Siklus baru', aksi: () => App.go('siklus-form') };
     if (t === 'siklus-detail') {
       const s = Siklus.cari(Siklus.sid);
-      return s && s.status === 'berjalan' ? { nama: 'Catat untuk siklus ini', pilih: tx(s.id).concat([['Catat panen', () => Siklus.aksi('catat-panen', {})], ['Catat jurnal', () => Rencana.dlgBuka('jurnal')], ['Tambah jadwal kegiatan', () => Rencana.dlgBuka('jadwal')]]) } : null;
+      return s && s.status === 'berjalan' ? { nama: 'Catat untuk siklus ini', pilih: tx(s.id).concat([['Catat panen', () => Siklus.aksi('catat-panen', {})], ['Catat jurnal', () => Rencana.dlgBuka('jurnal')], ['Catat upah', () => Upah.catat('', s.id)], ['Pakai stok', () => Stok.pakai('', s.id)], ['Tambah jadwal kegiatan', () => Rencana.dlgBuka('jadwal')]]) } : null;
     }
     if (t === 'jurnal') {
       const s = Siklus.cari(Siklus.sid);
@@ -21,6 +29,8 @@ const Fab = {
       if (Rencana.sub === 'kas') return { nama: 'Catat transaksi atau atur saldo awal', pilih: tx().concat([['Atur saldo awal kas', R('awal')]]) };
       if (Rencana.sub === 'anggaran') return { nama: 'Atur anggaran', aksi: R('anggaran') };
       if (Rencana.sub === 'aset') return { nama: 'Tambah aset', aksi: R('aset') };
+      if (Rencana.sub === 'upah') return { nama: 'Catat upah atau tambah pekerja', pilih: [['Catat upah', () => Upah.catat()], ['Tambah pekerja', R('pekerja')]] };
+      if (Rencana.sub === 'stok') return { nama: 'Pakai stok, tambah stok, atau tambah barang', pilih: [['Pakai stok', () => Stok.pakai()], ['Tambah stok (beli)', () => Stok.masuk()], ['Tambah barang', R('saprodi')]] };
       if (Rencana.sub === 'harga') return { nama: 'Catat harga pasar', aksi: R('harga') };
       if (Rencana.sub === 'utang') return { nama: 'Catat utang atau piutang', aksi: R('utang') };
     }

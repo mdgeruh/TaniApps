@@ -3,7 +3,7 @@
    ditampilkan di modal (Modal, docs/MODAL.md), baru dijalankan setelah "Impor". Berhasil: toast ringkasan (+ Urungkan untuk JSON dan CSV). */
 const Impor = {
   MAKSJSON: 20 * 1048576, MAKSCSV: 5 * 1048576,
-  KOL: [['transaksi', 'Transaksi'], ['siklus', 'Siklus'], ['panen', 'Panen'], ['jurnal', 'Jurnal'], ['unit', 'Unit'], ['komoditas', 'Komoditas'], ['aset', 'Aset'], ['utang', 'Utang/piutang'], ['kategori', 'Kategori']],
+  KOL: [['transaksi', 'Transaksi'], ['siklus', 'Siklus'], ['panen', 'Panen'], ['jurnal', 'Jurnal'], ['unit', 'Unit'], ['komoditas', 'Komoditas'], ['aset', 'Aset'], ['utang', 'Utang/piutang'], ['kategori', 'Kategori'], ['pekerja', 'Pekerja'], ['saprodi', 'Stok barang'], ['mutasiStok', 'Mutasi stok']],
   kb(n) { return n >= 1048576 ? (n / 1048576).toFixed(1).replace('.', ',') + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; },
   baris(a, b) { return '<div class="row"><span class="mu">' + a + '</span><span style="text-align:right">' + b + '</span></div>'; },
   berkas(i) { return i && i.nama ? this.baris('Berkas', esc(i.nama) + (i.ukuran ? ' · ' + this.kb(i.ukuran) : '')) : this.baris('Sumber', 'teks yang ditempel'); },

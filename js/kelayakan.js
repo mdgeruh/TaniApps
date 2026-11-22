@@ -34,11 +34,12 @@ const Kelayakan = {
   v() {
     const s = this.muat(), f = (k) => s[k] === '' ? '' : fmtInput(Number(s[k]) || 0), unit = s.unit === 'tahun' ? 'tahun' : 'bulan';
     const inp = (id, lab, k, ph) => '<label for="kl_' + id + '">' + lab + '</label><input id="kl_' + id + '" data-kl="' + k + '" data-rp inputmode="numeric" autocomplete="off" placeholder="' + ph + '" value="' + f(k) + '">';
-    return '<section><p class="note">Hitung apakah sebuah usaha atau investasi (mis. kolam, greenhouse, alat) layak dijalankan. Angka di sini tidak mengubah catatan keuanganmu.</p>' +
+    const isi = '<section><p class="note">Hitung apakah sebuah usaha atau investasi (mis. kolam, greenhouse, alat) layak dijalankan. Angka di sini tidak mengubah catatan keuanganmu.</p>' +
       '<div class="seg sm" style="justify-content:flex-start;margin:6px 0">' + [['bulan', 'Periode bulanan'], ['tahun', 'Periode tahunan']].map((x) => '<button type="button" class="btn' + (unit === x[0] ? ' on' : '') + '" data-rc="kl-unit" data-id="' + x[0] + '">' + x[1] + '</button>').join('') + '</div>' +
       inp('invest', 'Investasi awal (Rp)', 'invest', '0') + inp('net', 'Arus kas bersih per ' + unit + ' (Rp)', 'net', '0') + inp('n', 'Jumlah ' + unit, 'n', '12') + inp('sisa', 'Nilai sisa di akhir (Rp, opsional)', 'sisa', '0') + '<label for="kl_d">Diskonto per tahun (%)</label><input id="kl_d" data-kl="d" inputmode="decimal" autocomplete="off" placeholder="12" value="' + esc(s.d) + '">' +
-      '<div class="seg" style="margin-top:8px"><button type="button" class="btn" data-rc="kl-isi">Isi arus kas dari rata-rata 3 bulan</button></div></section>' +
-      '<section><h2>Hasil</h2><div id="kl_hasil" aria-live="polite">' + this.hasil(s) + '</div></section>';
+      '<div class="seg" style="margin-top:8px"><button type="button" class="btn" data-rc="kl-isi">Isi arus kas dari rata-rata 3 bulan</button></div></section>';
+    const hasil = '<section><h2>Hasil</h2><div id="kl_hasil" aria-live="polite">' + this.hasil(s) + '</div></section>';
+    return hasil + isi;
   },
   simpan() { App.data.pengaturan.kelayakan = Object.assign({}, this.s); App.simpan(); },
   /* dipanggil dari Rencana.klik */

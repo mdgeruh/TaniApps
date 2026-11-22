@@ -1,7 +1,7 @@
 /* Buku Kebun — sinkron cloud Supabase, opsional (v0.1.023; konfigurasi bawaan v0.1.106; Layar Akun v0.1.107) */
 var Sinkron = (function () {
   var KUNCI = 'tani.sinkron', TABEL = 'tani_data', JEDA = 20000, WAKTU = 15000;
-  var KOLEKSI = ['unit', 'komoditas', 'siklus', 'transaksi', 'panen', 'aset', 'utang', 'kategori', 'jurnal'];
+  var KOLEKSI = ['unit', 'komoditas', 'siklus', 'transaksi', 'panen', 'aset', 'utang', 'kategori', 'jurnal', 'pekerja', 'saprodi', 'mutasiStok'];
   var h = { ambil: function () { return {}; }, terapkan: function () {}, segar: function () {} };
   /* Konfigurasi bawaan proyek Supabase. Kunci publishable memang publik (aman di sisi klien); data dilindungi login dan RLS, lihat docs/SINKRON.md. Jangan pernah mengisi kunci service_role/secret di sini. */
   var BAWAAN = { url: 'https://yvjhovpyopglwlilntdt.supabase.co', key: 'sb_publishable_Sy7bKh5ctNM6G-p6tyxK-Q_Xv9Mr_NQ' };
@@ -51,6 +51,7 @@ var Sinkron = (function () {
     var e = document.getElementById('skDot'); if (!e) return;
     var s = keadaan();
     e.innerHTML = ikon(s.k, s.t);
+    var tk = document.getElementById('skTeks'); if (tk) tk.textContent = s.t;
   }
   function kabar(t) { status = t || ''; var e = document.getElementById('skMsg'); if (e) e.textContent = status; lencana(); }
 
@@ -332,7 +333,7 @@ var Sinkron = (function () {
     if (!b || b.closest('[role=dialog]')) return;
     var x = b.dataset.sk;
     if (x === 'akun') {
-      if (c.sesi) { Lipat.s['st-sink'] = true; App.go('setelan'); setTimeout(function () { var s = document.querySelector('[data-lipat="st-sink"]'); if (s) { s.open = true; s.scrollIntoView({ block: 'start' }); } }, 60); }
+      if (c.sesi) { App.go('profil'); setTimeout(function () { var s = document.getElementById('pfhAkun'); if (s) { s.scrollIntoView({ block: 'start' }); s.focus({ preventScroll: true }); } }, 60); }
       else akunBuka('masuk');
     }
     else if (x === 'akun-masuk') akunBuka('masuk');
@@ -370,5 +371,5 @@ var Sinkron = (function () {
     window.addEventListener('offline', lencana);
     if (c.sesi && c.auto) setTimeout(function () { jalan('gabung', true).catch(function () {}); }, 2000);
   }
-  return { init: init, ikon: ikon, html: html, tandai: tandai, aktif: function () { return !!c.sesi; }, gabung: gabung, buka: akunBuka, galatId: galatId };
+  return { init: init, ikon: ikon, html: html, tandai: tandai, aktif: function () { return !!c.sesi; }, email: function () { return (c.sesi && c.sesi.email) || ''; }, gabung: gabung, buka: akunBuka, galatId: galatId };
 })();
