@@ -1,5 +1,549 @@
 # Changelog
 
+## v0.1.199 — 2026-11-19
+Beranda lebih ringkas di HP. Hanya UI; angka tidak berubah.
+
+### Diubah
+- **Beranda → Ringkasan uang:** tiga subbagian (Siklus berjalan · sampai hari ini, Dibanding bulan lalu, Posisi kas · semua waktu) bisa dilipat dengan mengetuk judulnya. Bawaan: "Dibanding bulan lalu" tertutup karena angkanya sudah ada di kartu atas; dua lainnya terbuka. Keadaan diingat selama aplikasi terbuka. Di desktop (≥ 1024 px) semuanya tetap terbuka.
+- Berkas: `js/beranda.js`, `css/style.css`, `js/app.js` (versi), `sw.js`, `VERSION`, `README.md`, `CHANGELOG.md`, `index.html`, `buku-kebun.html`.
+
+## v0.1.198 — 2026-11-18
+Perapian kecil di Rencana keuangan (HP). Hanya UI.
+
+### Diubah
+- **Ringkasan Rencana:** anggaran kini satu batang tipis (kuning mulai 90%, merah bila lewat 100%) dan satu baris "86% anggaran terpakai · Rp … / Rp …", sebelumnya paragraf dua baris.
+- **Kelayakan:** selama investasi awal belum diisi, kartu Hasil mengecil jadi satu baris petunjuk tanpa judul; kembali penuh begitu hasil bisa dihitung.
+- Berkas: `js/rencana.js`, `css/style.css`, `js/app.js` (versi), `sw.js`, `VERSION`, `README.md`, `CHANGELOG.md`, `index.html`, `buku-kebun.html`.
+
+## v0.1.197 — 2026-11-18
+Jurnal lebih ringkas di HP. Hanya UI; data dan logika tidak berubah.
+
+### Diubah
+- **Jurnal (linimasa siklus):** chip "Catat cepat" dan chip saring (Semua, Catatan, Uang, Panen, Kegiatan) masing-masing satu baris yang bisa digeser di HP (< 600 px), sebelumnya membungkus jadi lima baris (±290 px sebelum isi). Tombol urutan (Terbaru/Terlama) pindah ke baris chip saring. Daftar saring jurnal di halaman Siklus ikut satu baris.
+- Berkas: `css/style.css`, `js/linimasa.js`, `js/app.js` (versi), `sw.js`, `VERSION`, `README.md`, `CHANGELOG.md`, `index.html`, `buku-kebun.html`.
+
+## v0.1.196 — 2026-11-18
+Laporan lebih ringkas di HP. Hanya UI; angka dan rumus tidak berubah.
+
+### Diubah
+- **Laporan:** delapan bagian (Penyusutan aset, Tren, Untung bersih per bulan, Bulan ini vs rata-rata, Vs periode sebelumnya, Komposisi, Biaya tetap vs variabel, Sorotan, Modal vs anggaran) bisa dilipat dengan mengetuk judulnya di HP dan tablet (< 1024 px). Ringkasan (KPI) dan Rincian per siklus tetap terbuka. Keadaan lipat diingat selama aplikasi terbuka dan bertahan saat ganti periode; bilah lompat membuka bagian yang dituju. Bisa dipakai dengan papan ketik (Enter atau Spasi). Desktop dan cetak tidak berubah.
+- Berkas: `js/analisa.js`, `css/style.css`, `js/app.js` (versi), `sw.js`, `VERSION`, `README.md`, `CHANGELOG.md`, `index.html`, `buku-kebun.html`.
+
+## v0.1.195 — 2026-11-18
+Perapian tampilan HP (Rencana keuangan dan halaman lain). Hanya UI; data, rumus, dan fitur tidak berubah.
+
+### Diperbaiki
+- **Arus kas terpotong di HP.** Tabel tiga kolom (selebar 335 px di wadah 320 px) memotong kolom Saldo. Kini daftar baris: bulan di kiri, bersih dan saldo bertumpuk di kanan, proyeksi tetap pudar bertanda *.
+- **Nilai aset dan anggaran patah baris.** Nama panjang dipotong dengan elipsis, nilai di kanan tidak membungkus.
+- **Target sentuh di bawah 44 px** (tombol, pilihan, kolom pilih; HP dan tablet < 1024 px) dinaikkan ke 44 px.
+
+### Diubah
+- **Rencana keuangan:** kartu ringkasan lebih rapat; bilah bagian tidak lagi dibungkus kartu; baris anggaran menampilkan sisa atau kelebihan (mis. "sisa Rp 70.000"); **Kelayakan** menampilkan kartu Hasil di atas isian.
+- **Lainnya:** empat kartu menu (Rencana keuangan, Buku pembeli, Upah harian, Stok saprodi) menjadi satu daftar "Menu keuangan" dengan judul dan satu baris keterangan.
+- **Transaksi:** filter ringkas; Periode dan tombol Filter satu baris, Jenis di bawahnya tanpa label (±150 px lebih pendek di HP).
+- **Siklus:** empat tab (Berjalan, Selesai, Agenda, Jurnal) satu baris di HP, sebelumnya 2 × 2.
+- **Laporan:** bilah lompat (Ringkasan, Grafik, Biaya, Sorotan, Siklus, Simulasi) agar halaman ±5.300 px mudah dijelajahi; tidak ikut tercetak.
+- `css/style.css`, `js/rencana.js`, `js/kelayakan.js`, `js/app.js`, `js/analisa.js`, `docs/RENCANA.md`, `CHANGELOG.md`, `README.md`, `sw.js`, `VERSION`, `index.html`, `buku-kebun.html`.
+
+### Belum
+- Diuji di Chromium headless (390 dan 1440 px; uji pembeli, upah, stok, prive lulus), belum di HP sungguhan. Bagian Laporan baru bisa dilipat sejak v0.1.196.
+
+## v0.1.194 — 2026-11-18
+Perbaikan halaman Rencana keuangan.
+
+### Diperbaiki
+- **Bilah bagian pecah menjadi 3 baris di HP.** Aturan `.seg.sm{flex-wrap:wrap}` (lebih spesifik) mengalahkan `.rc-chips`, sehingga sembilan chip (Anggaran, Arus kas, Aset, Utang/piutang, Pembeli, Upah, Stok, Harga pasar, Kelayakan) memakan ±136 px dan mendorong isi ke bawah. Kini satu baris setinggi 46 px yang bisa digeser; di layar lebar semua chip muat seperti sebelumnya.
+
+### Ditambah
+- Penanda geser: ujung kiri atau kanan memudar bila masih ada chip tersembunyi (kelas `ada-kiri` / `ada-kanan`, diperbarui saat menggeser).
+- Chip aktif otomatis digulir ke tengah saat halaman dibuka dan saat berganti bagian.
+- Aksesibilitas: grup berlabel "Bagian Rencana keuangan" dan `aria-pressed` pada tiap chip.
+
+### Diubah
+- Hanya bilah Rencana yang diubah (kelas baru `rc-sub`); chip Catat cepat di Jurnal tidak ikut berubah. `docs/RENCANA.md`, `CHANGELOG.md`, `roadmap.md`, `README.md`, `css/style.css`, `js/rencana.js`, `js/app.js`, `sw.js`, `VERSION`, `index.html`, `buku-kebun.html`.
+
+### Belum
+- Diuji di Chromium headless (390 dan 1440 px), belum di HP sungguhan. Chip Catat cepat di Jurnal masih terbungkus oleh aturan yang sama (belum diubah).
+
+## v0.1.193 — 2026-11-18
+Buku pembeli (butir A3 di usulan fitur roadmap).
+
+### Ditambah
+- **Sub-tab Pembeli** di Rencana keuangan (`#rencana-pembeli`, juga tombol **Buka buku pembeli** di Lainnya): ringkasan Pembeli, Penjualan, dan Piutang; pilihan periode **Semua**, **Tahun ini**, **Bulan ini** (piutang selalu seluruh waktu); daftar pembeli urut penjualan terbesar dengan jumlah panen, komoditas utama, rata-rata harga, dan lencana piutang. Pembeli yang hanya punya piutang juga tampil.
+- **Detail pembeli** (modal): total penjualan, jumlah panen, rentang tanggal, piutang, **per komoditas** (jumlah bersih, rata-rata harga, harga terakhir), piutang belum lunas (ketuk membuka detail utang/piutang untuk membayar), dan 8 riwayat jual terbaru.
+- **Ganti nama atau gabungkan**: mengganti nama pembeli di semua panen, catatan transaksi panen, dan piutangnya; memakai nama pembeli lain yang sudah ada menggabungkan keduanya.
+- **Saran nama** pada kolom Pembeli di form panen, dan nama yang sama (beda huruf besar kecil atau spasi ganda) otomatis memakai ejaan yang sudah ada agar tidak muncul pembeli kembar.
+- Lembar **Pembeli** di ekspor Excel.
+- `js/pembeli.js`, `tools/uji-pembeli.py` (Chromium headless, 390 dan 1440 px: 72 pemeriksaan) dan `docs/PEMBELI.md`.
+
+### Diubah
+- Pembeli **dihitung** dari data yang sudah ada (`panen.pembeli`, `utang.pihak`), tanpa koleksi atau kolom baru: impor, cadangan, ekspor JSON, dan sinkron tidak berubah. Nama dicocokkan tanpa membedakan huruf besar kecil dan spasi ganda.
+- Roadmap: A3 dicentang. `docs/PEMBELI.md` (baru), `RENCANA.md`, `EKSPOR.md`, `DATA-SCHEMA.md`, `README.md`, `CHANGELOG.md`, `roadmap.md`, `sw.js`, `js/app.js`, `js/rencana.js`, `js/siklus.js`, `js/xlsx.js`, `js/pembeli.js` (baru), `VERSION`, `index.html`, `buku-kebun.html`, `index.dev.html`, `tools/uji-pembeli.py` (baru).
+
+### Belum
+- Diuji di Chromium headless, belum di HP sungguhan. Belum ada kontak (telepon) dan catatan per pembeli (butuh koleksi baru), tombol Urungkan untuk ganti nama, dan data contoh. Nama yang salah ketik berbeda harus digabung manual. Panen tanpa nama pembeli tidak tampil di buku pembeli.
+
+## v0.1.192 — 2026-11-17
+Prive: pemisah uang usaha dan rumah tangga (butir A4 di usulan fitur roadmap) dan perbaikan panel desktop.
+
+### Ditambah
+- Kategori Modal bawaan **Prive / Kebutuhan Pribadi** (`prive`, urutan terakhir). Transaksi Prive **mengurangi kas** (saldo, arus kas, proyeksi) tetapi **tidak dihitung** sebagai modal, HPP, BEP, komposisi biaya, atau pengurang untung usaha, dan tidak terkait siklus (siklus dilepas otomatis saat disimpan). Mengubah kategori transaksi lama menjadi/dari Prive langsung berlaku.
+- Form Catat modal menampilkan penjelasan singkat saat Prive dipilih.
+- Daftar Transaksi tetap menampilkan Prive; ringkasan Modal/Hasil/Untung di atasnya tidak menghitungnya dan memberi catatan "Prive Rp … tidak dihitung sebagai modal atau untung usaha".
+- Laporan: bila periode punya Prive tampil **Prive (diambil pemilik)**, **Untung dikurangi prive**, dan **Prive ÷ untung** (untung utama tetap sebelum prive, seperti pola Gaji pemilik).
+- CSV memuat Prive; lembar Excel Transaksi menandai jenis "Prive" tanpa sifat biaya.
+- `App.semuaTx()` (semua transaksi tidak dihapus, termasuk Prive) di samping `App.aktif()` (transaksi usaha tanpa Prive). Tanpa koleksi atau kolom baru.
+- `tools/uji-prive.py` (Chromium headless, 390 dan 1440 px: 44 pemeriksaan) dan `docs/PRIVE.md`.
+
+### Diperbaiki
+- **Panel Catat transaksi di desktop (≥ 1024 px):** pilihan Pembayaran (Belum dibayar/Sebagian), Kategori, dan Siklus tidak ditangani karena panel berada di luar `#app`, sehingga kolom pihak dan jatuh tempo tidak muncul. Sekarang ditangani.
+
+### Diubah
+- Kas (`Utang.peristiwa`), daftar Transaksi, Transaksi terakhir Beranda, ekspor/impor CSV, lembar Excel Transaksi, dan rata-rata arus kas memakai `App.semuaTx()`; untung, HPP, siklus, dan Laporan tetap memakai `App.aktif()`.
+- Roadmap: A4 dicentang. `docs/PRIVE.md` (baru), `TRANSAKSI.md`, `LAPORAN.md`, `DATA-SCHEMA.md`, `EKSPOR.md`, `README.md`, `CHANGELOG.md`, `roadmap.md`, `sw.js`, `js/app.js`, `js/utang.js`, `js/rencana.js`, `js/analisa.js`, `js/xlsx.js`, `data/seed-kategori.json`, `VERSION`, `index.html`, `buku-kebun.html`, `tools/uji-prive.py`.
+
+### Belum
+- Diuji di Chromium headless, belum di HP sungguhan. Belum ada kategori setoran/tambah modal pemilik.
+
+## v0.1.191 — 2026-11-17
+Stok saprodi (butir A1 di usulan fitur roadmap).
+
+### Ditambah
+- **Sub-tab Stok** di Rencana keuangan (`#rencana-stok`, juga tombol di Lainnya): daftar barang (pupuk, benih, pestisida, lainnya) dengan sisa, satuan, pemakaian bulan ini, dan lencana **Habis** / **Menipis**.
+- **Tambah barang** (nama, jenis, satuan, batas peringatan, stok awal), **Tambah stok (beli)**, **Pakai stok**, **Koreksi sisa**, ubah dan hapus barang (Urungkan), riwayat 8 catatan terbaru dengan Hapus (Urungkan).
+- **Beli berharga membuat transaksi Modal** sesuai jenis (Pupuk, Benih, Pestisida, Lainnya) dan ikut mesin Utang (Tunai / Belum dibayar / Sebagian, pihak = pemasok). Pemakaian hanya mengurangi stok (biaya sudah dihitung saat beli). Pemakaian melebihi sisa ditolak; menghapus catatan yang membuat sisa negatif ditolak.
+- **Peringatan di Beranda** (Perlu perhatian dan lencana): "Stok X tinggal N satuan" atau "Stok X habis" untuk barang yang punya batas.
+- FAB detail siklus berjalan: **Pakai stok** (siklus terpilih otomatis). FAB sub-tab Stok: Pakai stok / Tambah stok / Tambah barang.
+- Koleksi baru `saprodi` dan `mutasiStok` (terpisah agar gabungan multi-tab dan sinkron Supabase aman per catatan; validasi `Store.sah`, pratinjau impor JSON), lembar Excel **Stok** dan **Mutasi stok**.
+- `tools/uji-stok.py` (Chromium headless, 390 dan 1440 px: 72 pemeriksaan) dan `docs/STOK.md`.
+
+### Diubah
+- Roadmap: A1 dicentang. `docs/DATA-SCHEMA.md`, `FAB.md`, `EKSPOR.md`, `RENCANA.md`, `UTANG.md`, `DESKTOP.md`, `README.md`, `CHANGELOG.md`, `roadmap.md`, `sw.js`, `js/app.js`, `VERSION`, `index.html`, `buku-kebun.html`, `index.dev.html`, `js/stok.js` (baru), `js/rencana.js`, `js/fab.js`, `js/beranda.js`, `js/sinkron.js`, `js/impor.js`, `js/xlsx.js`.
+
+### Belum
+- Diuji di Chromium headless, belum di HP sungguhan. Belum ada satuan ganda, nilai stok, ubah catatan stok, dan data contoh stok. Menghapus transaksi beli lewat daftar Transaksi tidak mengurangi stok.
+
+## v0.1.190 — 2026-11-17
+Upah harian / HOK (butir A2 di usulan fitur roadmap).
+
+### Ditambah
+- **Sub-tab Upah** di Rencana keuangan (`#rencana-upah`, juga tombol di Lainnya): daftar pekerja dengan tarif per hari, rekap per periode (Bulan ini, Bulan lalu, Semua), hari kerja dan upah per pekerja, bagian **Upah belum dibayar**, dan Riwayat upah.
+- **Catat upah** (modal): pilih pekerja, jumlah hari (boleh 0,5), upah per hari (terisi dari tarif pekerja), total dihitung langsung, tanggal, siklus, pembayaran Tunai / Belum dibayar / Sebagian, catatan. Dari FAB sub-tab Upah dan dari FAB detail siklus berjalan (siklus terpilih otomatis).
+- **Pekerja**: tambah, ubah, hapus (Urungkan), rekap per pekerja. Ganti nama menyegarkan catatan upah lama.
+- Upah tersimpan sebagai **transaksi Modal Tenaga Kerja** dengan kolom `pekerjaId`, `pekerjaNama`, `hari`, `tarifHarian`, `catatanUpah`, sehingga otomatis masuk biaya siklus, HPP, laporan, kas, ekspor, cadangan, dan sinkron. Belum dibayar memakai mesin Utang (pihak = nama pekerja) dengan tombol **Bayar upah** dan cicilan.
+- Koleksi baru `pekerja` (validasi di `Store.sah`, gabung multi-tab, sinkron Supabase, pratinjau impor JSON).
+- Lembar **Upah** di ekspor Excel.
+- `tools/uji-upah.py` (Chromium headless, 390 dan 1440 px: 31 pemeriksaan) dan `docs/UPAH.md`.
+
+### Diubah
+- Membuka catatan upah dari daftar Transaksi, detail siklus, atau Lihat transaksi di Utang/piutang dialihkan ke detail Upah agar hari dan tarif tidak berbeda dari jumlah.
+- Roadmap: A2 dicentang. `docs/DATA-SCHEMA.md`, `FAB.md`, `EKSPOR.md`, `RENCANA.md`, `UTANG.md`, `README.md`, `CHANGELOG.md`, `roadmap.md`, `sw.js`, `js/app.js`, `VERSION`, `index.html`, `buku-kebun.html`, `index.dev.html`, `js/upah.js` (baru), `js/rencana.js`, `js/fab.js`, `js/sinkron.js`, `js/impor.js`, `js/xlsx.js`.
+
+### Belum
+- Diuji di Chromium headless, belum di HP sungguhan. Belum ada absensi harian, lembur, bon/potongan, dan data contoh pekerja.
+
+## v0.1.189 — 2026-11-17
+Hanya dokumen: usulan fitur tambahan masuk roadmap. Tidak ada perubahan perilaku aplikasi.
+
+### Ditambah
+- Roadmap, bagian 7: **Usulan fitur tambahan** (10 butir, belum dikerjakan) dalam tiga kelompok: A pencatatan harian (stok saprodi, upah harian/HOK, buku pembeli, pemisah uang usaha dan rumah tangga), B analisa dan perencanaan (target musim tanam, kalender musim, ringkasan pengajuan KUR/dana desa), C kemudahan pakai (catat lewat suara, transaksi berulang otomatis, kalkulator dosis). Tiga yang disarankan lebih dulu: A2, A1, A4.
+- `roadmap.md`, `CHANGELOG.md`, `README.md`, `sw.js`, `js/app.js`, `VERSION`, `index.html` dan `buku-kebun.html` (hanya penomoran versi).
+
+## v0.1.188 — 2026-11-17
+Hanya dokumen: status Supabase dan HTTPS, serta tinjauan usulan fitur.
+
+### Diubah
+- Roadmap: butir Login dan sinkron Supabase dicentang (dikonfirmasi pengguna sudah jalan di proyek sungguhan lewat HTTPS); Fase 6F Tahap 5 ditandai sebagian.
+- `docs/SINKRON.md`, bagian Batasan: tidak lagi menyebut belum diuji di proyek sungguhan; mencatat apa yang belum diuji rinci.
+- Roadmap, bagian 7: **Tinjauan usulan fitur** berurutan prioritas.
+- `roadmap.md`, `docs/SINKRON.md`, `CHANGELOG.md`, `README.md`, `sw.js`, `js/app.js`, `VERSION`, `index.html` dan `buku-kebun.html` (hanya penomoran versi).
+
+## v0.1.187 — 2026-11-16
+Cetak Perjalanan Siklus dirapikan (dari tangkapan layar pratinjau PDF di HP).
+
+### Diperbaiki
+- **Ringkasan uang** memakai empat kartu (Untung/Rugi, Hasil, Modal, R/C ratio) selebar halaman seperti di Laporan, menggantikan tabel sempit 60% lebar; Panen bersih dan Modal per satuan pindah ke satu baris catatan di bawahnya.
+- **Lebar kolom tetap** untuk tabel Modal per kategori, Tahap, Catatan, Kejadian, Ukuran, dan Panen (sebelumnya mengikuti isi sehingga kolom Jumlah dan Bagian berjauhan dan tiap tabel berbeda). `Perjalanan.LEBAR`, parameter `lebar` pada `tab()`.
+- **Margin tabel cetak:** teks sel pertama kini lurus dengan judul bagian dan sel terakhir rata dengan garis kanan (sebelumnya masuk 5 pt di kedua sisi). Berlaku juga di cetak Laporan dan Jurnal Siklus.
+- **Jarak kolom:** kolom angka yang diikuti kolom teks (mis. Harga/kg lalu Pembeli, Jumlah lalu Terbesar) diberi jarak 12 pt agar tidak menempel.
+- `js/perjalanan.js`, `css/style.css`, `CHANGELOG.md`, `roadmap.md`, `README.md`, `sw.js`, `js/app.js`, `VERSION`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.186 — 2026-11-16
+Cetak lainnya: angka rata kanan di Jurnal Siklus dan Laporan Perjalanan Siklus.
+
+### Diperbaiki
+- **Cetak Jurnal Siklus:** kolom Hari (judul dan angka) rata kanan; sebelumnya rata kiri.
+- **Cetak Laporan Perjalanan Siklus, tabel Ukuran:** kolom Pertama dan Terakhir (angka berikut satuan dan "hari ke-") rata kanan, sejajar dengan Pengukuran dan Perubahan.
+- Sudah rata kanan sejak awal dan tidak diubah: daftar Transaksi, tabel Panen, Modal per kategori, Ringkasan uang, Tahap, Catatan, dan Kejadian.
+- `js/linimasa.js`, `js/perjalanan.js`, `CHANGELOG.md`, `roadmap.md`, `README.md`, `sw.js`, `js/app.js`, `VERSION`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.185 — 2026-11-16
+Cetak laporan: angka dan tanggal rata kanan.
+
+### Diperbaiki
+- **Sorotan periode:** kolom Tanggal kini rata kanan di sebelah Jumlah (urutan kolom: uraian, kategori, tanggal, jumlah), dan ketiga tabel (Pengeluaran terbesar, Pemasukan terbesar, Tersering) memakai lebar kolom tetap yang sama sehingga kolomnya lurus dari tabel ke tabel. Sebelumnya lebar kolom ikut isi, jadi tiap tabel berbeda.
+- **Tersering:** seluruh nilai (kategori, hari tersibuk, rata-rata, bulan terbaik dan terburuk) dan judul kolom Keterangan rata kanan; sebelumnya rata kiri.
+- **Komoditas teratas:** kolom No. rata kanan dengan lebar tetap.
+- CSS baru `.ct-fix` (tabel cetak berkolom tetap). `js/analisa.js`, `css/style.css`, `CHANGELOG.md`, `roadmap.md`, `README.md`, `sw.js`, `js/app.js`, `VERSION`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.184 — 2026-11-16
+Laporan: penyusutan aset dan efisiensi (untung per hari, per luas unit).
+
+### Ditambah
+- **Penyusutan aset** (layar, cetak, Excel). Bagian baru di bawah Ringkasan, tampil bila ada aset yang menyusut pada periode: penyusutan aset periode ini (harga beli ÷ hari umur ekonomis, dijumlah untuk hari yang masuk periode sampai hari ini), pembelian alat di Modal, dan **Untung dengan alat disusutkan** = untung + pembelian alat di Modal − penyusutan. Untung utama tidak berubah. Lembar Ringkasan Excel mendapat tiga baris yang sama. `Analisa.susut()`, `vSusut()`, `cetakSusut()`.
+- **Efisiensi** pada Rincian. Per Siklus: **Untung per hari** (hari siklus yang beririsan dengan periode, sampai hari ini bagi siklus berjalan). Per Siklus dan per Unit: **Untung dan Hasil per satuan luas** unit (m², lubang, dan seterusnya). Per Komoditas tidak ada efisiensi. Tampil di kartu Rincian, tabel baru "Efisiensi per …" di cetak, dan enam kolom baru di lembar Laporan Excel (Hari, Untung / hari, Ukuran unit, Satuan ukuran, Untung / ukuran, Hasil / ukuran). `Analisa.batasPeriode()`, `hariTumpang()`.
+- `js/analisa.js`, `docs/LAPORAN.md`, `roadmap.md`, `CHANGELOG.md`, `README.md`, `sw.js`, `js/app.js`, `VERSION`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.183 — 2026-11-16
+Hanya dokumen: tidak ada perubahan perilaku aplikasi.
+
+### Dihapus
+- Butir opsional "Dibuat oleh / Mengetahui" di cetak laporan dihapus dari `roadmap.md` (tidak jadi dikerjakan).
+- `roadmap.md`, `CHANGELOG.md`, `README.md`, `sw.js`, `js/app.js`, `VERSION`, `index.html` dan `buku-kebun.html` (hasil build; hanya penomoran versi).
+
+## v0.1.182 — 2026-11-16
+Laporan: perbandingan periode berjalan yang adil, HPP dan BEP tanpa gaji pemilik (opsional), perbaikan cetak dan Excel.
+
+### Ditambah
+- **HPP dan BEP tanpa gaji pemilik** (item opsional Fase 6I). Bila periode punya transaksi Gaji Pemilik, filter Laporan menampilkan pilihan **HPP dan BEP: Dengan gaji pemilik / Tanpa gaji pemilik** (bawaan: dengan gaji, perilaku lama). Pilihan hanya memengaruhi HPP, harga minimum, dan titik impas; untung dan R/C tetap sesudah gaji. Gaji dikeluarkan dari bucket biaya tempat ia dicatat (tetap atau variabel). Catatan di Rincian layar, cetak, dan baris "HPP dan BEP" di lembar Ringkasan Excel menyebut pilihan yang dipakai. `Analisa.tanpaGaji`, `pilihGaji()`.
+
+### Diperbaiki
+- **Vs periode sebelumnya menyesatkan saat periode masih berjalan.** Bulan ini yang baru 16 hari tadinya dibanding seluruh bulan lalu, sehingga modal tampak "turun 49%" dan berwarna hijau (membaik). Kini periode berjalan dibanding **jumlah hari pertama yang sama** pada periode sebelumnya (mis. 1–16 Okt), dengan catatan di layar dan cetak; Excel menandai "(N hari pertama)". Periode yang sudah penuh tetap dibanding periode sebelumnya yang penuh. `Analisa.banding()`.
+- **Kartu R/C ratio di cetak terpotong di tepi kanan** (garis kanan kartu keempat hilang di PDF). Lebar deret kartu dikurangi 1 pt di sisi kanan.
+- **Tanda minus pada Margin di kartu Rincian** kini "−" seperti di Ringkasan dan cetak (sebelumnya "-").
+- **Excel, lembar Tren** tadinya selalu 6 bulan walau grafik memakai 12; kini mengikuti pilihan 6/12 bulan, memakai nama bulan dan tahun, dan lembar bernama "Tren N bulan".
+
+### Diubah
+- Lembar Ringkasan Excel ditambah baris Modal dan Hasil periode sebelumnya.
+- Kop cetak Ringkasan mandiri menyebut "Transaksi pada periode di atas", bukan "Seluruh transaksi".
+- Dihapus: `Analisa.tren()` (tidak terpakai).
+- `js/analisa.js`, `css/style.css`, `docs/LAPORAN.md`, `roadmap.md`, `CHANGELOG.md`, `README.md`, `sw.js`, `js/app.js`, `VERSION`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.181 — 2026-11-16
+Laporan: banding dengan periode sebelumnya, bulan terbaik dan terburuk, rata-rata modal per hari (item roadmap Fase 6I).
+
+### Ditambah
+- **Vs periode sebelumnya** (layar, cetak, Excel): untung, modal, dan hasil periode terpilih dibanding periode sama panjang tepat sebelumnya, dengan selisih persen dan penanda membaik/memburuk. Bulan ini dan Bulan lalu dibanding bulan sebelumnya; Tahun ini dibanding tahun lalu; Pilih tanggal (Dari dan Sampai lengkap) dibanding rentang selevel sebelum Dari. Tidak tampil untuk Semua atau rentang yang belum lengkap. Periode yang masih berjalan diberi catatan "baru berjalan N dari M hari". `Analisa.rentangAktif()`, `sebelumnya()`, `banding()`, `vSebelum()`, `cetakSebelum()`.
+- **Sorotan periode** ditambah **Rata-rata modal / hari** (hari berlalu sampai hari ini; Semua dan rentang terbuka mulai dari transaksi tertua) serta **Bulan terbaik** dan **Bulan terburuk** menurut untung (hanya bila periode mencakup minimal dua bulan bertransaksi).
+- Desktop: Vs periode sebelumnya di kolom kanan di atas Biaya tetap vs variabel.
+- `js/analisa.js`, `css/style.css`, `docs/LAPORAN.md`, `roadmap.md`, `CHANGELOG.md`, `README.md`, `sw.js`, `js/app.js`, `VERSION`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.180 — 2026-11-16
+Hanya dokumen: roadmap diperbarui; tidak ada perubahan perilaku aplikasi.
+
+### Diubah
+- **Fase 6I — Laporan lebih informatif dan biaya gaji pemilik** ditambahkan ke `roadmap.md`: item selesai (v0.1.175–179) dan item berikutnya: banding dengan periode sebelumnya, bulan terbaik dan terburuk, rata-rata pengeluaran per hari, serta opsi HPP/BEP tanpa Gaji Pemilik. Tabel Changelog Dokumen dilengkapi sampai v0.1.180.
+- `roadmap.md`, `CHANGELOG.md`, `README.md`, `sw.js`, `js/app.js`, `VERSION`, `index.html` dan `buku-kebun.html` (hasil build; hanya penomoran versi).
+
+## v0.1.179 — 2026-11-16
+Laporan: bagian Sorotan periode.
+
+### Ditambah
+- **Sorotan periode** (layar, cetak, Excel), mengikuti Periode: tiga **pengeluaran terbesar** dan tiga **pemasukan terbesar** (di layar bisa diketuk untuk melihat atau mengubah transaksi), **kategori tersering** untuk modal dan hasil (menurut jumlah transaksi), **hari tersibuk**, **rata-rata per transaksi** modal dan hasil, serta jumlah transaksi modal dan hasil. Lembar Ringkasan Excel mendapat baris Pengeluaran terbesar dan Pemasukan terbesar. `Analisa.sorotan()`, `vSorotan()`, `cetakSorotan()`.
+- Desktop: Sorotan di kolom kanan di bawah Biaya tetap vs variabel.
+- `js/analisa.js`, `css/style.css`, `docs/LAPORAN.md`, `CHANGELOG.md`, `README.md`, `sw.js`, `js/app.js`, `VERSION`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.178 — 2026-11-16
+Laporan: periode bebas, biaya tetap vs variabel, untung sebelum dan sesudah gaji pemilik.
+
+### Ditambah
+- **Periode bebas.** Pilihan Periode kini: Bulan ini, **Bulan lalu**, Tahun ini, Semua, dan **Pilih tanggal** (isian Dari dan Sampai; bawaan awal bulan ini sampai hari ini). Dari yang lebih besar dari Sampai tetap dipakai dengan urutan benar; salah satu dikosongkan = tanpa batas di sisi itu. Berlaku untuk semua bagian yang mengikuti Periode, kop cetak (`namaPer()`), dan Excel. `Analisa.rentangTgl()`, `isianTgl()`, `atur()`.
+- **Biaya tetap vs variabel** (layar dan cetak): porsi, jumlah, dan tiga kategori terbesar tiap kelompok, mengikuti Periode. Lembar Ringkasan Excel ditambah baris Biaya tetap dan Biaya variabel. `Analisa.biayaSifat()`, `vBiaya()`, `cetakBiaya()`.
+- **Untung sebelum gaji pemilik.** Bila ada transaksi kategori Gaji Pemilik pada periode: kartu Ringkasan menampilkan Untung sebelum gaji, Gaji pemilik, dan Gaji ÷ hasil; kartu Rincian per kelompok menambah dua baris yang sama; cetak mendapat tabel Gaji pemilik; Excel mendapat dua baris di lembar Ringkasan. Untung/rugi utama tetap sesudah gaji (gaji termasuk modal).
+- Desktop: bagian Biaya tetap vs variabel di kolom kanan di atas Simulasi.
+- `js/analisa.js`, `js/app.js`, `css/style.css`, `docs/LAPORAN.md`, `CHANGELOG.md`, `README.md`, `sw.js`, `VERSION`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.177 — 2026-11-16
+Isian Penerima gaji (Saya/Istri) dihapus; penerima cukup ditulis di Catatan.
+
+### Dihapus
+- Dropdown **Penerima gaji** dan field `transaksi.penerima`, beserta tampilannya di daftar/tabel, pencarian, kolom CSV `penerima`, dan Excel.
+- Kategori bawaan **Gaji Pemilik** (biaya tetap) tetap ada.
+- `js/app.js`, `js/xlsx.js`, `docs/TRANSAKSI.md`, `docs/DATA-SCHEMA.md`, `CHANGELOG.md`, `README.md`, `sw.js`, `VERSION`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.176 — 2026-11-16
+Dropdown Penerima gaji memakai gaya dropdown kustom aplikasi.
+
+### Diperbaiki
+- Pilihan **Saya/Istri** di form Catat/Ubah tadinya tampil sebagai dropdown bawaan browser karena disisipkan setelah form dibuat. Kini diubah lewat `Form.upgrade` sehingga sama dengan dropdown lain.
+- `js/app.js`, `CHANGELOG.md`, `README.md`, `sw.js`, `VERSION`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.175 — 2026-11-16
+Biaya gaji pemilik (saya dan istri) sebagai transaksi Modal.
+
+### Ditambah
+- **Kategori bawaan "Gaji Pemilik"** (biaya tetap) di Modal. Muncul otomatis di data lama tanpa migrasi.
+- **Penerima gaji:** bila kategori Gaji Pemilik dipilih, form Catat/Ubah menampilkan pilihan **Saya** atau **Istri** (bawaan Saya). Disimpan di `transaksi.penerima` (`saya` | `istri`); dikosongkan bila kategori diganti.
+- Penerima tampil di baris dan tabel Transaksi, ikut dicari di kolom pencarian (mis. "istri"), dan ikut ekspor/impor CSV (kolom opsional `penerima`) serta kolom Catatan di Excel. CSV lama tanpa kolom ini tetap bisa diimpor.
+- Gaji Pemilik dihitung sebagai modal (biaya tetap), jadi mengurangi untung, R/C, dan masuk titik impas seperti biaya tetap lain; tampil di Komposisi modal.
+- `js/app.js`, `js/xlsx.js`, `data/seed-kategori.json`, `docs/TRANSAKSI.md`, `docs/DATA-SCHEMA.md`, `CHANGELOG.md`, `README.md`, `sw.js`, `VERSION`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.174 — 2026-11-16
+Modal di desktop lebih lebar, formulir Rencana dua kolom (item roadmap Tahap 2).
+
+### Diubah
+- **Kartu modal 520 px di layar ≥ 1024 px** (sebelumnya 440 px). Panduan cepat dan penampil foto nota tidak berubah.
+- **Formulir Rencana dua kolom di desktop:** Harga dan Umur, Jumlah dan Jatuh tempo, dan sejenisnya berdampingan; teks dan pilihan selebar penuh. Di bawah 1024 px tetap satu kolom. `Rencana.bungkus()`, kelas `.dm-form`, `.dm-fld`, `.lebar`.
+- Diuji di Chromium headless (1280 dan 390 px) untuk lima formulir: lebar kartu, penempatan kolom, tanpa overflow dan tanpa galat JS.
+- `js/rencana.js`, `css/style.css`, `docs/MODAL.md`, `roadmap.md`, `CHANGELOG.md`, `README.md`, `sw.js`, `js/app.js`, `VERSION`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.173 — 2026-11-16
+Layout desktop mulai di 1024 px (item roadmap Tahap 1: wadah lebih lebar).
+
+### Diubah
+- **Batas layout desktop 1100 → 1024 px.** Rail kiri, header baru, dan grid dua kolom kini tampil di tablet landscape dan jendela sempit. Semua media query dan `matchMedia` di JS disesuaikan; 1023 px ke bawah tetap tampilan tablet/HP.
+- **Transaksi di 1024–1179 px:** filter di atas tabel (satu kolom) agar kolom Kategori, Siklus, dan Catatan tidak terpotong.
+- Diuji di Chromium headless (lebar 1023, 1024, 1060, 1099, 1100; enam halaman): tanpa overflow dan tanpa galat JS.
+- `css/style.css`, `js/analisa.js`, `js/app.js`, `js/desktop.js`, `js/linimasa.js`, `js/ringkas.js`, `js/setelan.js`, `roadmap.md`, `docs/DESKTOP.md`, `docs/FAB.md`, `docs/HERO.md`, `docs/JURNAL.md`, `docs/SETELAN.md`, `docs/STYLE.md`, `docs/WIREFRAME.md`, `CHANGELOG.md`, `README.md`, `sw.js`, `VERSION`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.172 — 2026-11-16
+Beranda diringkas, Laporan dilengkapi.
+
+### Diubah
+- **Beranda tanpa bagian Grafik.** Tren hasil/modal (sama persis dengan Laporan), Untung bersih per bulan (sudah ada sebagai sparkline hero), donut Komposisi modal, Untung per komoditas, dan Modal vs anggaran dihapus dari Beranda. Urutan kini: Perlu perhatian, Siklus berjalan, Ringkasan uang, Transaksi terakhir. Aturan CSS `data-bx="grafik"` dan `.dash-grid` ikut dibuang.
+- **Laporan lebih informatif:** Ringkasan ditambah Margin, Transaksi, dan jumlah kelompok; bagian baru Untung bersih per bulan dan Modal vs anggaran (dipindah dari Beranda); Sumber hasil di bawah Komposisi modal; label Tren menyebut rentang bulan. Tata letak desktop: baris baru Untung per bulan | Anggaran.
+- Kode tak terpakai dibuang: `Analisa.vDashboard`, `svgTren`, `topKom`; `Beranda.donut`, `perKomoditas`, `untungBulanan`, `anggaran`, `grafik`; `App.grafikLipat`.
+- `docs/LAPORAN.md`: baris ganda "Harga jual rata-rata" dibereskan, bagian Sub-tab usang diringkas. `docs/HERO.md`, `docs/DESKTOP.md` diperbarui.
+- `js/analisa.js`, `js/beranda.js`, `js/app.js`, `css/style.css`, `docs/LAPORAN.md`, `docs/HERO.md`, `docs/DESKTOP.md`, `CHANGELOG.md`, `README.md`, `sw.js`, `VERSION`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.171 — 2026-11-16
+README dirapikan; tidak ada perubahan perilaku aplikasi.
+
+### Diubah
+- **README.md ditulis ulang.** Baris versi yang menumpuk riwayat (±13 KB) diganti satu baris dengan tautan ke CHANGELOG. Ditambah tabel Fitur, bagian Menjalankan (HP, PWA, pengembangan), dan Aturan Versi yang lebih jelas.
+- **Struktur Folder dilengkapi:** semua berkas `js/` (sebelumnya banyak yang belum tercatat, mis. `ringkas.js`, `cari.js`, `jurnal.js`, `impor.js`) dan semua `docs/` dikelompokkan per topik, ditambah daftar `tools/`. Salah ketik penataan `buku-kebun.html` dibetulkan.
+- `README.md`, `CHANGELOG.md`, `sw.js`, `js/app.js`, `VERSION`, `index.html` dan `buku-kebun.html` (hasil build; hanya penomoran versi).
+
+## v0.1.170 — 2026-11-16
+Pilihan Tema dikembalikan ke menu avatar; panah di tombol avatar dihapus.
+
+### Diubah
+- **Grup Tema (Terang, Gelap, Otomatis) kembali di menu avatar**, karena tombol tema tersembunyi di Beranda HP dan menu ini jalan pintas utamanya. Satu setelan `mode` yang sama dengan Setelan → Mode, jadi tidak ada data ganda. Menu kini: kepala Profil, Tema, Setelan, Akun & sinkron.
+- Tetap dihapus dari menu (v0.1.169): Sembunyikan angka dan Panduan cepat.
+- **Ikon panah (chevron) di tombol avatar dihapus**, beserta gaya `.pf-ch`; tombol hanya berisi foto atau huruf awal.
+- Gaya `.pf-grup`, `.pf-lbl`, `.pf-seg`, `.pf-pil` dikembalikan.
+- `js/profil.js`, `css/style.css`, `docs/PROFIL.md`, `docs/SETELAN.md`, `sw.js`, `js/app.js`, `VERSION`, `README.md`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.169 — 2026-11-16
+Menu avatar tanpa duplikat Setelan.
+
+### Diubah
+- **Menu avatar tinggal tiga butir: kepala Profil, Setelan, dan Akun & sinkron.** Dihapus: grup **Tema** (Terang/Gelap/Otomatis), **Sembunyikan angka**, dan **Panduan cepat**, karena ketiganya sudah ada di Setelan (Mode, Angka untung saat dibuka, Tentang). Fitur tidak hilang, hanya satu tempat.
+- Kode dan gaya yang tak terpakai (`.pf-grup`, `.pf-lbl`, `.pf-seg`, `.pf-pil`, cabang `mode`, `angka`, `panduan` di `klik()`) dibuang.
+- `tools/uji-profil.py` memeriksa isi menu avatar.
+- `js/profil.js`, `css/style.css`, `tools/uji-profil.py`, `docs/PROFIL.md`, `docs/SETELAN.md`, `sw.js`, `js/app.js`, `VERSION`, `README.md`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.168 — 2026-11-16
+Border tombol ikon masthead juga dihilangkan saat efek kaca nyala.
+
+### Diubah
+- **Tombol ikon di masthead (Cari, lonceng, Sembunyikan angka, avatar, tema, setelan) dan di bilah ringkas (`.hr-btn`) tanpa garis tepi, baik efek kaca mati maupun nyala.** Pada mode kaca, tombol tetap punya isian kaca dan bayangan lembut sehingga bentuknya terbaca. Garis dibuat transparan (ukuran 40 px tidak berubah), termasuk saat hover. Tombol aktif (`.active`) tetap berbingkai emas.
+- Aturan v0.1.167 (khusus kaca mati) digabung menjadi satu aturan untuk kedua mode.
+- Tidak berubah: tombol teks (`.btn`), navigasi bawah, kartu, dan kapsul luar `.masthead-right` tetap berbingkai kaca.
+- `css/style.css`, `docs/STYLE.md`, `sw.js`, `js/app.js`, `VERSION`, `README.md`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.167 — 2026-11-16
+Border tombol ikon masthead dihilangkan saat efek kaca mati.
+
+### Diubah
+- **Tombol ikon di masthead (Cari, lonceng, Sembunyikan angka, avatar, dan sejenisnya) tidak lagi berbingkai bila Efek kaca mati.** Garis tepi dibuat transparan (ukuran tombol tetap 40 px, tata letak tidak bergeser), termasuk saat disorot kursor. Bila Efek kaca nyala, tampilan tidak berubah. Tombol yang sedang aktif (`.active`) tetap berbingkai emas sebagai penanda status.
+- `css/style.css`, `docs/STYLE.md`, `sw.js`, `js/app.js`, `VERSION`, `README.md`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.166 — 2026-11-16
+Hanya dokumen; tidak ada perubahan perilaku aplikasi.
+
+### Diubah
+- **roadmap.md:** Fase 6H Tahap 3 dan 4 diberi catatan bahwa bagian Cadangan, Preferensi cepat, dan Tentang di Profil dicabut di v0.1.165 (duplikat Setelan), dan riwayat versi 0.1.165 dan 0.1.166 ditambahkan.
+- `sw.js`, `js/app.js`, `VERSION`, `README.md`, `index.html` dan `buku-kebun.html` hanya untuk penomoran versi.
+
+## v0.1.165 — 2026-11-16
+Hapus duplikasi antara halaman Profil dan Setelan; Setelan dipertahankan.
+
+### Diubah
+- **Halaman Profil tidak lagi mengulang kontrol Setelan.** Dihapus dari Profil: bagian *Preferensi cepat* (Tema dan Sembunyikan angka, sama dengan Setelan → Mode dan Angka untung saat dibuka), bagian *Cadangan* (tombol Cadangkan, sama dengan Setelan → Ekspor), dan bagian *Tentang* (Versi dan Panduan cepat, sama dengan Setelan → Tentang). Sebagai gantinya ada satu bagian **Pengaturan** dengan tombol Buka Setelan.
+- **Waktu cadangan manual terakhir** (`cadTerakhir`) dipindah ke Setelan → Data, pada baris Ekspor dan impor, agar tidak hilang.
+- Tidak berubah: Kepala profil, Ringkasan usaha, Akun dan sinkron (satu-satunya tempat), dan menu avatar (jalan pintas Tema dan Sembunyikan angka tetap ada di menu).
+- `js/profil.js`, `js/setelan.js`, `tools/uji-profil.py`, `docs/PROFIL.md`, `docs/SETELAN.md`, `sw.js`, `VERSION`, `README.md`, `js/app.js`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.164 — 2026-11-16
+Profil ikut cadangan.
+
+### Diubah
+- **Nama, foto, nama usaha, dan lokasi kini ikut data aplikasi** sebagai objek `profil` ({nama, foto, usaha, lokasi}): masuk ke ekspor JSON, cadangan otomatis, dan sinkron cloud, dan dipulihkan saat impor, pulih cadangan, atau tarik dari cloud. Setelan tetap salinan kerja; `data.profil` dicerminkan tiap kali data disimpan (`Profil.salin()`) dan diterapkan balik ke Setelan setelah data masuk (`Profil.terap()`).
+- Cadangan lama tanpa `profil` tidak menimpa profil di perangkat. Nilai dari berkas divalidasi: nama maks. 30 huruf, usaha dan lokasi maks. 40, foto hanya data URL gambar (jpeg, png, webp) di bawah 80.000 karakter; yang lain diabaikan.
+- Sinkron cloud: bila perangkat sudah punya profil, profil lokal dipakai; perangkat baru yang masih kosong mengambil profil dari cloud.
+- Teks di modal Ubah profil dan halaman Profil diperbarui (kini menyebut ikut cadangan dan cloud).
+- `js/profil.js`, `js/app.js`, `docs/PROFIL.md`, `docs/SETELAN.md`, `docs/CADANGAN.md`, `roadmap.md`, `sw.js`, `VERSION`, `README.md`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.163 — 2026-11-16
+Bagian Akun dan sinkron pindah ke halaman Profil.
+
+### Diubah
+- **Setelan → Akun dan sinkron dihapus; kartunya kini ada di halaman Profil** (`#pfhAkun`) dengan isi yang sama: status, Masuk atau Buat akun, Sinkronkan sekarang, Sinkron otomatis, Keluar, tindakan lanjutan (timpa, ambil, hapus data cloud), dan pengaturan proyek untuk pengelola. Tidak ada fitur yang hilang.
+- Ketuk ikon awan di header saat sudah masuk kini membuka halaman Profil pada bagian itu (sebelumnya Setelan). Halaman Profil digambar ulang setelah sinkron, masuk, atau keluar.
+- Bagian "Akun dan cadangan" di Profil dipecah: **Akun dan sinkron** (kartu lengkap) dan **Cadangan** (Cadangkan dan waktu cadangan terakhir).
+- Teks Setelan → Hapus semua data menunjuk ke halaman Profil untuk menghapus data cloud.
+- `js/setelan.js`, `js/profil.js`, `js/sinkron.js`, `js/app.js`, `docs/AKUN.md`, `docs/SETELAN.md`, `docs/SINKRON.md`, `docs/PROFIL.md`, `roadmap.md`, `sw.js`, `VERSION`, `README.md`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.162 — 2026-11-16
+Halaman Profil (Fase 6H, Tahap 1–6).
+
+### Ditambah
+- **Halaman Profil** (rute `#profil`), dibuka dari kepala menu avatar ("Profil"); tombol kembali ke Beranda. Isinya: **kepala** (foto, nama, nama usaha, lokasi, tombol Ubah profil), **Ringkasan usaha** (mulai mencatat sejak, siklus berjalan dan selesai, unit dan komoditas, jumlah transaksi; dihitung dari data yang ada, dengan keadaan kosong dan catatan bila masih data contoh), **Akun dan cadangan** (status sinkron, Masuk atau Kelola akun, Cadangkan dan waktu cadangan terakhir), **Preferensi cepat** (Tema, Sembunyikan angka) dan **Tentang** (versi, Panduan cepat, Setelan).
+- **Setelan baru** `usaha` (40 huruf), `lokasi` (40 huruf), dan `cadTerakhir` (waktu cadangan manual terakhir). Ketiganya lokal ke perangkat, bertahan saat Atur ulang, dan tidak ikut ekspor atau cloud (keputusan Fase 6H: tetap lokal seperti nama dan foto).
+- Modal *Ubah profil* kini juga memuat Nama usaha atau kebun dan Lokasi.
+- **Nama usaha di keluaran:** baris "Usaha" di kop Laporan cetak (hanya bila terisi) dan di ujung lembar Ringkasan Excel (di bawah Margin, supaya rumus tidak bergeser).
+- `tools/uji-profil.py`: uji peramban halaman Profil (HP 390 px dan desktop 1440 px).
+
+### Diubah
+- Kepala menu avatar kini membuka halaman Profil (sebelumnya modal Ubah profil, yang kini dibuka dari tombol Ubah profil di halaman). Baris di bawah nama memakai nama usaha bila ada.
+- `js/profil.js`, `js/setelan.js`, `js/app.js`, `js/rute.js`, `js/analisa.js`, `css/style.css`, `docs/PROFIL.md`, `docs/RUTE.md`, `docs/SETELAN.md`, `roadmap.md`, `sw.js`, `VERSION`, `README.md`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.161 — 2026-11-15
+Hanya dokumen; tidak ada perubahan perilaku aplikasi.
+
+### Ditambah
+- **roadmap.md:** Fase 6H — Halaman Profil (usulan, belum dikerjakan): enam tahap (halaman dan kepala, ringkasan usaha, akun dan cadangan, preferensi cepat dan Tentang, pemakaian nama usaha di kop cetak dan Excel, uji dan dokumen), prinsip, risiko, dan dua keputusan terbuka (cakupan awal; data profil lokal atau ikut cadangan). Catatan di Fase 6G diperbarui bahwa salam dan avatar sudah ditambahkan di v0.1.148.
+- `sw.js`, `js/app.js`, `VERSION`, `README.md`, `index.html` dan `buku-kebun.html` hanya untuk penomoran versi.
+
+## v0.1.160 — 2026-11-15
+Perubahan font.
+
+### Diubah
+- **Teks isi, tabel, dan tombol memakai IBM Plex Sans** (sebelumnya IBM Plex Mono): kalimat panjang lebih terbaca di HP. **IBM Plex Mono dipertahankan untuk label kecil huruf besar** (MODAL, HASIL, dst.; 18 selektor), dan **Fraunces tetap untuk judul dan angka besar**. Variabel baru `--f-isi` dan `--f-mono` di `:root`.
+- **Font tersimpan untuk luring:** service worker kini menyimpan permintaan ke `fonts.googleapis.com` dan `fonts.gstatic.com` di cache terpisah `buku-kebun-font` (cache dulu, diperbarui di latar belakang; tidak ikut terhapus saat versi naik). Tautan font diberi `crossorigin="anonymous"` supaya respons dapat disimpan. Memperbaiki butir 11 di docs/AUDIT-CSS.md (sebagian: tetap perlu koneksi pada pemuatan pertama).
+- `index.dev.html`, `css/style.css`, `sw.js`, `docs/STYLE.md`, `js/app.js`, `VERSION`, `README.md`, `index.html` dan `buku-kebun.html` (hasil build).
+
+### Belum
+- Mengunggah sendiri berkas woff2 (self-host) dan menaikkan ukuran teks isi ke ≥ 15 px; menunggu berkas font dan keputusan.
+
+## v0.1.159 — 2026-11-15
+Perbaikan keterbacaan Laporan.
+
+### Diubah
+- **Rincian per siklus:** siklus yang namanya sama (mis. dua musim Selada di unit yang sama) kini dibedakan dengan tanggal mulai. Di kartu tampil sebagai baris keterangan "Mulai 12 Okt 2026" di bawah nama; di cetak dan Excel menjadi bagian nama ("… · mulai 12 Okt 2026"), dibentuk di `Analisa.hitung()`.
+- **Siklus berjalan** diberi keterangan "Berjalan" (dan "belum ada hasil" bila memang belum), supaya R/C 0,00 dan rugi pada siklus yang belum panen tidak terbaca sebagai kegagalan.
+- **Excel → lembar Laporan:** kolom Status (Berjalan/Selesai) ditambah di ujung kanan bila dikelompokkan per siklus.
+- `js/analisa.js`, `css/style.css`, `docs/LAPORAN.md`, `sw.js`, `js/app.js`, `VERSION`, `README.md`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.158 — 2026-11-15
+Berkas .xlsx dibuat lebih baku agar terbuka di penampil yang ketat (aplikasi Google Sheets/Drive di HP menolak berkas dengan pesan "Spreadsheet tampaknya rusak").
+
+### Diubah
+- Teks sel kini disimpan dalam tabel teks bersama (`xl/sharedStrings.xml`), bukan `inlineStr` di tiap sel. Ini bentuk yang dipakai Excel dan hampir semua pustaka, dan lebih luas didukung penampil.
+- Ditambah bagian standar yang sebelumnya tidak ada: `docProps/core.xml`, `docProps/app.xml`, `<bookViews>` di workbook, `<dimension>` dan `<sheetFormatPr>` di tiap lembar.
+- `js/xlsx.js`, `sw.js`, `js/app.js`, `VERSION`, `README.md`, `index.html` dan `buku-kebun.html` (hasil build). Berlaku untuk Excel di Lainnya dan di Laporan.
+
+## v0.1.157 — 2026-11-15
+### Diubah
+- **Laporan → Excel** kini berisi tiga lembar: **Ringkasan** (periode, pengelompokan, tanggal dibuat, Modal, Hasil, Untung/rugi, R/C, Margin; Untung, R/C, dan Margin berupa rumus), **Laporan** (tabel per kelompok seperti sebelumnya), dan **Tren 6 bulan** (Modal, Hasil, Untung per bulan; tidak tergantung pilihan periode, sama seperti grafik tren).
+- `js/xlsx.js`: sel angka bergaya sendiri (`{ n, s }`). `docs/LAPORAN.md` diperbarui.
+- `js/analisa.js`, `js/xlsx.js`, `sw.js`, `js/app.js`, `VERSION`, `README.md`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.156 — 2026-11-15
+### Diubah
+- **Hero saat bulan ini belum ada transaksi** (sementara transaksi bulan lain sudah ada): keterangan di bawah angka kini mengarahkan, yaitu "lihat siklus berjalan di bawah" bila ada siklus berjalan, atau "ketuk + untuk mencatat" bila tidak. Tanpa angka di teks ini, jadi mode Samar tetap berlaku. Banner "Perlu perhatian" tidak diubah: sudah bisa dibuka untuk semua butir dan daftar penuh ada di lonceng header.
+- `js/app.js`, `sw.js`, `VERSION`, `README.md`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.155 — 2026-11-15
+Lanjutan perbaikan Beranda.
+
+### Ditambah
+- **Kas masuk dan keluar bulan ini** di "Posisi kas" pada Ringkasan uang (dari `Utang.bulan(k)`, uang yang benar-benar bergerak). Bila selisihnya berbeda dari untung bulan ini, muncul catatan singkat bahwa utang/piutang belum dihitung.
+- **Foto terbaru jurnal pada kartu Siklus berjalan:** HP = gambar kecil di kiri baris; desktop = menggantikan ikon. Bila foto tidak ada di perangkat, kartu kembali memakai ikon. Hanya memakai foto yang sudah ada di jurnal (tidak ada unggahan baru).
+- **Catat panen dan Catat jurnal di tombol + Beranda** (hanya bila ada siklus berjalan). Satu siklus berjalan: langsung dibuka; lebih dari satu: muncul pilihan siklus. Catat modal/hasil tidak berubah.
+
+### Catatan teknis
+- Setelah modal pilihan siklus ditutup, aksi berikutnya ditunda 250 ms karena penutupan modal memicu "kembali" di riwayat browser yang sempat membatalkan halaman Catat panen.
+- `js/utang.js`, `js/beranda.js`, `js/app.js`, `js/fab.js`, `css/style.css`, `sw.js`, `VERSION`, `README.md`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.154 — 2026-11-15
+Kartu Ringkasan uang di Beranda lebih bermakna untuk usaha tani musiman.
+
+### Ditambah
+- **Siklus berjalan · sampai hari ini:** Modal, Hasil, dan Untung dijumlahkan dari semua siklus berjalan (tidak terikat bulan), dengan catatan bahwa siklus yang belum panen wajar masih rugi. Tampil di atas "Dibanding bulan lalu". Hero tidak berubah (chip periode tetap tidak ada, sesuai keputusan di docs/HERO.md).
+- **Persen selisih** pada baris Untung, Modal, dan Hasil di "Dibanding bulan lalu", mis. "▲ naik Rp 300.000 (+100%)"; tanpa persen bila pembandingnya 0, dibatasi 999%.
+
+### Tidak dikerjakan
+- Tombol aksi cepat di Beranda: aksi Catat modal/hasil sudah ada di FAB (aturan v0.1.066), sedangkan Catat panen/jurnal memerlukan siklus terpilih; ditunda.
+- `js/beranda.js`, `sw.js`, `js/app.js`, `VERSION`, `README.md`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.153 — 2026-11-15
+Tombol Excel di Laporan menghasilkan berkas .xlsx asli.
+
+### Diperbaiki
+- **Laporan → Excel:** sebelumnya berkas `.xls` hanyalah tabel HTML dengan tipe `application/vnd.ms-excel`; Google Sheets/Drive di HP menolaknya ("Spreadsheet tampaknya rusak") dan Excel baru memberi peringatan format. Kini berkas `laporan-buku-kebun-<periode>-<dimensi>.xlsx` dibuat oleh `js/xlsx.js`: lembar Laporan dengan kolom Modal, Hasil, Untung, R/C, Margin (persen), Panen bersih, Satuan, HPP, Harga rata-rata, Harga min, BEP; angka bertipe angka, judul kolom dibekukan dan berfilter.
+- `Xlsx.simpan(lembar, nama)` baru (dipakai Laporan); gaya persen baru di `js/xlsx.js`.
+- `js/analisa.js`, `js/xlsx.js`, `sw.js`, `js/app.js`, `VERSION`, `README.md`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.152 — 2026-11-15
+Perbaikan ekspor CSV dan Excel.
+
+### Diperbaiki
+- **CSV transaksi:** kolom `siklus` kini berisi nama siklus, bukan ID internal. Baris dipisah CRLF, tipe berkas `text/csv;charset=utf-8`, alamat unduhan dilepas setelah dipakai. Bila belum ada transaksi, tidak ada berkas kosong dan pesannya jelas. Jumlah pada pesan dihitung dari baris yang diekspor.
+- **CSV jurnal:** jumlah catatan pada pesan kini benar walau isi catatan memuat baris baru (sebelumnya dihitung dari jumlah baris teks, sehingga berlebih). Pemisah baris CRLF, tipe `text/csv;charset=utf-8`.
+- **Excel:** angka tak hingga atau NaN (mis. aset berumur 0 bulan) tidak lagi tertulis sebagai teks "Infinity"/"NaN"; sel dikosongkan. Aset berumur 0 bulan tidak lagi membagi nol (penyusutan 0, nilai buku = harga beli). Nama lembar dijamin unik dan tanpa apostrof di tepi. Rumus tanpa hasil valid tidak membawa nilai tersimpan.
+- `js/xlsx.js`, `js/app.js`, `js/kejadian.js`, `sw.js`, `VERSION`, `README.md`, `index.html` dan `buku-kebun.html` (hasil build). Impor CSV tidak berubah (kolom `siklus` tetap diabaikan saat impor, jadi berkas lama dan baru sama-sama bisa diimpor).
+
+## v0.1.151 — 2026-11-15
+Ikon awan sinkron tidak lagi sendirian di halaman selain Beranda.
+
+### Diubah
+- **Header halaman selain Beranda (<1100 px):** di baris bawah judul, ikon awan kini diikuti label status ("Mode lokal", "Tersinkron", dst.) sebagai pengganti tagline yang disembunyikan sejak v0.1.149. Beranda dan desktop tidak berubah.
+- `index.dev.html` (span `#skTeks`), `js/sinkron.js`, `css/style.css`, `js/app.js`, `sw.js`, `VERSION`, `README.md`, `index.html` dan `buku-kebun.html` (hasil build).
+
+## v0.1.150 — 2026-11-15
+Visual Beranda mengikuti mockup hijau gelap berkaca (hanya gaya, tanpa fitur baru).
+
+### Diubah
+- **Header:** logo daun lebih besar dengan tagline "Manajemen pertanian" di bawah nama; avatar diberi panah dropdown.
+- **Sapaan dua baris:** "Selamat pagi," kecil, nama besar di bawahnya; baris tanggal memakai ikon kalender.
+- **Kartu hero:** sudut lebih bulat tanpa garis aksen kiri, label "Untung bulan ini" tebal dengan ikon grafik.
+- **Perlu perhatian (HP/tablet <1100 px):** banner satu baris (ikon !, butir pertama, lencana "N item"); ketuk untuk membuka daftar lengkap. Desktop tetap pita daftar.
+- **HP ≤720 px:** bilah bawah melayang berbentuk pil dengan garis penanda aktif; FAB bercahaya dan naik agar tidak menempel pada bilah.
+- `css/style.css`, `js/profil.js`, `js/beranda.js`, `js/app.js`, `js/*` versi, `sw.js`, `VERSION`, `index.html` dan `buku-kebun.html` (hasil build).
+
+### Catatan
+- Belum diterapkan dari mockup: baris 4 tombol cepat, pemilih periode "Bulan Ini", foto di kartu Siklus berjalan, dan latar foto daun asli. Diuji di Chromium 390 px (terang, dan gelap + kaca) dan 1440 px tanpa galat JS; belum di HP sungguhan.
+
+## v0.1.149 — 2026-11-15
+Header profil (logo, lonceng, avatar) di semua halaman; rincian di butir Diubah v0.1.148.
+
+## v0.1.148 — 2026-11-15
+Profil di header Beranda, mengikuti contoh tangkapan layar (sapaan, lonceng, avatar).
+
+### Ditambahkan
+- **Sapaan** di judul Beranda: "Selamat pagi/siang/sore/malam, <nama>" (tanpa nama bila belum diisi). Bilah ringkas HP tetap menulis "Buku Kebun" di Beranda.
+- **Lonceng** di header Beranda dengan lencana jumlah "Perlu perhatian" (merah bila ada yang lewat, amber bila hanya akan datang). Ketuk membuka dropdown berisi hingga 5 butir (ketuk butir menuju siklus/Rencana/panen terkait), tautan Lihat semua yang menggulir ke kartu Perlu perhatian, dan keadaan kosong.
+- **Avatar** (foto, atau huruf awal nama, atau ikon orang) yang membuka dropdown: kartu profil (nama dan status akun), Tema (Terang / Gelap / Otomatis), Sembunyikan angka (saklar), Setelan, Akun & sinkron (atau Masuk untuk sinkron), Panduan cepat.
+- **Ubah profil** (modal lewat Modal bersama): nama panggilan (maks. 30 huruf) dan foto yang diperkecil 160 px dan dipotong persegi. Tersimpan di Setelan perangkat ini; tidak ikut ekspor data dan tidak dikirim ke cloud.
+- Aksesibilitas: `aria-haspopup`/`aria-expanded`, panah atas/bawah/Home/End, Esc menutup dan mengembalikan fokus ke avatar, latar transparan menutup, pilihan tema `menuitemradio`.
+- `js/profil.js` (baru), `css/style.css`, `js/app.js`, `js/setelan.js` (kunci `nama`, `foto`), `js/sinkron.js` (`Sinkron.email()`), `js/ringkas.js`, `index.dev.html`, `docs/PROFIL.md`, `index.html` dan `buku-kebun.html` (hasil build).
+
+### Diubah
+- **Header seragam di semua halaman (v0.1.149):** baris atas HP/tablet (logo + Buku Kebun yang bisa diketuk ke Beranda, lonceng, avatar) kini tampil di setiap halaman; judul halaman dan tombol kembali tetap di baris kedua. Tombol tema dan Setelan lama disembunyikan di semua halaman karena sudah ada di dropdown avatar. Sapaan tetap khusus Beranda.
+- **Logo dan nama app** (daun + "Buku Kebun") kembali di baris atas header Beranda HP/tablet (<1100 px), tombol di kanan, sapaan di bawahnya; desktop tetap memakai logo di rail kiri.
+- Di Beranda, tombol tema dan Setelan lama di header disembunyikan karena kini ada di dropdown; di halaman lain tetap seperti semula. Pintasan `,` dan rail desktop tidak berubah.
+- Setelan → Kembali ke bawaan tidak lagi menghapus nama dan foto profil.
+
+### Catatan
+- Diuji di Chromium (390 px dan 1440 px): buka/tutup dropdown, ganti tema, saklar angka, simpan nama, sapaan, Esc dan fokus, pindah ke Setelan; tanpa galat JS. Belum diuji di HP sungguhan, dan unggah foto lewat pemilih berkas belum diuji otomatis.
+
+## v0.1.147 — 2026-11-15
+Perbaikan halaman cetak (Ctrl+P / Cetak dari browser) untuk halaman yang dicetak langsung.
+
+### Diperbaiki
+- **Halaman kosong di ujung cetakan:** `.wrap` membawa `padding-bottom` 96 px (150 px di lebar ≤ 720 px, termasuk lebar kertas A4) yang disiapkan untuk bilah bawah layar. Di cetak padding ini dihapus; Beranda turun dari 6 ke 5 halaman dan halaman terakhir tidak lagi kosong.
+- **Galat saat mencetak tab Jurnal tanpa siklus terpilih:** `Analisa.cetakPasang` memanggil `Linimasa.cetakDoc` dengan siklus `undefined` (TypeError `komoditasId`), sehingga dokumen cetak tidak terpasang. Kini tab Jurnal tanpa siklus mencetak halaman apa adanya tanpa galat.
+- **Latar layar tidak ikut tercetak:** `section` dan `.hero-card` memakai latar putih (tanpa krem, gradien, atau blur kaca) saat cetak.
+- **Elemen layar disembunyikan:** ikon status sinkron (`#skDot`), tombol Hapus pada banner Data contoh, kotak Cari setelan, dan isi terlipat Zona berbahaya.
+- **Ukuran tampilan** (zoom 90–120%) tidak lagi memperbesar atau memperkecil cetakan (`body{zoom:1}` saat cetak).
+- `css/style.css`, `js/analisa.js` (`cetakPasang`), `js/app.js` (versi), `sw.js`, `VERSION`, `README.md`, `index.html` dan `buku-kebun.html` (hasil build).
+
+### Catatan
+- Laporan, Perjalanan siklus, Linimasa, dan Umpan jurnal memakai dokumen cetak sendiri (`#cetak-lap`) dan tidak berubah.
+- Diuji lewat PDF A4 Chromium untuk sembilan halaman × (Hijau terang, Hijau gelap + kaca): tanpa galat JS. Halaman Setelan masih menyisakan satu halaman kosong di ujung karena isi bagian terlipat (Data, Cadangan, Akun, Tentang) tetap memakan ruang; Setelan memang bukan halaman yang lazim dicetak, belum ditangani. Belum diuji di printer atau HP sungguhan.
+
 ## v0.1.146 — 2026-11-15
 Warna titik badge Beranda di navbar (HP) tidak lagi hijau saja.
 

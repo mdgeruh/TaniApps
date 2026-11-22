@@ -1,6 +1,6 @@
 # Roadmap — Web App Keuangan Pertanian Rumahan
 
-> Status dokumen: draf v0.1 · Terakhir diperbarui: 5 November 2026 · Fase 5 selesai; Fase 6 berjalan: cadangan otomatis + dasar PWA; FAB kontekstual; chart di Beranda; data contoh otomatis; sinkron Supabase (v0.1.023); penyempurnaan UX (v0.1.024); kartu hero Beranda (v0.1.025); judul halaman (v0.1.026); foto nota lokal (v0.1.037); optimasi performa/aksesibilitas bagian 1 (v0.1.038); pembayaran utang/piutang tahap 1 (v0.1.048) dan tahap 2: tombol Bayar + cicilan (v0.1.049); Catat panen vs Catat hasil (v0.1.050); jadwal kegiatan per siklus (v0.1.051); katalog harga pasar (v0.1.052); kalkulator kelayakan usaha (v0.1.053); ekspor Excel (v0.1.054); isian Rencana keuangan lewat modal FAB (v0.1.055); ringkasan, sub-tab geser, ubah aset/utang (v0.1.056); daftar anggaran dengan detail (v0.1.057); daftar aset dan utang dengan detail (v0.1.058); grafik arus kas, saringan utang, simpan & tambah lagi, tren harga (v0.1.059); Jadwal dan Panen lewat modal detail (v0.1.060); modal bersama, tombol kembali, hapus seragam (v0.1.061); detail siklus dipadatkan (v0.1.066); duplikat FAB dibersihkan (v0.1.067); layout desktop dashboard tahap A–C (v0.1.081); Fase 6E Jurnal Siklus direncanakan, 8 tahap (v0.1.086); Tahap 0 selesai: docs/JURNAL.md dan wireframe, menunggu konfirmasi keputusan (v0.1.087); Fase 6E Tahap 4 foto jurnal (v0.1.092); Jurnal Tahap 7: Catat cepat (v0.1.100); keamanan data multi-tab (v0.1.101); performa 1.000+ entri dan aksesibilitas Jurnal diaudit (v0.1.105); cetak laporan diperbarui (v0.1.111); latar kaca dedaunan tropis (v0.1.123)
+> Status dokumen: draf v0.1 · Terakhir diperbarui: 17 November 2026 · Fase 5 selesai; Fase 6 berjalan: cadangan otomatis + dasar PWA; FAB kontekstual; chart di Beranda; data contoh otomatis; sinkron Supabase (v0.1.023); penyempurnaan UX (v0.1.024); kartu hero Beranda (v0.1.025); judul halaman (v0.1.026); foto nota lokal (v0.1.037); optimasi performa/aksesibilitas bagian 1 (v0.1.038); pembayaran utang/piutang tahap 1 (v0.1.048) dan tahap 2: tombol Bayar + cicilan (v0.1.049); Catat panen vs Catat hasil (v0.1.050); jadwal kegiatan per siklus (v0.1.051); katalog harga pasar (v0.1.052); kalkulator kelayakan usaha (v0.1.053); ekspor Excel (v0.1.054); isian Rencana keuangan lewat modal FAB (v0.1.055); ringkasan, sub-tab geser, ubah aset/utang (v0.1.056); daftar anggaran dengan detail (v0.1.057); daftar aset dan utang dengan detail (v0.1.058); grafik arus kas, saringan utang, simpan & tambah lagi, tren harga (v0.1.059); Jadwal dan Panen lewat modal detail (v0.1.060); modal bersama, tombol kembali, hapus seragam (v0.1.061); detail siklus dipadatkan (v0.1.066); duplikat FAB dibersihkan (v0.1.067); layout desktop dashboard tahap A–C (v0.1.081); Fase 6E Jurnal Siklus direncanakan, 8 tahap (v0.1.086); Tahap 0 selesai: docs/JURNAL.md dan wireframe, menunggu konfirmasi keputusan (v0.1.087); Fase 6E Tahap 4 foto jurnal (v0.1.092); Jurnal Tahap 7: Catat cepat (v0.1.100); keamanan data multi-tab (v0.1.101); performa 1.000+ entri dan aksesibilitas Jurnal diaudit (v0.1.105); cetak laporan diperbarui (v0.1.111); latar kaca dedaunan tropis (v0.1.123); halaman Profil (v0.1.162); usulan fitur tambahan A1–C3 dicatat di bagian 7 (v0.1.189); Upah harian A2 selesai (v0.1.190), Stok saprodi A1 selesai (v0.1.191), Prive A4 selesai (v0.1.192), Buku pembeli A3 selesai (v0.1.193), bilah bagian Rencana satu baris (v0.1.194)
 
 ## 1. Visi & Tujuan
 
@@ -94,7 +94,7 @@ Aplikasi web sederhana untuk mencatat dan menganalisa keuangan pertanian skala r
 
 ### Fase 6 — PWA & Sinkron Cloud (v0.6) (Minggu 14–16)
 - [x] PWA: bisa dipasang di HP dan jalan offline — manifest, service worker, ikon, tombol pasang (v0.1.019); **diuji di hosting HTTPS (Vercel) dan terpasang serta jalan di HP** (dikonfirmasi pengguna, v0.1.110)
-- [ ] Login & sinkron Supabase (opsional) — sebagian: login, gabung per entri, sinkron otomatis, timpa/ambil/hapus cloud sudah ada dan lolos uji server tiruan (v0.1.023, docs/SINKRON.md); layar Masuk/Daftar dan label status (v0.1.107, Fase 6F, docs/AKUN.md); centang setelah diuji di proyek Supabase sungguhan
+- [x] Login & sinkron Supabase (opsional) — **dikonfirmasi pengguna sudah jalan di proyek sungguhan lewat HTTPS (17/11/2026)**; uji rinci (kode OTP, batas kecepatan, sesi habis, dua perangkat) tetap di Fase 6F Tahap 5. Sebelumnya: login, gabung per entri, sinkron otomatis, timpa/ambil/hapus cloud sudah ada dan lolos uji server tiruan (v0.1.023, docs/SINKRON.md); layar Masuk/Daftar dan label status (v0.1.107, Fase 6F, docs/AKUN.md); centang setelah diuji di proyek Supabase sungguhan (kini jalan, lihat di atas)
 - [x] Cadangan otomatis & pemulihan data (docs/CADANGAN.md; salinan di browser, belum ke cloud)
 - [ ] Mode multi-pengguna sederhana (pemilik & pencatat)
 - **Hasil:** data aman dan bisa diakses dari beberapa perangkat
@@ -134,7 +134,7 @@ Aturan: hanya tata letak untuk layar ≥1100 px; token warna, font, dan gaya kar
 - [ ] **G. Pengujian lanjutan** — sebagian (v0.1.085): cetak dari kerangka baru diuji dan diperbaiki (4 tema × 6 halaman, PDF A4; Emas gelap tercetak tak terbaca, tepi hitam tema gelap), dan audit statis kompatibilitas selesai (docs/DESKTOP.md). Belum: Firefox dan Safari (tidak tersedia di lingkungan pengembangan), monitor dan skala Windows sungguhan, dialog cetak sungguhan. Sudah diuji di Chromium headless pada lebar 1100, 1280, 1360, 1920 (v0.1.080)
 
 **Tahap 1 — murah dan berdampingan dengan Tahap 0**
-- [ ] Wadah lebih lebar dengan grid dua kolom: Beranda selesai lewat Tahap 0 (v0.1.080, mulai 1100 px); Laporan (ringkasan | tren) dan layar 1024–1099 px belum
+- [x] Wadah lebih lebar dengan grid dua kolom: Beranda (v0.1.080), Laporan (v0.1.082), dan layar 1024–1099 px (v0.1.173: batas desktop diturunkan dari 1100 ke 1024 px; Transaksi memakai filter di atas tabel sampai 1179 px). Belum diuji di tablet sungguhan
 - [x] Navigasi desktop konsisten di semua halaman: rail kiri tetap (ikon dengan tooltip nama; label penuh menunggu Tahap 0-E), bilah bawah tetap untuk HP, tab atas dipertahankan di 721–1099 px (v0.1.080)
 - [x] *(v0.1.118; teks dibatasi ±1,25× lewat pengukuran saat tampil, bukan gambar ulang; tinggi dibatasi sejak Tahap 0-B)* Grafik: ukuran font tetap dan tinggi dibatasi; 12 bulan sebagai bawaan di desktop
 - [ ] Angka (sebagian: tabular-nums global sudah ada, v0.1.110; rata kanan di semua daftar dan tabel belum diperiksa): `font-variant-numeric: tabular-nums` dan rata kanan di semua daftar dan tabel jumlah
@@ -144,7 +144,7 @@ Aturan: hanya tata letak untuk layar ≥1100 px; token warna, font, dan gaya kar
 **Tahap 2 — lebih besar**
 - [x] *(v0.1.119)* Transaksi sebagai tabel di desktop (tanggal, kategori, siklus, catatan, jumlah): header lengket, bisa diurutkan, baris hover
 - [x] *(v0.1.121; khusus Transaksi, panel kanan)* Pola master–detail: daftar di kiri, detail/ubah di panel kanan (bukan pindah halaman penuh)
-- [ ] Modal menjadi dialog atau drawer selebar 480–560 px di desktop; formulir dua kolom untuk isian pendek; urutan Tab dan fokus otomatis
+- [x] Modal menjadi dialog selebar 520 px di desktop; formulir Rencana dua kolom untuk isian pendek; urutan Tab dan fokus otomatis sudah ada (v0.1.174, docs/MODAL.md). Modal Siklus, Bayar utang, dan Profil baru melebar, belum dua kolom
 - [~] *(v0.1.120: ikon hapus di baris, pilih banyak + hapus massal, hover/fokus di tabel; target klik lebih rapat belum)* Interaksi mouse: `@media (hover:hover) and (pointer:fine)` — efek hover, target klik lebih rapat, ikon hapus di baris (geser tidak berguna dengan mouse), pilih banyak dengan kotak centang untuk hapus massal
 - [ ] 3–4 kartu KPI dalam satu baris (lihat Tahap 0-C)
 
@@ -290,7 +290,7 @@ Prioritas dari tinggi ke rendah. Berkas terkait: `js/linimasa.js` (`cetakDoc`), 
 - [ ] **Tahap 2 — Masuk dengan kode 6 angka lewat email dan pemulihan kata sandi:** `signInWithOtp` lalu `verifyOtp` (tanpa tautan, cocok untuk PWA terpasang); lupa kata sandi; kirim ulang dengan hitung mundur. Butuh templat email Supabase yang memuat kode (`{{ .Token }}`).
 - [ ] **Tahap 3 — Pilihan gabung pada login pertama dan ajakan lembut:** bila perangkat dan cloud sama-sama berisi data, tampilkan jumlah masing-masing dan tiga pilihan (Gabungkan, Pakai data cloud, Pakai data perangkat ini); ajakan membuat akun sekali per 30 hari setelah ±30 transaksi, bisa ditutup.
 - [ ] **Tahap 4 — Ganti kata sandi, hapus akun dan data cloud:** konfirmasi dengan mengetik email; keluar dengan pilihan menyimpan atau menghapus data lokal.
-- [ ] **Tahap 5 — Uji pada proyek Supabase sungguhan:** konfirmasi email, kode OTP, batas kecepatan, sesi habis, dua perangkat, uji kamera/PWA terpasang.
+- [ ] **Tahap 5 — Uji pada proyek Supabase sungguhan** (sebagian: sinkron dasar dan HTTPS dikonfirmasi jalan, 17/11/2026; sisanya belum): konfirmasi email, kode OTP, batas kecepatan, sesi habis, dua perangkat, uji kamera/PWA terpasang.
 - [ ] **Tahap 6 — Multi-pengguna (pemilik dan pencatat):** tabel kebun, anggota, dan RLS berbasis peran; skema satu baris per pengguna (`tani_data`) perlu diganti. Dikerjakan setelah alur akun stabil.
 
 ### Fase 6G — Penyempurnaan Header (ringan) — Tahap 1–3 selesai (v0.1.134)
@@ -314,11 +314,44 @@ Prioritas dari tinggi ke rendah. Berkas terkait: `js/linimasa.js` (`cetakDoc`), 
 **Tahap 3 — Pelengkap (opsional, ukur manfaatnya dulu)**
 - [x] **Penanda "perlu perhatian"** (titik kecil; selesai v0.1.132: titik merah/emas di bilah bawah HP, lencana angka tetap di rail desktop) pada ikon Beranda di bilah bawah dan rail bila ada jatuh tempo lewat atau anggaran ≥90%, memakai daftar yang sama dengan kartu "Perlu perhatian".
 - [x] **Pencarian cepat** (selesai v0.1.133, docs/CARI.md): ikon kaca pembesar di header dan bilah ringkas membuka dialog yang mencari transaksi, siklus, dan jurnal; pintasan `/` di desktop; kata kunci terakhir; *Lihat semua* ke saringan Transaksi/Jurnal. Sejak v0.1.134 juga mencakup panen, utang/piutang, aset, dan harga pasar.
-- *Sengaja tidak dimasukkan:* salam atau avatar besar (tidak relevan untuk mode lokal), notifikasi push, dan spanduk pasang aplikasi (sudah ada di Setelan).
+- *Sengaja tidak dimasukkan:* salam atau avatar besar (tidak relevan untuk mode lokal), notifikasi push, dan spanduk pasang aplikasi (sudah ada di Setelan). *(Diperbarui: salam dan avatar akhirnya ditambahkan di v0.1.148, docs/PROFIL.md; halaman profil penuh diusulkan di Fase 6H.)*
 
 **Risiko dan mitigasi.** Bilah lengket bisa menutupi judul bagian saat tautan atau fokus melompat → `scroll-padding-top`; bilah lengket di atas efek kaca bisa mahal di HP lama → latar solid; header berubah tinggi bisa membuat konten melompat → ruang disediakan tetap (CLS 0).
 **Ukuran keberhasilan.** Tinggi header HP ≤105 px (Tahap 1: 107 px; sisanya dicapai bilah ringkas Tahap 2), tanpa regresi tata letak desktop (uji 1100, 1280, 1440 px) dan tanpa galat JavaScript.
 **Keputusan untuk Anda.** (1) Diputuskan: bilah muncul saat gulir ke atas (hemat ruang); bila ingin selalu tampil setelah melewati header, ubah `geser()` di `js/ringkas.js`. (2) Tanggal di Beranda sudah memakai bentuk ringkas "Jumat, 13/11"; ubah ke "Jumat, 13 Nov" bila lebih disukai.
+
+### Fase 6H — Halaman Profil (selesai di v0.1.162)
+**Latar.** Sejak v0.1.148 "profil" hanya berupa nama dan foto (modal *Ubah profil*) dengan menu dari avatar (docs/PROFIL.md); belum ada halaman. Informasi tentang usaha tersebar di Setelan, Akun dan sinkron, dan Panduan. (Catatan: butir "salam atau avatar besar tidak relevan" di Fase 6G sudah digantikan oleh v0.1.148.)
+**Prinsip.** (1) **Pusat ringkasan, bukan Setelan kedua:** pengaturan tetap di Setelan; halaman profil hanya menampilkan dan menautkan. (2) **Lokal dulu:** data profil tersimpan di perangkat. (3) **Tanpa palet, huruf, atau gaya kartu baru** (aturan docs/STYLE.md); tampil di HP dan desktop. (4) **Ringkasan dihitung dari data yang sudah ada**, tanpa input baru. (5) **Satu pengguna per perangkat;** multi-pengguna (Fase 6F Tahap 6) tidak disentuh.
+
+**Tahapan**
+- [x] **Tahap 1 — Halaman dan kepala:** rute `profil` (docs/RUTE.md) dibuka dari item "Profil" di menu avatar; modal *Ubah profil* tetap dipakai untuk menyunting. Kepala: foto, nama, **nama usaha atau kebun**, **lokasi** (desa atau kabupaten; opsional). Setelan baru `usaha` dan `lokasi` (batas panjang; bertahan saat Atur ulang). *(selesai v0.1.162: rute `#profil`, kepala dengan nama usaha dan lokasi)*
+- [x] **Tahap 2 — Ringkasan usaha** (dihitung, tanpa input baru): mulai mencatat sejak (tanggal transaksi pertama), siklus berjalan dan selesai, jumlah unit, komoditas, total transaksi. Satu kartu; keadaan kosong yang ramah, termasuk saat masih data contoh. *(selesai v0.1.162)*
+- [x] **Tahap 3 — Akun dan cadangan:** status sinkron dan waktu sinkron terakhir (label yang sama dengan header), tombol Masuk atau Keluar (membuka Layar Akun yang ada), tombol Cadangkan (ekspor yang ada), dan waktu cadangan terakhir (penanda lokal baru). *(selesai v0.1.162; penanda `cadTerakhir` hanya untuk cadangan manual. **Sejak v0.1.165** tombol Cadangkan dan waktu cadangan pindah ke Setelan → Data karena duplikat; di Profil tinggal Akun dan sinkron)*
+- [x] **Tahap 4 — Preferensi cepat dan Tentang:** tema (3 pilihan) dan sembunyikan angka dengan kontrol yang sama seperti di menu avatar; versi aplikasi, panduan cepat, tautan ke Setelan. *(selesai v0.1.162; **dicabut di v0.1.165**: tema, sembunyikan angka, versi, dan panduan hanya di Setelan; Profil tinggal tombol Buka Setelan, menu avatar tetap punya pintasan tema dan angka)*
+- [x] **Tahap 5 — Pemakaian nama usaha:** kop Laporan cetak dan lembar Ringkasan Excel (baris "Usaha"), supaya data profil berguna di keluaran, bukan sekadar hiasan. *(selesai v0.1.162: kop cetak dan baris Usaha di ujung lembar Ringkasan Excel)*
+- [x] **Tahap 6 — Uji dan dokumen:** docs/PROFIL.md diperbarui; uji peramban (HP 360/390 px, desktop 1100/1440 px, tema terang/gelap, skema Emas, mode Tersembunyi); tanpa galat JavaScript; tes bawaan lulus. *(selesai v0.1.162: `tools/uji-profil.py`; belum diuji di HP sungguhan)*
+- *Sengaja tidak dimasukkan (usulan):* multi-pengguna dan peran, lencana pencapaian atau avatar bergaya media sosial, dan data identitas sensitif (NIK, rekening, nomor telepon).
+
+**Risiko dan mitigasi.** Tumpang tindih dengan Setelan → profil hanya menampilkan dan menautkan. Nama usaha panjang merusak kop cetak → batas 40 huruf dan elipsis. Data profil hilang saat ganti perangkat → tulis jelas di halaman bahwa data ini lokal, atau putuskan ikut cadangan (lihat Keputusan).
+**Ukuran keberhasilan.** Halaman terbuka dalam satu ketukan dari avatar di semua halaman; tanpa regresi tata letak Beranda dan header; nama usaha tampil di kop cetak dan Excel.
+**Keputusan (diambil di v0.1.162, dapat diubah).** (1) Cakupan: semua tahap dikerjakan sekaligus. (2) Nama usaha dan lokasi awalnya lokal seperti nama dan foto; sejak v0.1.164 keempat data profil (nama, foto, usaha, lokasi) ikut cadangan, ekspor, dan sinkron lewat `data.profil`.
+
+### Fase 6I — Laporan lebih informatif dan biaya gaji pemilik (v0.1.175–184)
+
+- [x] Kategori Modal bawaan **Gaji Pemilik** (biaya tetap); penerima (saya atau istri) cukup ditulis di Catatan. Isian Penerima khusus sempat ada di v0.1.175–176 lalu dihapus di v0.1.177 (docs/TRANSAKSI.md)
+- [x] Laporan: **periode bebas** (Bulan lalu, Pilih tanggal Dari–Sampai) (v0.1.178, docs/LAPORAN.md)
+- [x] Laporan: **biaya tetap vs variabel** di layar, cetak, dan Excel (v0.1.178)
+- [x] Laporan: **untung sebelum dan sesudah gaji pemilik** di Ringkasan, Rincian, cetak, dan Excel (v0.1.178)
+- [x] Laporan: **Sorotan periode**: tiga pengeluaran dan pemasukan terbesar, kategori tersering, hari tersibuk, rata-rata per transaksi (v0.1.179)
+- [x] Laporan: **banding dengan periode sebelumnya** yang sama panjang (modal, hasil, untung, selisih persen) untuk Bulan ini, Bulan lalu, Tahun ini, dan Pilih tanggal (v0.1.181)
+- [x] Laporan: **bulan terbaik dan terburuk** (menurut untung) dalam periode terpilih, di Sorotan (v0.1.181)
+- [x] Laporan: **rata-rata pengeluaran per hari** pada periode terpilih, di Sorotan (v0.1.181)
+- [x] HPP dan BEP dengan pilihan **mengecualikan Gaji Pemilik**: pilihan di filter Laporan (muncul bila periode punya gaji), bawaan tetap dengan gaji (v0.1.182)
+- [x] Laporan: **penyusutan aset** dan **untung dengan alat disusutkan** (layar, cetak, Excel) (v0.1.184)
+- [x] Laporan: **efisiensi** — untung per hari (per siklus) dan untung/hasil per satuan luas unit (v0.1.184)
+- [ ] Usulan berikutnya: kas vs untung (piutang belum cair); susut panen dan harga jual vs harga pasar; banding antarmusim per komoditas; biaya per kg per kategori
+- [x] Perbaikan Laporan: pembanding periode berjalan memakai jumlah hari yang sama, kartu R/C cetak tidak terpotong, Excel Tren mengikuti 6/12 bulan (v0.1.182)
 
 ### Fase 7 — Rilis v1.0 (Minggu 17–18)
 - [ ] Pengujian dengan data nyata (minimal 1–2 siklus)
@@ -363,7 +396,6 @@ Prioritas dari tinggi ke rendah. Berkas terkait: `js/linimasa.js` (`cetakDoc`), 
   - [x] 5. Grafik aman hitam-putih: batang Hasil (solid) dan Modal (arsir) dengan angka di atas batang; komposisi modal memakai batang berbingkai yang dicetak walau latar tidak dicetak.
   - [x] 6. `@page` A4 dengan margin, font cetak, nomor halaman "Halaman x dari y" di kaki (margin box CSS; butuh Chrome/Edge modern, Firefox dan Safari mungkin tanpa nomor halaman).
   - [x] 7. Mode Tersembunyi: tombol Cetak minta ketukan kedua ("Angka akan tercetak lengkap") karena kertas selalu memuat angka lengkap.
-  - [ ] 8. Opsional: blok "Dibuat oleh / Mengetahui" untuk laporan ke pengurus atau kelompok tani (belum dikerjakan; perlu keputusan apakah bawaan atau pilihan di Setelan).
   - [x] 9. Satu dokumen untuk ketiga tab (Ringkasan, Grafik, Rincian) sekaligus, satu kop, Rincian di halaman lanskap baru (selesai di v0.1.075; diuji lewat PDF Chromium: 3 halaman pada data contoh).
 - Isian Rencana keuangan lewat modal FAB, bukan isian di halaman (**selesai di v0.1.055**, docs/FAB.md dan docs/RENCANA.md; belum diuji di HP sungguhan; Kelayakan tetap kalkulator di halaman karena hasilnya tampil langsung saat mengetik):
   - Tombol + di Rencana membuka modal: Anggaran → Atur anggaran (pilih siklus), Arus kas → pilihan Catat modal / Catat hasil / Atur saldo awal kas, Aset → Tambah aset, Utang/piutang → Catat utang atau piutang, Harga pasar → Catat harga pasar (pilih komoditas).
@@ -401,6 +433,36 @@ Prioritas dari tinggi ke rendah. Berkas terkait: `js/linimasa.js` (`cetakDoc`), 
 - [x] *(selesai v0.1.142)* **Cache agregat bulanan:** `Analisa.agg()` satu lintasan, dipakai bersama `Analisa.bulanN`, `Beranda.per`, dan hero; memo dibatalkan saat `App._ak` direset. Render Beranda pada 100.000 transaksi 155 → 72 ms (`tools/uji-agregat.py`). Sedang.
 - [x] **Penjelasan R/C untuk pemula** (v0.1.110): ketuk "R/C ratio" membuka penjelasan satu kalimat dan status (mis. ≥ 1,3 sehat). Kecil.
 - [x] **Uji tangkapan layar otomatis** (v0.1.110, `tools/uji-hero.py`): kartu hero di 320/360/390/1440 px agar regresi terlihat sebelum rilis. Kecil.
+
+### Tinjauan usulan fitur setelah Supabase dan HTTPS jalan (17 November 2026)
+Urutan usulan, dari yang paling mendesak:
+1. **Mantapkan akun dan sinkron** (Fase 6F Tahap 2–5): masuk kode 6 angka dan lupa kata sandi (penting untuk PWA di HP), pilihan gabung pada login pertama, ganti kata sandi dan hapus akun, lalu uji dua perangkat dan sesi habis. Dasar bagi semua fitur cloud lain.
+2. **Pengaman produksi:** `vercel.json` untuk header keamanan (CSP, X-Content-Type-Options, Referrer-Policy) dan `sw.js` tanpa cache agar pembaruan cepat sampai; audit RLS di proyek sungguhan (tiap pengguna hanya melihat barisnya); cadangan berkala proyek Supabase; kebijakan privasi singkat.
+3. **Foto dan nota ke cloud** (Supabase Storage, opsional, dengan batas kuota): sekarang foto hanya di perangkat sehingga HP hilang berarti foto hilang.
+4. **Multi-pengguna pemilik dan pencatat** (Tahap 6): tabel kebun, anggota, dan RLS berbasis peran; mengganti skema satu baris per pengguna.
+5. **Laporan lanjutan:** kas vs untung (piutang belum cair), susut panen, harga jual vs harga pasar, banding antarmusim, biaya per kg per kategori (lihat Fase 6I).
+6. **Berbagi laporan:** tautan baca-saja atau PDF siap kirim ke pengurus, koperasi, atau bank (laba-rugi, arus kas, aset).
+7. **Pengingat sungguhan:** Web Push atau email terjadwal (Supabase Edge Function) untuk jadwal pupuk, panen, dan utang jatuh tempo; hanya untuk yang masuk akun.
+8. **Kualitas:** uji perangkat nyata (kamera, printer, Safari iOS), Firefox dan WebKit, konsolidasi CSS.
+
+### Usulan fitur tambahan (17 November 2026, belum dikerjakan)
+Belum ada di daftar prioritas di atas; dicek terhadap kode v0.1.188 (tidak ada stok, upah harian, buku pembeli, atau penanda uang pribadi). Urutan di dalam kelompok dari yang paling bermanfaat. Semua opsional dan tanpa ketergantungan cloud kecuali disebut. Tiga yang disarankan lebih dulu: A2, A1, A4.
+
+**A. Pencatatan harian usaha tani**
+- [x] **A1. Stok saprodi** — *selesai v0.1.191 (docs/STOK.md; diuji di Chromium headless, belum di HP sungguhan).* Sisa pupuk, benih, pestisida; beli berharga otomatis menjadi modal (dan utang bila belum dibayar), pakai mengurangi stok, koreksi sisa, peringatan menipis di Perlu perhatian Beranda. Belum: satuan ganda, nilai stok, ubah catatan, data contoh.
+- [x] **A2. Upah harian (HOK)** — *selesai v0.1.190 (docs/UPAH.md; diuji di Chromium headless, belum di HP sungguhan).* Daftar pekerja, hari kerja, dan tarif harian; upah tercatat sebagai transaksi Tenaga Kerja sehingga otomatis masuk biaya siklus, HPP, dan laporan; rekap per pekerja dan periode; upah belum dibayar lewat mesin Utang. Belum: absensi harian, lembur, bon/potongan, data contoh.
+- [x] **A3. Buku pembeli** — *selesai v0.1.193 (docs/PEMBELI.md; diuji di Chromium headless, belum di HP sungguhan).* Daftar pembeli dihitung dari nama pembeli di panen dan piutang (tanpa koleksi baru): total penjualan per periode, rata-rata harga per komoditas, piutang, riwayat jual, ganti nama dan gabung ejaan berbeda, saran nama di form panen. Belum: kontak dan catatan per pembeli (butuh koleksi), data contoh.
+- [x] **A4. Pemisah uang usaha dan rumah tangga (Prive)** — *selesai v0.1.192 (docs/PRIVE.md; diuji di Chromium headless, belum di HP sungguhan).* Kategori Prive mengurangi kas tetapi tidak dihitung sebagai modal, HPP, atau pengurang untung; baris Prive di Laporan. Belum: kategori setoran/tambah modal pemilik.
+
+**B. Analisa dan perencanaan**
+- [ ] **B1. Target musim tanam.** Isi target panen dan harga sebelum tanam, bandingkan dengan realisasi (melengkapi anggaran dan jadwal yang sudah ada).
+- [ ] **B2. Kalender musim.** Rata-rata untung per komoditas per bulan dari data sendiri, untuk melihat bulan tanam yang paling menguntungkan.
+- [ ] **B3. Ringkasan pengajuan KUR atau dana desa.** Satu paket PDF: profil usaha, laba-rugi, arus kas, aset, utang. Berbeda dari "Berbagi laporan" (prioritas 6) karena formatnya khusus untuk bank atau koperasi; menjawab pertanyaan terbuka no. 5.
+
+**C. Kemudahan pakai**
+- [ ] **C1. Catat lewat suara.** Mis. "beli pupuk NPK 200 ribu" diubah menjadi draf transaksi yang dikonfirmasi pengguna.
+- [ ] **C2. Transaksi berulang otomatis.** Biaya tetap (listrik, air) muncul sebagai draf tiap bulan, tinggal dikonfirmasi.
+- [ ] **C3. Kalkulator dosis dan campuran.** Takaran pupuk atau pestisida per luas atau per tangki, terhubung ke Jadwal.
 
 ## 8. Metrik Keberhasilan
 
@@ -580,3 +642,29 @@ Prioritas dari tinggi ke rendah. Berkas terkait: `js/linimasa.js` (`cetakDoc`), 
 | 0.1.140 | 2026-11-15 | Perbaikan sparkline hero: tanpa kotak fokus saat ditap, titik tepat di garis pada Ukuran tampilan selain 100% (docs/HERO.md) |
 | 0.1.141 | 2026-11-15 | Angka utama hero mengikuti bulan yang disentuh di sparkline, tanpa petunjuk melayang (docs/HERO.md) |
 | 0.1.142 | 2026-11-15 | Cache agregat bulanan bersama untuk hero, Beranda, dan Laporan; `tools/uji-agregat.py` (docs/HERO.md) |
+| 0.1.161 | 2026-11-15 | Roadmap: Fase 6H Halaman Profil (usulan, belum dikerjakan) |
+| 0.1.162 | 2026-11-16 | Fase 6H: halaman Profil (`#profil`), nama usaha dan lokasi, ringkasan usaha, akun dan cadangan, nama usaha di kop cetak dan Excel |
+| 0.1.163 | 2026-11-16 | Akun dan sinkron dipindah dari Setelan ke halaman Profil |
+| 0.1.164 | 2026-11-16 | Nama, foto, nama usaha, dan lokasi ikut cadangan, ekspor, impor, dan sinkron |
+| 0.1.165 | 2026-11-16 | Hapus duplikat Profil dan Setelan (Setelan dipertahankan); waktu cadangan manual pindah ke Setelan → Data |
+| 0.1.166 | 2026-11-16 | Hanya dokumen: roadmap Fase 6H disinkronkan dengan v0.1.165 |
+| 0.1.175 | 2026-11-16 | Kategori Gaji Pemilik dengan isian Penerima (Saya/Istri) |
+| 0.1.176 | 2026-11-16 | Dropdown Penerima memakai gaya dropdown kustom |
+| 0.1.177 | 2026-11-16 | Isian Penerima dihapus; penerima ditulis di Catatan, kategori Gaji Pemilik tetap |
+| 0.1.178 | 2026-11-16 | Laporan: periode bebas, biaya tetap vs variabel, untung sebelum dan sesudah gaji pemilik (docs/LAPORAN.md) |
+| 0.1.179 | 2026-11-16 | Laporan: Sorotan periode (transaksi terbesar, kategori tersering, hari tersibuk, rata-rata) |
+| 0.1.180 | 2026-11-16 | Hanya dokumen: roadmap Fase 6I |
+| 0.1.181 | 2026-11-16 | Laporan: banding dengan periode sebelumnya, bulan terbaik dan terburuk, rata-rata modal per hari |
+| 0.1.182 | 2026-11-16 | Laporan: pembanding periode berjalan yang adil, HPP/BEP tanpa gaji pemilik (opsional), perbaikan cetak dan Excel |
+| 0.1.183 | 2026-11-16 | Hanya dokumen: butir opsional blok "Dibuat oleh / Mengetahui" dihapus dari roadmap |
+| 0.1.184 | 2026-11-16 | Laporan: penyusutan aset, untung dengan alat disusutkan, efisiensi (untung per hari dan per luas) |
+| 0.1.185 | 2026-11-16 | Cetak laporan: angka dan tanggal rata kanan, kolom tabel Sorotan lurus |
+| 0.1.186 | 2026-11-16 | Cetak Jurnal Siklus dan Perjalanan Siklus: kolom Hari dan Ukuran rata kanan |
+| 0.1.187 | 2026-11-16 | Cetak Perjalanan Siklus dirapikan: kartu ringkasan, kolom tetap, margin tabel lurus |
+| 0.1.188 | 2026-11-17 | Hanya dokumen: Supabase dan HTTPS dikonfirmasi jalan; tinjauan usulan fitur |
+| 0.1.189 | 2026-11-17 | Hanya dokumen: usulan fitur tambahan (stok saprodi, upah harian, buku pembeli, prive, target musim, dan lainnya) masuk backlog |
+| 0.1.190 | 2026-11-17 | Upah harian / HOK: sub-tab Upah di Rencana, pekerja, catat upah (tunai/belum dibayar), lembar Excel Upah (docs/UPAH.md) |
+| 0.1.191 | 2026-11-17 | Stok saprodi: sub-tab Stok di Rencana, beli/pakai/koreksi, peringatan menipis di Beranda, lembar Excel Stok dan Mutasi stok (docs/STOK.md) |
+| 0.1.192 | 2026-11-17 | Prive: kategori yang mengurangi kas tapi bukan biaya usaha, baris Prive di Laporan; perbaikan panel Catat transaksi desktop (docs/PRIVE.md) |
+| 0.1.193 | 2026-11-18 | Buku pembeli: sub-tab Pembeli di Rencana, penjualan, rata-rata harga, piutang, ganti nama dan gabung, saran nama di form panen, lembar Excel Pembeli (docs/PEMBELI.md) |
+| 0.1.194 | 2026-11-18 | Perbaikan halaman Rencana keuangan: bilah bagian satu baris yang bisa digeser (sebelumnya pecah 3 baris di HP), penanda geser, aria-pressed (docs/RENCANA.md) |
